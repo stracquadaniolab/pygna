@@ -1,0 +1,12 @@
+name: pygna
+channels:
+  - defaults
+  - bioconda
+  - conda-forge
+dependencies:
+  - python=3.7.2
+  - pandas
+  - bumpversion
+  - snakemake
+  - sphinx
+  - sphinx_rtd_theme
