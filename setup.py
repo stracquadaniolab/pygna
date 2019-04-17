@@ -12,7 +12,7 @@ setup(
     name = 'pygna',
     packages = find_packages(),
     version = '0.1.0',
-    description = 'Geneset Network Analylysis',
+    description = 'Geneset Network Analysis',
     long_description = readme,
     license = 'MIT',
     url='git@github.com:stracquadaniolab/pygna.git',
