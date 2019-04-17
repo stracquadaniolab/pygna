@@ -5,7 +5,7 @@ Introduction
 ------------
 Geneset Network Analysis
 
-Current version: 0.0.1
+Current version: 0.1.0
 
 Authors
 -------
