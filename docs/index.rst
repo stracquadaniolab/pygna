@@ -1,23 +1,28 @@
-.. pygna documentation master file, created by Viola Fanfani & Giovanni Stracquadanio
-   sphinx-quickstart
+.. PyGNA Documentation documentation master file, created by
+   sphinx-quickstart on Wed Dec 12 15:31:26 2018.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Documentation: pygna
-============================================
-This is the index page for the project "pygna"
-by Viola Fanfani & Giovanni Stracquadanio (v.fanfani@sms.ed.ac.uk).
+Welcome to PyGNA Documentation!
+===============================
 
-Description
------------
-Geneset Network Analylysis
+PyGNA is a Geneset Network Analysis python package: it performs various analyses
+on biological networks and genesets.
+
+File parsing
+------------
+
+Before the real analysis the user needs to create an input dataset suitable for the analysis tools.
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
 
-   changelog.rst
+    parsing
+    subnetwork
+    simulations
+    logging
+
 
 Indices and tables
 ==================

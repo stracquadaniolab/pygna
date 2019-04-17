@@ -12,21 +12,21 @@
 # add these directories to sys.path here. If the directory is relative to the
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
-# import os
-# import sys
-# sys.path.insert(0, os.path.abspath('.'))
+import os
+import sys
+sys.path.insert(0, os.path.abspath("/home/Documents/Projects/geneset_network_analysis_tool/"))
 
 
 # -- Project information -----------------------------------------------------
 
-project = 'pygna'
+project = 'geneset_network_analysis_tool'
 copyright = 'Viola Fanfani & Giovanni Stracquadanio'
 author = 'Viola Fanfani & Giovanni Stracquadanio'
 
 # The short X.Y version
-version = '0.0.1'
+version = '0.1.0'
 # The full version, including alpha/beta/rc tags
-release = '0.0.1'
+release = '0.1.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -43,6 +43,11 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.ifconfig',
     'sphinx.ext.viewcode',
+    'sphinx.ext.todo',
+    'sphinx.ext.viewcode',
+    'sphinx.ext.githubpages',
+    'sphinx.ext.autodoc',
+    'sphinx.ext.napoleon'
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -78,7 +83,7 @@ pygments_style = None
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = 'alabaster'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -98,14 +103,19 @@ html_theme = 'sphinx_rtd_theme'
 # defined by theme itself.  Builtin themes are using these templates by
 # default: ``['localtoc.html', 'relations.html', 'sourcelink.html',
 # 'searchbox.html']``.
-#
-# html_sidebars = {}
-
+# This is required for the alabaster theme
+# refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
+html_sidebars = {
+    '**': [
+        'relations.html',  # needs 'show_related': True theme option to display
+        'searchbox.html',
+    ]
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'pygna'
+htmlhelp_basename = 'geneset_network_analysis_tool'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -132,7 +142,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'pygna.tex', 'Documentation: pygna',
+    (master_doc, 'geneset_network_analysis_tool.tex', 'Documentation: geneset_network_analysis_tool',
      'Viola Fanfani & Giovanni Stracquadanio', 'manual'),
 ]
 
@@ -142,7 +152,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'pygna', 'pygna Documentation',
+    (master_doc, 'geneset_network_analysis_tool', 'geneset_network_analysis_tool Documentation',
      [author], 1)
 ]
 
@@ -153,8 +163,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'pygna', 'pygna Documentation',
-     author, 'testproject', 'Geneset Network Analylysis.',
+    (master_doc, 'geneset_network_analysis_tool', 'geneset_network_analysis_tool Documentation',
+     author, 'testproject', 'Python tool for the anetwrok analysis of genesets.',
      'Miscellaneous'),
 ]
 
