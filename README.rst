@@ -3,7 +3,7 @@ pygna : README
 
 Introduction
 ------------
-Geneset Network Analylysis
+Geneset Network Analysis
 
 Current version: 0.0.1
 
