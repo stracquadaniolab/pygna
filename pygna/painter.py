@@ -6,8 +6,8 @@ import scipy
 import pandas as pd
 import sys
 import matplotlib.pyplot as plt
-import geneset_network_analysis_tool.diagnostic as diag
-import geneset_network_analysis_tool.output as out
+import pygna.diagnostic as diag
+import pygna.output as out
 import multiprocessing
 import time
 import seaborn as sns

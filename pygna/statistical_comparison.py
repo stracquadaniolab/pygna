@@ -5,10 +5,10 @@ import numpy as np
 import scipy
 import sys
 import matplotlib.pyplot as plt
-import geneset_network_analysis_tool.diagnostic as diag
+import pygna.diagnostic as diag
 import multiprocessing
 import time
-import geneset_network_analysis_tool.statistical_test as st
+import pygna.statistical_test as st
 
 class StatisticalComparison:
 

@@ -5,8 +5,8 @@ import numpy as np
 import logging
 import pandas as pd
 import seaborn as sns
-from geneset_network_analysis_tool import output
-from geneset_network_analysis_tool.utils import YamlConfig
+from pygna import output
+from pygna.utils import YamlConfig
 
 class BlockModel(object):
 

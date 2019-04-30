@@ -14,7 +14,7 @@
 #
 import os
 import sys
-sys.path.insert(0, os.path.abspath("/home/Documents/Projects/geneset_network_analysis_tool/"))
+sys.path.insert(0, os.path.abspath("../../pygna/"))
 
 
 # -- Project information -----------------------------------------------------
@@ -115,7 +115,7 @@ html_sidebars = {
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'geneset_network_analysis_tool'
+htmlhelp_basename = 'pygna'
 
 
 # -- Options for LaTeX output ------------------------------------------------

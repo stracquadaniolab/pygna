@@ -5,10 +5,10 @@ import logging
 import pickle
 import numpy as np
 import networkx as nx
-import geneset_network_analysis_tool.statistical_test as st
-import geneset_network_analysis_tool.statistical_comparison as sc
-import geneset_network_analysis_tool.diagnostic as diagnostic
-import geneset_network_analysis_tool.painter as paint
+import pygna.statistical_test as st
+import pygna.statistical_comparison as sc
+import pygna.diagnostic as diagnostic
+import pygna.painter as paint
 import pandas as pd
 import scipy
 import time
@@ -22,8 +22,8 @@ from matplotlib import pyplot as plt
 
 import yaml
 import pandas as pd
-import geneset_network_analysis_tool.parser as parser
-import geneset_network_analysis_tool.output as output
+import pygna.parser as parser
+import pygna.output as output
 import logging
 
 class YamlConfig:
@@ -157,3 +157,52 @@ def new_network(filename:"barabasi network file to be converted",
         if int_type in types:
             with open(output_file,"a") as f:
                 f.write(fields[0]+"\t"+fields[1]+"\t"+int_type+"\n")
+
+
+
+def csv2gmt(input_file:'input csv file',
+                setname:'name of the set',
+                output_file: 'output gmt file',
+                name_column: 'column with the names'='Unnamed: 0',
+                filter_column: 'column with the values to be filtered'= 'padj',
+                alternative:'alternative to use for the filter, with less the filter is applied <threshold, otherwise >= threshold' ='less',
+                threshold: 'threshold for the filter'=0.01,
+                descriptor:'descriptor for the gmt file'=None):
+
+    """
+    This function converts a csv file to a gmt allowing to filter the elements 
+    using the values of one of the columns. The user can specify the column used to 
+    retrieve the name of the objects and the filter condition. 
+    """
+
+    if input_file.endswith('.csv'):
+        with open(input_file,'r') as f:
+            table=pd.read_csv(f)
+    else:
+        logging.error('only csv files supported')
+    
+    if descriptor==None:
+        descriptor=input_file.split('/')[-1]
+    
+    threshold=float(threshold)
+
+    gmt_dict={}
+    gmt_dict[setname]={}
+    gmt_dict[setname]['descriptor']=descriptor
+    gmt_dict[setname]['genes']=[]
+
+    try:
+        if alternative=='less':
+            geneset=table[table[filter_column]<threshold].loc[:,name_column].values.tolist()
+        else:
+            geneset=table[table[filter_column]>=threshold].loc[:,name_column].values.tolist()
+    except:
+        logging.error('error in filtering')
+
+    logging.info('geneset='+str(geneset))
+    gmt_dict[setname]['genes']=geneset
+
+    if output_file.endswith('.gmt'):
+        output.print_GMT(gmt_dict, output_file)
+    else:
+        logging.error('specify gmt output')

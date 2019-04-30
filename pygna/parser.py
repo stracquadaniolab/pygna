@@ -2,6 +2,7 @@ import logging
 import pickle
 import networkx as nx
 import tables
+import pandas as pd
 
 class Parser:
 
@@ -96,3 +97,4 @@ class Hdf5MatrixParser(Parser):
             hdf5_data=hdf5_file.root.matrix[:]
 
         return (hdf5_nodes, hdf5_data)
+

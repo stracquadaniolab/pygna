@@ -10,3 +10,11 @@ dependencies:
   - snakemake
   - sphinx
   - sphinx_rtd_theme
+  - networkx>=2.2
+  - numpy
+  - scipy
+  - matplotlib
+  - argh
+  - pytables>=3.4.4
+  - seaborn>=0.9
+  - palettable
