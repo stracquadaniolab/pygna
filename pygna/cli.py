@@ -22,30 +22,33 @@ def main():
     """
     argh dispatch
     """
-    argh.dispatch_commands([
-                            dm.generate_vip_network,
-                            bm.generate_simulated_network,
-                            cmd.test_degree_distribution,
-                            cmd.hierarchical_clustering_SP,
-                            cmd.hierarchical_clustering_RW,
-                            utils.new_network,
+    argh.dispatch_commands([# network summary
                             cmd.network_summary,
-                            utils.convert_gmt,
-                            paint.paint_final_table,
-                            paint.paint_datasets_stats,
-                            paint.paint_comparison_stats,
-                            paint.paint_comparison_RW,
+                            # single set analyses
                             cmd.analyse_total_degree,
                             cmd.analyse_internal_degree,
                             cmd.analyse_module,
                             cmd.analyse_location,
-			                cmd.analyse_location_median,
                             cmd.analyse_RW,
+                            cmd.test_degree_distribution,
+                            # comparison analysis
                             cmd.comparison_shortest_path,
                             cmd.comparison_random_walk,
+                            # building functions
                             cmd.build_distance_matrix,
                             cmd.build_RWR_diffusion,
-                            cmd.build_graph])
+                            cmd.build_graph,
+                            # paint
+                            paint.paint_final_table,
+                            paint.paint_datasets_stats,
+                            paint.paint_comparison_stats,
+                            paint.paint_comparison_RW,
+                            # utils
+                            utils.convert_gmt,
+                            utils.csv2gmt,
+                             #simulations
+                            dm.generate_vip_network,
+                            bm.generate_simulated_network,])
 
 if __name__ == "__main__":
     """
