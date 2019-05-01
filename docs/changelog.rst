@@ -1,6 +1,11 @@
 Changelog
 =========
 
+v0.3.0
+------
+Diffusion weights test
+deseq support
+
 v0.2.1
 ------
 Temporary or redundant functions removed

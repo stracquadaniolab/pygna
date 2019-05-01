@@ -31,6 +31,7 @@ def main():
                             cmd.analyse_location,
                             cmd.analyse_RW,
                             cmd.test_degree_distribution,
+                            cmd.test_diffusion_weights,
                             # comparison analysis
                             cmd.comparison_shortest_path,
                             cmd.comparison_random_walk,
@@ -45,7 +46,8 @@ def main():
                             paint.paint_comparison_RW,
                             # utils
                             utils.convert_gmt,
-                            utils.csv2gmt,
+                            utils.geneset_from_table,
+                            utils.convert_csv_names,
                              #simulations
                             dm.generate_vip_network,
                             bm.generate_simulated_network,])
