@@ -211,8 +211,6 @@ def filter_table(table:'input csv file',
     """
     This function filters a table according to a filter rule.
     """
-
-
     
     threshold=float(threshold)
 

@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v0.3.1
+------
+Changes to network summary function, writes text rst formatted
+
 v0.3.0
 ------
 Diffusion weights test

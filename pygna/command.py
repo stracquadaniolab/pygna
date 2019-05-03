@@ -58,21 +58,14 @@ def __load_geneset(filename, setname=None):
 
     return geneset
 
-
-# def __convert_entrez2symbol(entrez_data):
-#    with open("/primary_data/Homo_sapiens.gene_info","r") as f:
-#        table_id=pd.read_table(f, usecols=["GeneID", "Symbol"])
-#    table_id=table_id.set_index("GeneID")
-#    symbol_data=entrez_data.map(table_id.Symbol)
-#    return symbol_data
-
 def __read_RW_matrix(RW_matrix_filename):
     """ Reads matrix from hdf5 file
     """
 
     if RW_matrix_filename.endswith('hdf5'):
-        # hdf5_file="/home/viola/Documents/UniEssex/repos/geneset-network-analysis/processed_data/barabasi_distance_matrix.hdf5"
         hdf5_nodes, hdf5_data = ps.Hdf5MatrixParser().read(RW_matrix_filename)
+        if type(hdf5_nodes[0]) == bytes:
+            hdf5_nodes = [i.decode() for i in hdf5_nodes]
     else:
         logging.error("invalid input format for matrix")
 
@@ -116,93 +109,41 @@ def __read_distance_matrix(distance_matrix_filename):
     elif distance_matrix_filename.endswith('hdf5'):
         # hdf5_file="/home/viola/Documents/UniEssex/repos/geneset-network-analysis/processed_data/barabasi_distance_matrix.hdf5"
         hdf5_nodes, hdf5_data = ps.Hdf5MatrixParser().read(distance_matrix_filename)
+        if type(hdf5_nodes[0]) == bytes:
+            hdf5_nodes = [i.decode() for i in hdf5_nodes]
     else:
         logging.error("invalid input format for matrix")
 
     return hdf5_nodes, hdf5_data
 
+################################################################################
+######### SUMMARY ##############################################################
+################################################################################
 
 def network_summary(network_file, output_folder, output_name, geneset_file=None, setname=None):
     """
     This function saves the principal info on a graph:
     - network properties
     - degree distribution
+
+    If a geneset/setname is passed to the function, the properties of 
+    the subgraph are evaluated.
     """
 
     network = __load_network(network_file)
-    D=dict(nx.degree(network))
 
-    # TODO: organise code better
     if geneset_file:
         geneset=__load_geneset(geneset_file,setname)
         for setname, item in geneset.items():
-
-
             graph = nx.subgraph(network, item)
-
-            degree = np.array(list(dict(nx.degree(graph)).values()))
-
-            n_nodes = nx.number_of_nodes(graph)
-            n_edges = nx.number_of_edges(graph)
-
-            if n_nodes > 1:
-
-                density = (2 * n_edges) / ((n_nodes) * (n_nodes - 1))
-
-            else: density=0
-
-            degrees={k: v for k, v in D.items() if k in item}
-            degrees = sorted(degrees.items(), key=lambda kv: kv[1])
-
-
-
-
-            with open(output_folder +output_name + setname + "graph_summary.txt", "w") as file1:
-                file1.write("Info: " + nx.info(graph))
-                file1.write("\nDensity: " + str(density))
-                file1.write("\nTop degrees: " + str(degrees[-10:]))
-                file1.write("\nmin degree = " + str(np.min(degree)))
-                file1.write("\nmax degree = " + str(np.max(degree)))
-                file1.write("\nmedian degree = " + str(np.median(degree)))
-                file1.write("\ndegree mode = " + str(scipy.stats.mode(degree)))
-                file1.write("\ndisconnected nodes = " + str(np.sum(degree == 0)))
-                file1.write("\nClustering: \naverage clsutering" +
-                            str(nx.average_clustering(graph)))
+            out.write_graph_summary(graph, output_folder, output_name)
 
     else:
 
-        graph = network
-
-        degree = np.array(list(dict(nx.degree(graph)).values()))
-
-        n_nodes = nx.number_of_nodes(graph)
-        n_edges = nx.number_of_edges(graph)
-
-        degrees={k: v for k, v in D.items()}
-        degrees = sorted(degrees.items(), key=lambda kv: kv[1])
-
-        density = (2 * n_edges) / ((n_nodes) * (n_nodes - 1))
-
-        with open(output_folder +output_name + "_graph_summary.txt", "w") as file1:
-            file1.write("Info: " + nx.info(graph))
-            file1.write("\nDensity: " + str(density))
-
-            file1.write("\nmin degree = " + str(np.min(degree)))
-            file1.write("\nmax degree = " + str(np.max(degree)))
-            file1.write("\nmedian degree = " + str(np.median(degree)))
-            file1.write("\ndegree mode = " + str(scipy.stats.mode(degree)))
-            file1.write("\ndisconnected nodes = " + str(np.sum(degree == 0)))
-            file1.write("\nClustering: \naverage clsutering" +
-                            str(nx.average_clustering(graph)))
-
-        f, axis = plt.subplots(1)
-        sns.distplot(degree, ax=axis)
-        f.savefig(output_folder + output_name
-         + "_degree_distribution.pdf", format='pdf')
+        out.write_graph_summary(network, output_folder, output_name)
 
 
-def summary_composition():
-    pass
+
 
 ################################################################################
 ######### SINGLE SET ANALYSES ##################################################
@@ -593,7 +534,7 @@ def test_diffusion_weights(network_file: "network file, use a network with weigh
                weight_column: "Column to use as weight (default is deseq)" = 'stat',
                filter_column: 'Column used to define the significant genes' = 'padj',
                filter_condition: 'Condition for significance' = 'less',
-               
+
                filter_threshold: 'threshold for significance' = 0.01,
                weight: "RW" = "RW",
                number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,

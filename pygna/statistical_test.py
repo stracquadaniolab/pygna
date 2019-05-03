@@ -87,7 +87,7 @@ class StatisticalTest:
 def geneset_localisation_statistic_median(network, geneset, diz={},  observed_flag=False):
     """ median shortest path for each node """
     cum_sum = 0.0
-    geneset_index=[diz["nodes"].index(i.encode('utf-8')) for i in geneset]
+    geneset_index=[diz["nodes"].index(i) for i in geneset]
 
     for u in geneset_index:
         d_uv = []
@@ -104,7 +104,7 @@ def geneset_localisation_statistic_median(network, geneset, diz={},  observed_fl
 def geneset_localisation_statistic(network, geneset, diz={},  observed_flag=False):
     # minumum shortest path
     cum_sum = 0.0
-    geneset_index=[diz["nodes"].index(i.encode('utf-8')) for i in geneset]
+    geneset_index=[diz["nodes"].index(i) for i in geneset]
 
     for u in geneset_index:
         min_du = float('inf')
@@ -173,12 +173,10 @@ def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
     try:
         diz["matrix"]
     except KeyError:
-        print("The dictionary doesnt have a RW key, create the diz with a create_RW function")
+        print("The dictionary doesnt have a matrix key")
         raise
 
-    #print(geneset)
-    #print(diz["nodes"])
-    geneset_index=[diz["nodes"].index(i.encode('utf-8')) for i in geneset]
+    geneset_index=[diz["nodes"].index(i) for i in geneset]
     prob=[diz["matrix"][i,j] for i in geneset_index for j in geneset_index if i!=j]
     prob=np.sum(prob)#/len(prob)
     return prob

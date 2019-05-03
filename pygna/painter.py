@@ -38,7 +38,7 @@ class Painter_RW(Painter):
         Painter.__init__(self, network, output_folder, name, diz={})
         self.RW_nodes = list(RW_dict["nodes"])
         self.geneset = list(geneset)
-        self.geneset_index=[list(RW_dict["nodes"]).index(i.encode('utf-8')) for i in geneset]
+        self.geneset_index=[list(RW_dict["nodes"]).index(i) for i in geneset]
         self.RW_matrix = RW_dict["matrix"][self.geneset_index,:][:,self.geneset_index]
 
     def plot_matrix (self, show_labels=False):

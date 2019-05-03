@@ -102,8 +102,8 @@ def comparison_shortest_path(network, genesetA, genesetB, diz={}):
 
     cum_sum = 0.0
 
-    genesetA_index=[diz["nodes"].index(i.encode('utf-8')) for i in genesetA]
-    genesetB_index=[diz["nodes"].index(i.encode('utf-8')) for i in genesetB]
+    genesetA_index=[diz["nodes"].index(i) for i in genesetA]
+    genesetB_index=[diz["nodes"].index(i) for i in genesetB]
 
     if (len(genesetA_index)==0 or len(genesetB_index)==0):
         sys.exit()
@@ -151,7 +151,7 @@ def comparison_random_walk(network, genesetA, genesetB, diz={}):
     try:
         diz["matrix"]
     except KeyError:
-        print("The dictionary doesnt have a RW key, create the diz with a create_RW function")
+        print("The dictionary doesnt have a matrix key")
         raise
 
     genesetA_index=[diz["nodes"].index(i) for i in genesetA]

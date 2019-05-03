@@ -55,9 +55,6 @@ def plot_diffusion_matrix(nodes, matrix, filename, show_labels=False):
 def plot_null_distribution(null_distribution, observed, output_folder, setname=None):
 
     fig,axes=plt.subplots(1, figsize=(10,10))
-    print(type(null_distribution))
-    print(len(null_distribution))
-    print(null_distribution.shape)
     g1= sns.distplot(null_distribution, hist=True, kde=True, rug=False, ax=axes)
     #g2= sns.distplot(null_distribution, kde=False, rug=False, color= "r", ax=axes)
     if len(null_distribution[null_distribution > observed]):

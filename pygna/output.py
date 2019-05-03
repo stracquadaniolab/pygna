@@ -8,6 +8,9 @@ import glob
 import numpy as np
 import statsmodels.stats.multitest as multi
 import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+import scipy
 
 
 class Output:
@@ -144,3 +147,77 @@ def apply_multiple_testing_correction(table_file, pval_col='empirical_pvalue', m
     table=table.sort_values(by='bh_pvalue')
 
     table.to_csv(table_file, index=False)
+
+
+def write_graph_summary(graph, output_folder, prefix ):
+
+    '''
+    This function takes a graph as input and writes the network properties in a file
+    '''
+
+    D=dict(nx.degree(graph))
+    degree = np.array(list(dict(nx.degree(graph)).values()))
+
+
+    n_nodes = nx.number_of_nodes(graph)
+    n_edges = nx.number_of_edges(graph)
+
+    degrees={k: v for k, v in D.items()}
+    degrees = sorted(degrees.items(), key=lambda kv: kv[1])
+
+    density = (2 * n_edges) / ((n_nodes) * (n_nodes - 1))
+
+    with open(output_folder + prefix + "_graph_summary.txt", "w") as file1:
+        file1.write('Network Summary for %s ' %str(prefix))
+        file1.write('\n---------------------------------------------------\n')
+        file1.write("\nInfo: " + nx.info(graph))
+        file1.write("\nOther Properties::\n ")
+        file1.write("\n\t- Density: " + str(density))
+        file1.write("\n\t- min degree = " + str(np.min(degree)))
+        file1.write("\n\t- max degree = " + str(np.max(degree)))
+        file1.write("\n\t- median degree = " + str(np.median(degree)))
+        file1.write("\n\t- degree mode = " + str(scipy.stats.mode(degree)))
+        file1.write("\n\t- disconnected nodes = " + str(np.sum(degree == 0)))
+        file1.write("\n\t- average clustering" +
+                            str(nx.average_clustering(graph)))
+
+
+    fig,axes=plt.subplots(1, figsize=(10,10))
+    g1= sns.distplot(degree, hist=True, kde=True, rug=False, ax=axes)
+    sns.despine(ax=axes,top=True, bottom=False, right=True, left=True)
+    g1.set_ylabel('Density')
+    g1.set_xlabel('Network Degree')
+    fig.savefig(output_folder+prefix+"_degree.pdf", format= "pdf")
+    fig.savefig(output_folder+prefix+"_degree.png", format= "png")
+
+    largest_cc = nx.Graph(graph.subgraph(
+        max(nx.connected_components(graph), key=len)))
+
+
+    D=dict(nx.degree(largest_cc))
+    degree = np.array(list(dict(nx.degree(largest_cc)).values()))
+
+
+    n_nodes = nx.number_of_nodes(largest_cc)
+    n_edges = nx.number_of_edges(largest_cc)
+
+    degrees={k: v for k, v in D.items()}
+    degrees = sorted(degrees.items(), key=lambda kv: kv[1])
+
+    density = (2 * n_edges) / ((n_nodes) * (n_nodes - 1))
+
+    with open(output_folder + prefix + "_graph_summary.txt", "a") as file1:
+        file1.write('\n\nLargest Connected Component Summary for %s \n ' %str(prefix))
+        file1.write('-----------------------------------------------------------------\n')
+        file1.write("\nInfo: " + nx.info(largest_cc))
+        file1.write("\nLargest Connected Component::\n")
+
+        file1.write("\n\t- Density: " + str(density))
+        file1.write("\n\t- min degree = " + str(np.min(degree)))
+        file1.write("\n\t- max degree = " + str(np.max(degree)))
+        file1.write("\n\t- median degree = " + str(np.median(degree)))
+        file1.write("\n\t- degree mode = " + str(scipy.stats.mode(degree)))
+        file1.write("\n\t- disconnected nodes = " + str(np.sum(degree == 0)))
+        file1.write("\n\t- average clustering" +
+                            str(nx.average_clustering(largest_cc)))
+
