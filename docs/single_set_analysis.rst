@@ -21,7 +21,6 @@ Localisation Analysis
 ---------------------
 
 .. autofunction:: pygna.command.analyse_location
-.. autofunction:: pygna.command.analyse_location_median
 
 Interactions probabilistic Analysis
 -----------------------------------

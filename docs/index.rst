@@ -18,8 +18,12 @@ Before the real analysis the user needs to create an input dataset suitable for 
 .. toctree::
     :maxdepth: 2
 
+    changelog
     parsing
-    subnetwork
+    single_set_analysis
+    comparison
+    utilities
+    pipelines
     simulations
     logging
 

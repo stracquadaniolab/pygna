@@ -3,12 +3,13 @@ Simulated Networks
 
 We have created a framework for testing the performance of Geneset Network analysis: it allows
 the experimenter to create simulated networks specifying many parameters.
-The model we use is the Stochastic Block Model that provides a way to create the network
+The model we use is the Stochastic Block Model and Degree Model that provides a way to create the network
 and identify clusters into it.
 
 The function to generate a simulated dataset is:
 
-.. autofunction:: pygna.simulations.generate_simulated_network
+.. autofunction:: pygna.degree_model.generate_vip_network
+.. autofunction:: pygna.block_model.generate_simulated_network
 
 
 All the parameters can be specified in a yaml file that is passed as input. As output,
