@@ -57,8 +57,8 @@ class BlockModel(object):
 
         self.graph=graph
         
-    def plot_graph(self):
-        pass
+    def plot_graph(self, output_folder):
+        plot_bm_graph(self.graph, self.bm, output_folder=output_folder)
 
     def write_network(self, output_file):
 
@@ -129,7 +129,7 @@ def generate_graph_from_sm(n_nodes, block_model, nodes_in_block=False, node_name
     G.add_edges_from(edges)
     return G
 
-def plot_graph(graph, block_model, output_folder=None):
+def plot_bm_graph(graph, block_model, output_folder=None):
 
     nodes = graph.nodes()
     colors = ['#b15928','#1f78b4','#6a3d9a','#33a02c','#ff7f00']
@@ -178,3 +178,4 @@ def generate_simulated_network(input_file: "yaml configuration file"):
         bm.create_graph()
         bm.write_network(outpath+suffix+"_s_"+str(i)+"_network.tsv")
         bm.write_cluster_genelist(outpath+suffix+"_s_"+str(i)+"_genes.gmt")
+        #bm.plot_graph(outpath+suffix+"_s_"+str(i))

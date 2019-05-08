@@ -8,6 +8,7 @@ import sys
 import matplotlib.pyplot as plt
 import pygna.diagnostic as diag
 import pygna.output as out
+import pygna.command as cmd
 import multiprocessing
 import time
 import seaborn as sns
@@ -342,3 +343,30 @@ def paint_final_table (final_table, output_file):
     ax[1].set_xticklabels(analysis, rotation=90)
     ax[1].set_title('pvalue')
     plt.savefig(output_file+'_corr.pdf', f="pdf")
+
+def plot_adjacency(network: 'network_filename',
+                    output_folder: 'output_folder',
+                    prefix: 'prefix for the file',
+                    clusters_file: 'file of clusters to order the nodes'= None):
+
+    graph=cmd.__load_network(network)
+    nodelist=None
+    if clusters_file:
+        geneset=cmd.__load_geneset(clusters_file)
+        nodelist=[k for i,v in geneset.items() for k in v]
+        print(nodelist)
+
+
+    plt.imshow(nx.adjacency_matrix(graph, nodelist=nodelist).toarray(), cmap='OrRd')
+    plt.title("Adjacency Matrix")
+
+    plt.savefig(output_folder+prefix+'_adjacency_matrix.png')
+
+    plt.figure(figsize=(13.5,5))
+    fig,axes=plt.subplots(1,len(geneset.keys()),figsize=(13.5,5))
+
+    count=0
+    for i,v in geneset.items():
+        axes[count].imshow(nx.adjacency_matrix(graph, nodelist=v).toarray(), cmap='OrRd')
+        count+=1
+    plt.savefig(output_folder+prefix+'_cluster_matrices.png')

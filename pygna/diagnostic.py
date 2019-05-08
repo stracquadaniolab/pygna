@@ -4,6 +4,8 @@ import logging
 import numpy as np
 import networkx as nx
 
+
+
 def connected_components_diagnostic(c_components):
     """
     Diagnosis tool for the connected components object.
@@ -37,10 +39,6 @@ def plot_diffusion_matrix(nodes, matrix, filename, show_labels=False):
     """
 
     logging.info("Plotting figure as "+ str(filename))
-
-    
-
-
     fig,axes=plt.subplots(1)
     axes.imshow(matrix,cmap="PuBu")
     if show_labels==True:

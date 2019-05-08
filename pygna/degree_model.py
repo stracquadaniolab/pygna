@@ -144,9 +144,6 @@ def plot_adjacency(graph, output_folder, prefix):
 
     plt.savefig(output_folder+prefix+'VIP.png')
 
-
-
-
 def generate_vip_network(output_folder,
                         prefix,
                         n_nodes: 'number of nodes in the network'=1000,

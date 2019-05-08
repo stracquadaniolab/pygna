@@ -44,6 +44,7 @@ def main():
                             paint.paint_datasets_stats,
                             paint.paint_comparison_stats,
                             paint.paint_comparison_RW,
+                            paint.plot_adjacency,
                             # utils
                             utils.convert_gmt,
                             utils.geneset_from_table,
