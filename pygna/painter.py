@@ -347,26 +347,80 @@ def paint_final_table (final_table, output_file):
 def plot_adjacency(network: 'network_filename',
                     output_folder: 'output_folder',
                     prefix: 'prefix for the file',
-                    clusters_file: 'file of clusters to order the nodes'= None):
+                    clusters_file: 'file of clusters to order the nodes'= None,
+                    size:'number of genes to plot, allows to cut the adjacency matrix' = None):
+
+    """
+    This function plots the adjacency matrix of a network. If a geneset file is passed, 
+    the matrix is organised by the different sets in the geneset.
+    For the moment the genelist needs to be complete and non overlapping.
+    """
 
     graph=cmd.__load_network(network)
+    if len(graph.nodes)>1000:
+        logging.warning('Graph is larger than 1k nodes, plotting might take too long')
+
     nodelist=None
+    s=0
+    nodelabels=[]
     if clusters_file:
         geneset=cmd.__load_geneset(clusters_file)
         nodelist=[k for i,v in geneset.items() for k in v]
-        print(nodelist)
+        for i,v in geneset.items():
+            s+=1
+            nodelabels.append([s]*len(v))
+    nodelabels=[i for j in nodelabels for i in j]
+    nodelabels=np.asarray(nodelabels)[np.newaxis,:]
+    
+
+    matrix = nx.adjacency_matrix(graph, nodelist=nodelist).toarray()
+
+    if size:
+        matrix = matrix [0:int(size),0:int(size)]
+        nodelabels = nodelabels [:,0:int(size)]
+
+    print(nodelabels.shape)
+
+    if clusters_file:
+        f,axes= plt.subplots(2,2, figsize=(10,10),gridspec_kw={'width_ratios': [1,100],'height_ratios': [1,100],
+                                                    "wspace":0.005,"hspace":0.005})
+        sns.heatmap([[0,0],[0,0]], cmap='Greys',
+                vmin=0, vmax=1,square=True, ax=axes[0,0],
+                cbar=False, xticklabels=False, yticklabels=False)
+        sns.heatmap(matrix, cmap='Greys',
+                vmin=0, vmax=1,square=True, ax=axes[1,1],
+                cbar=False, xticklabels=False, yticklabels=False)
+        
+        count=0
+        for i,v in geneset.items():
+            if (size and count<int(size)): 
+                axes[0,1].annotate(i, xy=(count, 0),xytext=(count, 0))
+            elif (size and count>=int(size)):
+                pass
+            else:
+                axes[0,1].annotate(i, xy=(count, 0),xytext=(count, 0))
+            count=count+len(v)
+
+        g=sns.heatmap(nodelabels,xticklabels=False,yticklabels=False,
+                        vmin=1, vmax=len(geneset.keys()), 
+                    square=False,cbar=False,linewidths=0,
+                    cmap='Set3',ax=axes[0,1])
+        g=sns.heatmap(nodelabels.T,xticklabels=False,yticklabels=False,
+                        vmin=1, vmax=len(geneset.keys()),
+                    square=False,cbar=False,linewidths=0,
+                    cmap='Set3',ax=axes[1,0])
+        #plt.imshow(nx.adjacency_matrix(graph, nodelist=nodelist).toarray(), cmap='Greys')
+        #plt.title("Adjacency Matrix")
+    else:
+        f,axes= plt.subplots(1,1, figsize=(10,10))
+        sns.heatmap(matrix, cmap='Greys',
+                vmin=0, vmax=1,square=True, ax=axes[1,1],
+                cbar=False, xticklabels=False, yticklabels=False)
+
+    plt.savefig(output_folder+prefix+'_adjacency_matrix.png', f= 'png')
+    plt.savefig(output_folder+prefix+'_adjacency_matrix.pdf', f= 'pdf')
 
 
-    plt.imshow(nx.adjacency_matrix(graph, nodelist=nodelist).toarray(), cmap='OrRd')
-    plt.title("Adjacency Matrix")
-
-    plt.savefig(output_folder+prefix+'_adjacency_matrix.png')
-
-    plt.figure(figsize=(13.5,5))
-    fig,axes=plt.subplots(1,len(geneset.keys()),figsize=(13.5,5))
-
-    count=0
-    for i,v in geneset.items():
-        axes[count].imshow(nx.adjacency_matrix(graph, nodelist=v).toarray(), cmap='OrRd')
-        count+=1
-    plt.savefig(output_folder+prefix+'_cluster_matrices.png')
+    #fig,axes=plt.subplots(1, 3, figsize=(8,10),gridspec_kw={'width_ratios': [1,3,4],"wspace":0.025})
+    #fig.subplots_adjust(left=0.2,right=0.80) 
+    
