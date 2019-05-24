@@ -129,7 +129,7 @@ def generate_graph_from_sm(n_nodes, block_model, nodes_in_block=False, node_name
     G.add_edges_from(edges)
     return G
 
-def plot_bm_graph(graph, block_model, output_folder=None):
+def plot_bm_graph(graph, block_model, output_folder = None):
 
     nodes = graph.nodes()
     colors = ['#b15928','#1f78b4','#6a3d9a','#33a02c','#ff7f00']
