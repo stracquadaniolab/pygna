@@ -4,10 +4,9 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - python=3.7.2
+  - python>=3.7
   - pandas
   - bumpversion
-  - snakemake
   - sphinx
   - sphinx_rtd_theme
   - networkx>=2.2
