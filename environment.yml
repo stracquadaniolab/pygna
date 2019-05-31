@@ -4,16 +4,17 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - python>=3.7
+  - python>=3.5
+  - snakemake
   - pandas
   - bumpversion
   - sphinx
-  - sphinx_rtd_theme
   - networkx>=2.2
   - numpy
   - scipy
   - matplotlib
   - argh
+  - pyyaml
   - pytables>=3.4.4
   - seaborn>=0.9
   - palettable
