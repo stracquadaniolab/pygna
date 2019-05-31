@@ -8,7 +8,7 @@ import sys
 import matplotlib.pyplot as plt
 import pygna.diagnostic as diag
 import pygna.output as out
-import pygna.command as cmd
+import pygna.parser as ps
 import multiprocessing
 import time
 import seaborn as sns
@@ -356,7 +356,7 @@ def plot_adjacency(network: 'network_filename',
     For the moment the genelist needs to be complete and non overlapping.
     """
 
-    graph=cmd.__load_network(network)
+    graph=ps.__load_network(network)
     if len(graph.nodes)>1000:
         logging.warning('Graph is larger than 1k nodes, plotting might take too long')
 
@@ -364,7 +364,7 @@ def plot_adjacency(network: 'network_filename',
     s=0
     nodelabels=[]
     if clusters_file:
-        geneset=cmd.__load_geneset(clusters_file)
+        geneset=ps.__load_geneset(clusters_file)
         nodelist=[k for i,v in geneset.items() for k in v]
         for i,v in geneset.items():
             s+=1

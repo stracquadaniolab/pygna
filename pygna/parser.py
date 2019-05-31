@@ -3,6 +3,49 @@ import pickle
 import networkx as nx
 import tables
 import pandas as pd
+import sys
+
+def __load_network(filename):
+    """ Loads network from file
+    """
+    if filename.endswith('tsv'):
+        network = ps.TSVParser().read(filename)
+    elif filename.endswith('gpickle'):
+        network = nx.read_gpickle(filename)
+    else:
+        network = ps.Tab2Parser().read(filename)
+
+    return network
+
+
+def __load_geneset(filename, setname=None):
+    """Loads a geneset from file
+    """
+
+    geneset = GMTParser().read(filename)
+    if setname:
+        if setname in geneset:
+            temp = geneset[setname]
+            geneset.clear()
+            geneset[setname] = temp
+        else:
+            logging.error("Cannot find geneset: %s" % setname)
+            sys.exit(-1)
+
+    return geneset
+
+def __read_RW_matrix(RW_matrix_filename):
+    """ Reads matrix from hdf5 file
+    """
+
+    if RW_matrix_filename.endswith('hdf5'):
+        hdf5_nodes, hdf5_data = Hdf5MatrixParser().read(RW_matrix_filename)
+        if type(hdf5_nodes[0]) == bytes:
+            hdf5_nodes = [i.decode() for i in hdf5_nodes]
+    else:
+        logging.error("invalid input format for matrix")
+
+    return hdf5_nodes, hdf5_data
 
 class Parser:
 

@@ -5,6 +5,7 @@ import logging
 import pickle
 import numpy as np
 import networkx as nx
+
 import pygna.statistical_test as st
 import pygna.statistical_comparison as sc
 import pygna.diagnostic as diagnostic

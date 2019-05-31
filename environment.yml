@@ -1,12 +1,13 @@
-name: pygna
+name: pygnas
 channels:
   - defaults
   - bioconda
   - conda-forge
 dependencies:
-  - python=3.7
+  - python=3.6
   - pandas
-  - bumpversiononda 
+  - snakemake
+  - bumpversion 
   - sphinx
   - numpy
   - scipy
