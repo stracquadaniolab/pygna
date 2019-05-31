@@ -1,4 +1,4 @@
-name: pygnas
+name: pygna
 channels:
   - defaults
   - bioconda
