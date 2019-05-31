@@ -1,10 +1,11 @@
-name: pygna
+name: pygna2
 channels:
   - defaults
   - bioconda
   - conda-forge
 dependencies:
-  - python>=3.5
+  - python=3.5
+  - argh
   - snakemake
   - pandas
   - bumpversion
@@ -13,7 +14,6 @@ dependencies:
   - numpy
   - scipy
   - matplotlib
-  - argh
   - pyyaml
   - pytables>=3.4.4
   - seaborn>=0.9
