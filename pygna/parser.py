@@ -9,11 +9,11 @@ def __load_network(filename):
     """ Loads network from file
     """
     if filename.endswith('tsv'):
-        network = ps.TSVParser().read(filename)
+        network = TSVParser().read(filename)
     elif filename.endswith('gpickle'):
         network = nx.read_gpickle(filename)
     else:
-        network = ps.Tab2Parser().read(filename)
+        network = Tab2Parser().read(filename)
 
     return network
 
