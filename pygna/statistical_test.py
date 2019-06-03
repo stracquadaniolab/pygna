@@ -35,6 +35,9 @@ class StatisticalTest:
         else:
             logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
             observed = self.__test_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
+            # TODO: remove begin
+            verbose_localisation_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
+            # TODO: remove end
             logging.info("Observed %f." % observed)
             # iterations
             null_distribution=StatisticalTest.get_null_distribution_mp(self,mapped_geneset,max_iter, n_proc=cores)
@@ -211,3 +214,35 @@ def geneset_neighbor_statistic(network, geneset, diz={},observed_flag=False):
     for g in geneset:
         num_edges += len(set(network.neighbors(g)))#len(set(network.neighbors(g)) & sg)
     return num_edges
+
+def verbose_localisation_statistic(network, geneset, diz={},  observed_flag=False):
+    # minumum shortest path
+    cum_sum = 0.0
+    geneset_index=[diz["nodes"].index(i) for i in geneset]
+    print(geneset_index)
+
+    gu=-1
+    for u in geneset_index:
+        gu=gu+1
+        min_du = float('inf')
+        closest=""
+        gv=-1
+        for v in geneset_index:
+            gv=gv+1
+
+            kkk=nx.shortest_path_length(network, source=geneset[gu], target=geneset[gv])
+            d_uv = diz["matrix"][v][u]+diz["matrix"][u][v]
+            if kkk!=d_uv:
+                print('WARNING %d not equal %d' %(kkk,d_uv))
+            
+            if u != v and d_uv < min_du:
+                min_du = d_uv
+                closest=v
+            
+        print('For gene %s min_du is: %d , gene %s' %(str(u), min_du, str(closest)))
+        cum_sum += min_du
+
+        
+
+    #logging.info("localisation statistic= %f", (cum_sum/float(len(geneset))))
+    return cum_sum/float(len(geneset))
