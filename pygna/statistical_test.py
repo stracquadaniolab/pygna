@@ -36,7 +36,7 @@ class StatisticalTest:
             logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
             observed = self.__test_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
             # TODO: remove begin
-            verbose_localisation_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
+            #verbose_localisation_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
             # TODO: remove end
             logging.info("Observed %f." % observed)
             # iterations

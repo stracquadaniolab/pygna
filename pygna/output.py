@@ -136,7 +136,6 @@ def apply_multiple_testing_correction(table_file, pval_col='empirical_pvalue', m
 
     with open(table_file, 'r+') as f:
         table=pd.read_csv(f)
-    
 
     rejects,pval,k,bonf=multi.multipletests(table[pval_col].values, alpha=float(threshold), method=method)
     table["rejects"]=rejects
