@@ -1,6 +1,10 @@
 Changelog
 =========
 
+07/06/2019
+----------
+Single geneset analysis, added dataset dimension filter.
+
 v0.3.1
 ------
 Changes to network summary function, writes text rst formatted

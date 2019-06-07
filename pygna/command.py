@@ -114,6 +114,7 @@ def analyse_total_degree( network_file: "network file",
                             outpath: "output folder where to place all generated files",
                             prefix: "prefix to add to all generated files",
                             setname: "Geneset to analyse" = None,
+                            size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                             number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                             cores: "Number of cores for the multiprocessing" = 1,
                             show_results: "barplot of results" = False,
@@ -141,27 +142,31 @@ def analyse_total_degree( network_file: "network file",
 
     st_test = st.StatisticalTest(st.geneset_total_degree_statistic, network)
 
+
     for setname, item in geneset.items():
 
-        start = time.time()
-        item = set(item)
+        if len(item)>size_cut:
 
-        observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-            item, max_iter=number_of_permutations, alternative='greater', cores= cores)
-        # observed_z=(observed-np.mean(null_d))/np.std(null_d)
-        end = time.time()
+            item = set(item)
 
-        logging.info("Setname:" + setname)
-        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-        logging.info("Null mean: %g null variance: %g" %
-                     (np.mean(null_d), np.var(null_d)))
-        logging.info("Time: %g" % (end - start))
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
+                item, max_iter=number_of_permutations, alternative='greater', cores= cores)
+            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
 
-        output1.update_st_table_empirical(
-            setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
-        if show_null:
-            diagnostic.plot_null_distribution(
-                null_d, observed, output1.output, setname=setname)
+
+            logging.info("Setname:" + setname)
+            if n_mapped < size_cut:
+                logging.info('%s remove from results since nodes mapped are < %d' %(setname, size_cut))
+            else:
+                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+                logging.info("Null mean: %g null variance: %g" %
+                            (np.mean(null_d), np.var(null_d)))
+
+                output1.update_st_table_empirical(
+                    setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
+                if show_null:
+                    diagnostic.plot_null_distribution(
+                        null_d, observed, output1.output, setname=setname)
 
     output1.save_output_summary()
 
@@ -175,6 +180,7 @@ def analyse_internal_degree( network_file: "network file",
                             outpath: "output folder where to place all generated files",
                             prefix: "prefix to add to all generated files",
                             setname: "Geneset to analyse" = None,
+                            size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                             number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                             cores: "Number of cores for the multiprocessing" = 1,
                             show_results: "barplot of results" = False,
@@ -204,25 +210,25 @@ def analyse_internal_degree( network_file: "network file",
 
     for setname, item in geneset.items():
 
-        start = time.time()
         item = set(item)
+        if len(item)>size_cut:
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
+                item, max_iter=number_of_permutations, alternative='greater', cores= cores)
+            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
 
-        observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-            item, max_iter=number_of_permutations, alternative='greater', cores= cores)
-        # observed_z=(observed-np.mean(null_d))/np.std(null_d)
-        end = time.time()
+            logging.info("Setname:" + setname)
 
-        logging.info("Setname:" + setname)
-        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-        logging.info("Null mean: %g null variance: %g" %
-                     (np.mean(null_d), np.var(null_d)))
-        logging.info("Time: %g" % (end - start))
-
-        output1.update_st_table_empirical(
-            setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
-        if show_null:
-            diagnostic.plot_null_distribution(
-                null_d, observed, output1.output, setname=setname)
+            if n_mapped < size_cut:
+                logging.info('%s remove from results since nodes mapped are < %d' %(setname, size_cut))
+            else:
+                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+                logging.info("Null mean: %g null variance: %g" %
+                            (np.mean(null_d), np.var(null_d)))
+                output1.update_st_table_empirical(
+                    setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
+                if show_null:
+                    diagnostic.plot_null_distribution(
+                        null_d, observed, output1.output, setname=setname)
 
     output1.save_output_summary()
 
@@ -236,6 +242,7 @@ def analyse_RW(network_file: "network file, use a network with weights",
                outpath: "output folder where to place all generated files",
                prefix: "prefix to add to all generated files",
                setname: "Geneset to analyse" = None,
+               size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                weight: "RW" = "RW",
                number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                cores: "Number of cores for the multiprocessing" = 1,
@@ -271,31 +278,36 @@ def analyse_RW(network_file: "network file, use a network with weights",
     for setname, item in geneset.items():
 
         item = set(item).intersection(set(list(network.nodes)))
-        observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-            item, max_iter=number_of_permutations, alternative='greater')
-        # observed_z=(observed-np.mean(null_d))/np.std(null_d
-        logging.info("Plotting diagnostic"
-                     + str(output1.output))
+        if len(item)>size_cut:
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
+                item, max_iter=number_of_permutations, alternative='greater')
+            # observed_z=(observed-np.mean(null_d))/np.std(null_d
+            logging.info("Plotting diagnostic"
+                        + str(output1.output))
 
-        if (len(item)>0 and show_null):
-            diagnostic.plot_null_distribution(
-                null_d, observed, output1.output, setname=setname)
+            if (len(item)>0 and show_null):
+                diagnostic.plot_null_distribution(
+                    null_d, observed, output1.output, setname=setname)
 
-        logging.info("Setname:" + setname)
-        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-        logging.info("Null mean: %g null variance: %g" %
-                     (np.mean(null_d), np.var(null_d)))
-        output1.update_st_table_empirical(
-            setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
+            logging.info("Setname:" + setname)
+            logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+            logging.info("Null mean: %g null variance: %g" %
+                        (np.mean(null_d), np.var(null_d)))
+            output1.update_st_table_empirical(
+                setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
 
-        logging.info("show matrix: "+str(show_matrix) )
-        if (len(item)>0 and show_matrix):
-            print(len(item))
-            print(item)
-            painter_rw = paint.Painter_RW(
-                network, output1.output , setname, RW_dict, item)
-            logging.info("Painting matrix")
-            painter_rw.plot_matrix()
+            logging.info("show matrix: "+str(show_matrix) )
+            if (len(item)>0 and show_matrix):
+                print(len(item))
+                print(item)
+                painter_rw = paint.Painter_RW(
+                    network, output1.output , setname, RW_dict, item)
+                logging.info("Painting matrix")
+                painter_rw.plot_matrix()
+        
+        else:
+            logging.info('%s removed from results since nodes mapped are < %d' %(setname, size_cut))
+
 
     output1.save_output_summary()
 
@@ -308,6 +320,7 @@ def analyse_module(network_file: "network file",
                    outpath: "output folder where to place all generated files",
                    prefix: "prefix to add to all generated files",
                    setname: "Geneset to analyse" = None,
+                   size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                    number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                    cores: "Number of cores for the multiprocessing" = 1,
                    create_output_LCC: "flag for creating a GMT file with the LCC lists" = False,
@@ -336,38 +349,39 @@ def analyse_module(network_file: "network file",
 
     for setname, item in geneset.items():
 
-        start = time.time()
         item = set(item)
-        if create_output_LCC:
+        if len(item)>size_cut:
+            if create_output_LCC:
 
-            module = nx.subgraph(network, item)
-            if len(module.nodes)>0:
-                LCC = sorted(list(nx.connected_components(module)),
-                            key=len, reverse=True)[0]
+                module = nx.subgraph(network, item)
+                if len(module.nodes)>0:
+                    LCC = sorted(list(nx.connected_components(module)),
+                                key=len, reverse=True)[0]
+                else:
+                    LCC=[]
+                if symbol:
+                    converter = Converter()
+                    LCC = converter.entrez2symbol(LCC)
+
+                output1.add_GMT_entry(setname, "module_analysis", LCC)
+
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
+                item, max_iter=number_of_permutations, alternative='greater')
+            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
+
+            logging.info("Setname:" + setname)
+            if n_mapped < size_cut:
+                logging.info('%s remove from results since nodes mapped are < %d' %(setname, size_cut))
             else:
-                LCC=[]
-            if symbol:
-                converter = Converter()
-                LCC = converter.entrez2symbol(LCC)
+                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+                logging.info("Null mean: %g null variance: %g" %
+                            (np.mean(null_d), np.var(null_d)))
 
-            output1.add_GMT_entry(setname, "module_analysis", LCC)
-
-        observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-            item, max_iter=number_of_permutations, alternative='greater')
-        # observed_z=(observed-np.mean(null_d))/np.std(null_d)
-        end = time.time()
-
-        logging.info("Setname:" + setname)
-        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-        logging.info("Null mean: %g null variance: %g" %
-                     (np.mean(null_d), np.var(null_d)))
-        logging.info("Time: %g" % (end - start))
-
-        output1.update_st_table_empirical(
-            setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
-        if show_null:
-            diagnostic.plot_null_distribution(
-                null_d, observed, output1.output, setname=setname)
+                output1.update_st_table_empirical(
+                    setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
+                if show_null:
+                    diagnostic.plot_null_distribution(
+                        null_d, observed, output1.output, setname=setname)
 
     output1.save_output_summary()
 
@@ -384,6 +398,7 @@ def analyse_location(network_file: "network file",
                      outpath: "output folder where to place all generated files",
                      prefix: "prefix to add to all generated files",
                      setname: "Geneset to analyse" = None,
+                     size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                      number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                      cores: "Number of cores for the multiprocessing" = 1,
                      show_matrix: "plotting flag, if true the distance matrix for each geneset is saved " = False,
@@ -418,17 +433,20 @@ def analyse_location(network_file: "network file",
     for setname, item in geneset.items():
 
         item = set(item).intersection(set(list(network.nodes)))
-        observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-            item, max_iter=number_of_permutations)
+        if len(item)>size_cut:
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
+                item, max_iter=number_of_permutations)
 
-        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-        logging.info("Null mean: %g null variance: %g" %
-                     (np.mean(null_d), np.var(null_d)))
-        logging.info("1th percentile: %g " % (np.percentile(null_d, 1)))
+            logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+            logging.info("Null mean: %g null variance: %g" %
+                        (np.mean(null_d), np.var(null_d)))
+            logging.info("1th percentile: %g " % (np.percentile(null_d, 1)))
 
-        output1.update_st_table_empirical(
-            setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
-
+            output1.update_st_table_empirical(
+                setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
+        else:
+            logging.info('%s remove from results since nodes mapped are < %d' %(setname, size_cut))
+            
     output1.save_output_summary()
 
     if show_results:
@@ -444,6 +462,7 @@ def test_degree_distribution(network_file: "network file",
                    outpath: "output folder where to place all generated files",
                    prefix: "prefix to add to all generated files",
                    setname: "Geneset to analyse" = None,
+                   size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                    show_results: "barplot of results" = False):
     '''
         Performs degree distribution test
@@ -464,15 +483,18 @@ def test_degree_distribution(network_file: "network file",
     for setname, item in geneset.items():
 
         item = set(item)
+        if len(item)>size_cut:
+            observed, pvalue, n_mapped, n_geneset = st_test.apply_test(item)
+            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
 
-        observed, pvalue, n_mapped, n_geneset = st_test.apply_test(item)
-        # observed_z=(observed-np.mean(null_d))/np.std(null_d)
+            logging.info("Setname:" + setname)
+            if n_mapped < size_cut:
+                logging.info('%s remove from results since nodes mapped are < %d' %(setname, size_cut))
+            else:
+                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
 
-        logging.info("Setname:" + setname)
-        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-
-        output1.update_st_table_empirical(
-            setname, n_mapped, n_geneset, 1, observed, pvalue, 0, 0)
+                output1.update_st_table_empirical(
+                    setname, n_mapped, n_geneset, 1, observed, pvalue, 0, 0)
 
     output1.save_output_summary()
 
@@ -567,7 +589,7 @@ def test_diffusion_weights(network_file: "network file, use a network with weigh
 ######### COMPARISONS ##########################################################
 ################################################################################
 
-
+# TODO: add size cut 
 def comparison_shortest_path(network_file: "network file",
                              distance_matrix_filename: "distance matrix file generated by pygna",
                              A_geneset_file: "GMT geneset file, if it's the only parameter passed the analysis is gonna be run on all the couples of datasets, otherwise specify the other files and setnames",
