@@ -155,11 +155,11 @@ def comparison_random_walk(network, genesetA, genesetB, diz={}):
         raise
 
 
-    if (len(genesetA_index)==0 or len(genesetB_index)==0):
-        sys.exit()
-
     genesetA_index=[diz["nodes"].index(i) for i in genesetA]
     genesetB_index=[diz["nodes"].index(i) for i in genesetB]
+
+    if (len(genesetA_index)==0 or len(genesetB_index)==0):
+        sys.exit()
 
     probAB=[diz["matrix"][i,j] for i in genesetA_index for j in genesetB_index ] #if i!=j]
     probBA=[diz["matrix"][i,j] for i in genesetB_index for j in genesetA_index ] #if i!=j]

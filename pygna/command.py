@@ -725,6 +725,7 @@ def comparison_random_walk(network_file: "network file",
                            setname_A: "Geneset A to analyse" = None,
                            B_geneset_file: "GMT geneset file" = None,
                            setname_B: "Geneset B to analyse" = None,
+                           length_filter = 20,
                            cores: "Number of cores for the multiprocessing" = 1,
                            number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                            show_matrix: "plotting flag, if true the diffusion matrix for each pair of genesets is saved " = False,
@@ -785,22 +786,24 @@ def comparison_random_walk(network_file: "network file",
             "table_comparison_random_walk")
 
         for pair in itertools.combinations(setnames, 2):
-            logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
+            if (len(pair[0])>length_filter and len(pair[1])>length_filter):
 
-            n_overlaps = len(set(geneset_A[pair[0]]).intersection(
-                set(geneset_A[pair[1]])))
+                logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
 
-            observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(set(
-                geneset_A[pair[0]]), set(geneset_A[pair[1]]), max_iter=number_of_permutations, alternative='greater')
+                n_overlaps = len(set(geneset_A[pair[0]]).intersection(
+                    set(geneset_A[pair[1]])))
 
-            output1.update_comparison_table_empirical(pair[0], pair[1],
-                                                      len(set(
-                                                          geneset_A[pair[0]])), A_mapped,
-                                                      len(set(
-                                                          geneset_A[pair[1]])), B_mapped,
-                                                      n_overlaps,
-                                                      number_of_permutations, observed, pvalue,
-                                                      np.mean(null_d), np.var(null_d))
+                observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(set(
+                    geneset_A[pair[0]]), set(geneset_A[pair[1]]), max_iter=number_of_permutations, alternative='greater')
+
+                output1.update_comparison_table_empirical(pair[0], pair[1],
+                                                        len(set(
+                                                            geneset_A[pair[0]])), A_mapped,
+                                                        len(set(
+                                                            geneset_A[pair[1]])), B_mapped,
+                                                        n_overlaps,
+                                                        number_of_permutations, observed, pvalue,
+                                                        np.mean(null_d), np.var(null_d))
 
     else:
 
@@ -819,25 +822,26 @@ def comparison_random_walk(network_file: "network file",
 
         for set_A, item_A in geneset_A.items():
             for set_B, item_B in geneset_B.items():
-                n_overlaps = len(set(item_A).intersection(set(item_B)))
+                if (len(item_A)>length_filter and len(item_B)>length_filter):
+                    n_overlaps = len(set(item_A).intersection(set(item_B)))
 
-                observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                    set(item_A), set(item_B), max_iter=number_of_permutations)
+                    observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
+                        set(item_A), set(item_B), max_iter=number_of_permutations,alternative='greater')
 
-                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-                logging.info("Null mean: %g null variance: %g" %
-                             (np.mean(null_d), np.var(null_d)))
-                logging.info("1th percentile: %g " %
-                             (np.percentile(null_d, 1)))
+                    logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+                    logging.info("Null mean: %g null variance: %g" %
+                                (np.mean(null_d), np.var(null_d)))
+                    logging.info("1th percentile: %g " %
+                                (np.percentile(null_d, 1)))
 
-                output1.update_comparison_table_empirical(set_A, set_B,
-                                                          len(set(item_A)
-                                                              ), A_mapped,
-                                                          len(set(item_B)
-                                                              ), B_mapped,
-                                                          n_overlaps,
-                                                          number_of_permutations, observed, pvalue,
-                                                          np.mean(null_d), np.var(null_d))
+                    output1.update_comparison_table_empirical(set_A, set_B,
+                                                            len(set(item_A)
+                                                                ), A_mapped,
+                                                            len(set(item_B)
+                                                                ), B_mapped,
+                                                            n_overlaps,
+                                                            number_of_permutations, observed, pvalue,
+                                                            np.mean(null_d), np.var(null_d))
 
     output1.save_output_summary()  # Save Summary of Analysis
     if show_results:
