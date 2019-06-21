@@ -779,11 +779,11 @@ def comparison_random_walk(network_file: "network file",
         logging.info("Setnames: " + str(setnames))
 
         output1 = out.Output(network_file, outpath, prefix,
-                             "comparison_random_walk", A_geneset_file, setnames)
+                             "association_RW", A_geneset_file, setnames)
         output1.add_output_text(" RW matrix = " + str(RW_dict_file))
         logging.info("Output-folder= " + output1.output)
         output1.create_comparison_table_empirical(
-            "table_comparison_random_walk")
+            "table_association_RW")
 
         for pair in itertools.combinations(setnames, 2):
             if (len(pair[0])>length_filter and len(pair[1])>length_filter):
@@ -814,10 +814,10 @@ def comparison_random_walk(network_file: "network file",
         sets_B = [key for key in geneset_B.keys()]
         logging.info("Setnames in B: " + str(sets_B))
 
-        output1 = out.Output(network_file, outpath, prefix,"comparison_random_walk",
+        output1 = out.Output(network_file, outpath, prefix,"association_RW",
                              A_geneset_file, sets_A, B_geneset_file, sets_B)
         logging.info("Output-folder= " + output1.output)
-        output1.create_comparison_table_empirical("table_random_walk")
+        output1.create_comparison_table_empirical("table_association_RW")
         output1.add_output_text(" RW matrix = " + str(RW_dict_file))
 
         for set_A, item_A in geneset_A.items():
