@@ -28,7 +28,7 @@ class StatisticalComparison:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
 
-    def comparison_empirical_pvalue(self, genesetA, genesetB, alternative = 'less', max_iter = 100):
+    def comparison_empirical_pvalue(self, genesetA, genesetB, alternative = 'less', max_iter = 100, keep=False):
 
         """
         This method applies the __comparison_statistic to two genesets and
@@ -46,7 +46,7 @@ class StatisticalComparison:
         logging.info("Observed %f." % (observed))
 
         # iterations
-        null_distribution=StatisticalComparison.get_comparison_null_distribution_mp(self,mapped_genesetA, mapped_genesetB ,max_iter)
+        null_distribution=StatisticalComparison.get_comparison_null_distribution_mp(self,mapped_genesetA, mapped_genesetB ,max_iter, keep)
         #null_distribution=np.array([0,0,0,0,0,0,0,0])
         # computing empirical pvalue
         pvalue = 1
@@ -57,7 +57,7 @@ class StatisticalComparison:
 
         return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB)
 
-    def get_comparison_null_distribution_mp(self, genesetA, genesetB, max_iter=100):
+    def get_comparison_null_distribution_mp(self, genesetA, genesetB, max_iter=100, keep = False):
         print(int(self.__n_proc))
         p = multiprocessing.Pool(self.__n_proc)
 
@@ -67,11 +67,11 @@ class StatisticalComparison:
 
         if self.__n_proc==1:
 
-            null_distribution=StatisticalComparison.get_comparison_null_distribution(self, genesetA,genesetB, max_iter)
+            null_distribution=StatisticalComparison.get_comparison_null_distribution(self, genesetA,genesetB, max_iter, keep)
 
         else:
 
-            results = [p.apply_async(StatisticalComparison.get_comparison_null_distribution, args=(self,genesetA,genesetB,n_trial)) for w in list(range(1,self.__n_proc+1))]
+            results = [p.apply_async(StatisticalComparison.get_comparison_null_distribution, args=(self,genesetA,genesetB,n_trial, keep)) for w in list(range(1,self.__n_proc+1))]
 
             null_distribution=np.array([])
             for r in results:
@@ -81,16 +81,24 @@ class StatisticalComparison:
 
         return np.asarray(null_distribution)
 
-    def get_comparison_null_distribution(self, genesetA,genesetB, n_samples):
+    def get_comparison_null_distribution(self, genesetA,genesetB, n_samples, keep):
 
         np.random.seed()
         random_dist=[]
-        for i in range(n_samples):
-            random_sample_A = np.random.choice(list(self.__universe), len(genesetA), replace=False)
-            random_sample_B = np.random.choice(list(self.__universe), len(genesetB), replace=False)
-            random_dist.append( self.__comparison_statistic(self.__network, set(random_sample_A),set(random_sample_B), self.__diz) )
+
+        if keep:
+            for i in range(n_samples):
+                random_sample_A = np.random.choice(list(self.__universe), len(genesetA), replace=False)
+                random_dist.append( self.__comparison_statistic(self.__network, set(random_sample_A),set(genesetB), self.__diz) )
+        
+        else:
+            for i in range(n_samples):
+                random_sample_A = np.random.choice(list(self.__universe), len(genesetA), replace=False)
+                random_sample_B = np.random.choice(list(self.__universe), len(genesetB), replace=False)
+                random_dist.append( self.__comparison_statistic(self.__network, set(random_sample_A),set(random_sample_B), self.__diz) )
 
         return random_dist
+
 
 
 ###############################################################################

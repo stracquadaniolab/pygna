@@ -586,7 +586,7 @@ def test_diffusion_weights(network_file: "network file, use a network with weigh
 
 
 ################################################################################
-######### COMPARISONS ##########################################################
+######### associations and COMPARISONS #########################################
 ################################################################################
 
 # TODO: add size cut 
@@ -598,12 +598,15 @@ def comparison_shortest_path(network_file: "network file",
                              setname_A: "Geneset A to analyse" = None,
                              B_geneset_file: "GMT geneset file" = None,
                              setname_B: "Geneset B to analyse" = None,
+                             keep: 'if true, keeps the geneset B unpermuted' = False,
                              cores: "Number of cores for the multiprocessing" = 1,
                              number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                              show_matrix: "plotting flag, if true the diffusion matrix for each pair of genesets is saved" = False,
                              show_results: "heatmap of results" = False):
     '''
-        Performs comparison of network location analysis.
+        Performs comparison of network location analysis. If the flag 
+        --keep  is passed, one of the B geneset is kept 
+        fixed, and doesnt't get permuted  
 
         It computes a p-value for the shortest path distance
         between two genesets being smaller than expected by chance
@@ -616,6 +619,11 @@ def comparison_shortest_path(network_file: "network file",
         if both sets are in the same file, B_geneset_file can be not specified,
         but setnames are needed.
     '''
+
+    if keep:
+        analysis_name_str = 'association_SP'
+    else:
+        analysis_name_str = 'comparison_SP'
 
     network = ps.__load_network(network_file)
     network = nx.Graph(network.subgraph(
@@ -649,19 +657,20 @@ def comparison_shortest_path(network_file: "network file",
 
         # Creating the output table
         output1 = out.Output(
-            network_file, outpath, prefix, "comparison_shortest_path", A_geneset_file, setnames)
+            network_file, outpath, prefix, analysis_name_str, A_geneset_file, setnames)
         output1.add_output_text(
             " distance matrix = " + str(distance_matrix_filename))
         logging.info("Output-folder= " + output1.output)
         output1.create_comparison_table_empirical(
-            "table_comparison_shortest_path")
+            "table_"+analysis_name_str)
 
         for pair in itertools.combinations(setnames, 2):
             logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
             overlaps=set(geneset_A[pair[0]]).intersection(set(geneset_A[pair[1]]))
             logging.info('There are %d genes shared between A and B' %len(overlaps))
+
             observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                set(geneset_A[pair[0]]), set(geneset_A[pair[1]]), max_iter=number_of_permutations)
+                    set(geneset_A[pair[0]]), set(geneset_A[pair[1]]), max_iter=number_of_permutations, keep = keep)
             # Save the results
             output1.update_comparison_table_empirical(pair[0], pair[1],
                                                       len(set(
@@ -686,14 +695,14 @@ def comparison_shortest_path(network_file: "network file",
             " distance matrix = " + str(distance_matrix_filename))
         logging.info("Output-folder= " + output1.output)
         output1.create_comparison_table_empirical(
-            "table_comparison_shortest_path")
+            "table_"+analysis_name_str)
 
         for set_A, item_A in geneset_A.items():
             for set_B, item_B in geneset_B.items():
                 n_overlaps = len(set(item_A).intersection(set(item_B)))
 
                 observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                    set(item_A), set(item_B), max_iter=number_of_permutations)
+                    set(item_A), set(item_B), max_iter=number_of_permutations, keep = keep)
 
                 logging.info("Observed: %g p-value: %g" % (observed, pvalue))
                 logging.info("Null mean: %g null variance: %g" %
@@ -726,6 +735,7 @@ def comparison_random_walk(network_file: "network file",
                            B_geneset_file: "GMT geneset file" = None,
                            setname_B: "Geneset B to analyse" = None,
                            length_filter = 20,
+                           keep = False,
                            cores: "Number of cores for the multiprocessing" = 1,
                            number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                            show_matrix: "plotting flag, if true the diffusion matrix for each pair of genesets is saved " = False,
@@ -744,6 +754,11 @@ def comparison_random_walk(network_file: "network file",
         if both sets are in the same file, B_geneset_file can be not specified,
         but setnames are needed.
     '''
+
+    if keep:
+        analysis_name_str = 'association_RW'
+    else:
+        analysis_name_str = 'comparison_RW'
 
     network = ps.__load_network(network_file)
     network = nx.Graph(network.subgraph(
@@ -783,7 +798,7 @@ def comparison_random_walk(network_file: "network file",
         output1.add_output_text(" RW matrix = " + str(RW_dict_file))
         logging.info("Output-folder= " + output1.output)
         output1.create_comparison_table_empirical(
-            "table_association_RW")
+            "table_"+analysis_name_str)
 
         for pair in itertools.combinations(setnames, 2):
             if (len(pair[0])>length_filter and len(pair[1])>length_filter):
@@ -794,7 +809,7 @@ def comparison_random_walk(network_file: "network file",
                     set(geneset_A[pair[1]])))
 
                 observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(set(
-                    geneset_A[pair[0]]), set(geneset_A[pair[1]]), max_iter=number_of_permutations, alternative='greater')
+                    geneset_A[pair[0]]), set(geneset_A[pair[1]]), max_iter=number_of_permutations, alternative='greater', keep=keep)
 
                 output1.update_comparison_table_empirical(pair[0], pair[1],
                                                         len(set(
@@ -817,7 +832,7 @@ def comparison_random_walk(network_file: "network file",
         output1 = out.Output(network_file, outpath, prefix,"association_RW",
                              A_geneset_file, sets_A, B_geneset_file, sets_B)
         logging.info("Output-folder= " + output1.output)
-        output1.create_comparison_table_empirical("table_association_RW")
+        output1.create_comparison_table_empirical("table_"+analysis_name_str)
         output1.add_output_text(" RW matrix = " + str(RW_dict_file))
 
         for set_A, item_A in geneset_A.items():
@@ -826,7 +841,7 @@ def comparison_random_walk(network_file: "network file",
                     n_overlaps = len(set(item_A).intersection(set(item_B)))
 
                     observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                        set(item_A), set(item_B), max_iter=number_of_permutations,alternative='greater')
+                        set(item_A), set(item_B), max_iter=number_of_permutations,alternative='greater', keep=keep)
 
                     logging.info("Observed: %g p-value: %g" % (observed, pvalue))
                     logging.info("Null mean: %g null variance: %g" %
@@ -847,6 +862,7 @@ def comparison_random_walk(network_file: "network file",
     if show_results:
         paint.paint_comparison_stats(
             output1.output_table, output1.output, "RWR")
+
 
 ################################################################################
 ######### BUILDING FUNCTIONS ###################################################
