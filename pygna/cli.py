@@ -23,6 +23,7 @@ def main():
     argh dispatch
     """
     argh.dispatch_commands([# network summary
+                            cmd.network_graphml,
                             cmd.network_summary,
                             # single set analyses
                             cmd.analyse_total_degree,

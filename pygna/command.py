@@ -32,7 +32,7 @@ from matplotlib import pyplot as plt
 
 
 
-def __read_distance_matrix(distance_matrix_filename):
+def __read_distance_matrix(distance_matrix_filename, in_memory = False):
     """ Reads the large matrix .lm text file for the diffusion matrix and creates
     a hdf5 file to work with it
     """
@@ -68,7 +68,7 @@ def __read_distance_matrix(distance_matrix_filename):
 
     elif distance_matrix_filename.endswith('hdf5'):
         # hdf5_file="/home/viola/Documents/UniEssex/repos/geneset-network-analysis/processed_data/barabasi_distance_matrix.hdf5"
-        hdf5_nodes, hdf5_data = ps.Hdf5MatrixParser().read(distance_matrix_filename)
+        hdf5_nodes, hdf5_data = ps.Hdf5MatrixParser().read(distance_matrix_filename, in_memory)
         if type(hdf5_nodes[0]) == bytes:
             hdf5_nodes = [i.decode() for i in hdf5_nodes]
     else:
@@ -246,6 +246,7 @@ def analyse_RW(network_file: "network file, use a network with weights",
                weight: "RW" = "RW",
                number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                cores: "Number of cores for the multiprocessing" = 1,
+               in_memory: 'set if you want the large matrix to be read in memory' = False,
                show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
                show_results: "barplot of results" = False,
                show_null: "plot null distribution" = False):
@@ -262,7 +263,7 @@ def analyse_RW(network_file: "network file, use a network with weights",
     geneset = ps.__load_geneset(geneset_file, setname)
     RW_dict = {} #ps.DiffusionDictParser().read(RW_dict_file)
 
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(RW_dict_file)
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(RW_dict_file, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(network_file, outpath, prefix,
@@ -401,6 +402,7 @@ def analyse_location(network_file: "network file",
                      size_cut: 'removes all genesets with a mapped length < size_cut' = 20,
                      number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                      cores: "Number of cores for the multiprocessing" = 1,
+                     in_memory: 'set if you want the large matrix to be read in memory' = False,
                      show_matrix: "plotting flag, if true the distance matrix for each geneset is saved " = False,
                      show_results: "barplot of results" = False):
     '''
@@ -418,7 +420,7 @@ def analyse_location(network_file: "network file",
     #distance_matrix = ps.DistanceMatrixParser().read(distance_matrix_file)
     diz = {}
     diz["nodes"], diz["matrix"] = __read_distance_matrix(
-        distance_matrix_filename)
+        distance_matrix_filename, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
 
@@ -600,6 +602,7 @@ def comparison_shortest_path(network_file: "network file",
                              setname_B: "Geneset B to analyse" = None,
                              keep: 'if true, keeps the geneset B unpermuted' = False,
                              cores: "Number of cores for the multiprocessing" = 1,
+                             in_memory: 'set if you want the large matrix to be read in memory' = False,
                              number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                              show_matrix: "plotting flag, if true the diffusion matrix for each pair of genesets is saved" = False,
                              show_results: "heatmap of results" = False):
@@ -631,7 +634,7 @@ def comparison_shortest_path(network_file: "network file",
 
     sp_diz = {}
     sp_diz["nodes"], sp_diz["matrix"] = __read_distance_matrix(
-        distance_matrix_filename)
+        distance_matrix_filename, in_memory=in_memory)
 
     if (setname_A and setname_B == None and B_geneset_file == None):
         logging.error(" this analysis requires at least two genesets ")
@@ -737,6 +740,7 @@ def comparison_random_walk(network_file: "network file",
                            length_filter = 20,
                            keep = False,
                            cores: "Number of cores for the multiprocessing" = 1,
+                           in_memory: 'set if you want the large matrix to be read in memory' = False,
                            number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
                            show_matrix: "plotting flag, if true the diffusion matrix for each pair of genesets is saved " = False,
                            show_results: "heatmap of results" = False):
@@ -771,7 +775,7 @@ def comparison_random_walk(network_file: "network file",
     logging.info("Reading diffusion matrix")
     RW_dict = {}
     RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        RW_dict_file)
+        RW_dict_file, in_memory=in_memory)
 
     geneset_A = ps.__load_geneset(A_geneset_file, setname_A)
 
@@ -1018,3 +1022,43 @@ def build_graph(network_file: "network file",
         nx.write_graphml(new_network_minimal, output_folder
                          + setname + "_minimal.graphml")
 
+def network_graphml(network_file: "network file",
+                geneset_file: "geneset file",
+                output_folder: "graphml network for visualisation",
+                prefix:'prefix for the new file',
+                setname: "setname" = None,
+                giant_component_only: "compute the shortest paths only for nodes in the giant component" = True):
+    '''
+        Build a shortest path distance matrix for a given network.
+    '''
+    network = ps.__load_network(network_file)
+    geneset = ps.__load_geneset(geneset_file, setname)
+
+    if giant_component_only:
+        network = network.subgraph(
+            max(nx.connected_components(network), key=len))
+
+    for setname in geneset:
+        # print(setname)
+        # new_network = nx.Graph()
+        # new_network_minimal = nx.Graph()
+        # for s in geneset[setname]:
+        #     if s in network.nodes():
+        #         l0 = np.inf
+        #         for t in geneset[setname]:
+        #             if (t in network.nodes()) & (s != t):
+        #                 path = nx.shortest_path(network, source=s, target=t)
+        #                 if l0 > len(path):
+        #                     l0 = len(path)
+        #                     new_network_minimal.add_path(path)
+        #                 new_network.add_path(path)
+
+        dict_nodes = {}
+        for n in network.nodes():
+            if n in geneset[setname]:
+                dict_nodes[n] = True
+            else:
+                dict_nodes[n] = False
+        nx.set_node_attributes(network, dict_nodes, setname)
+
+    nx.write_graphml(network, output_folder + prefix + ".graphml")
