@@ -145,7 +145,7 @@ def comparison_shortest_path(network, genesetA, genesetB, diz={}):
 
         cum_sum+=min_dv
 
-    logging.info(cum_sum_v)
+    #logging.info(cum_sum_v)
     d_AB = cum_sum/float(len(genesetA)+len(genesetB))
 
 
