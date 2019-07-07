@@ -1,6 +1,6 @@
 # PyGNA: a Python framework for geneset network analysis
 
-Current version: 0.4.1-dev
+Current version: 0.4.2-dev
 
 ![build](https://circleci.com/gh/stracquadaniolab/baghera/tree/master.svg?style=svg)
 ![platform](https://anaconda.org/stracquadaniolab/baghera/badges/platforms.svg)
