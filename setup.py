@@ -11,19 +11,31 @@ setup(
     # package information
     name = 'pygna',
     packages = find_packages(),
-    version = '0.4.1',
+    version = '0.4.1-dev',
     description = 'Geneset Network Analysis',
     long_description = readme,
     license = 'MIT',
-    url='git@github.com:stracquadaniolab/pygna.git',
-    keywords='',
+    url='https://github.com/stracquadaniolab/pygna',
+    keywords='Bioinformatics Network Statistics',
 
     # author information
-    author = 'Viola Fanfani & Giovanni Stracquadanio',
+    author = 'Viola Fanfani, Giovanni Stracquadanio',
     author_email = 'v.fanfani@sms.ed.ac.uk',
 
     # installation info and requirements
-    install_requires=[],
+    install_requires=[
+        'pandas',
+        'numpy',
+        'scipy',
+        'matplotlib',
+        'pyyaml',
+        'tables>=3.4.4',
+        'seaborn>=0.9',
+        'palettable',
+        'networkx>=2.2',
+        'statsmodels',
+        'argh'
+    ],
     setup_requires=[],
 
     # test info and requirements
@@ -40,4 +52,10 @@ setup(
             'pygna=pygna.cli:main',
         ],
     },
+
+    classifiers=[
+        'License :: OSI Approved :: MIT License',
+        'Programming Language :: Python :: 3.7',
+        'Topic :: Scientific/Engineering :: Bio-Informatics'
+    ]
 )

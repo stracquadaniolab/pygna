@@ -1,0 +1,11 @@
+pandas
+numpy
+scipy
+matplotlib
+pyyaml
+tables>=3.4.4
+seaborn>=0.9
+palettable
+networkx>=2.2
+statsmodels
+argh
