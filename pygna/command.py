@@ -968,7 +968,7 @@ def comparison_random_walk(
         logging.info("Setnames: " + str(setnames))
 
         output1 = out.Output(
-            network_file, outpath, prefix, "association_RW", A_geneset_file, setnames
+            network_file, outpath, prefix, analysis_name_str, A_geneset_file, setnames
         )
         output1.add_output_text(" RW matrix = " + str(RW_dict_file))
         logging.info("Output-folder= " + output1.output)
@@ -1068,7 +1068,8 @@ def comparison_random_walk(
 
     output1.save_output_summary()  # Save Summary of Analysis
     if show_results:
-        paint.paint_comparison_RW(output1.output_table, output1.output, "RWR")
+        sg= setname_B == None
+        paint.paint_comparison_RW(output1.output_table, output1.output, "RWR", single_geneset=sg)
 
 
 ################################################################################

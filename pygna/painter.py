@@ -332,7 +332,7 @@ def paint_comparison_stats(table_filename, output_folder, stat_name):
     # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
 
 
-def paint_comparison_RW(table_filename, output_folder, stat_name):
+def paint_comparison_RW(table_filename, output_folder, stat_name, single_geneset=False):
 
     palette = OrRd_9.mpl_colors  # [0::3]
     with open(table_filename, "r") as f:
@@ -341,40 +341,76 @@ def paint_comparison_RW(table_filename, output_folder, stat_name):
 
     n_permutations = table["number_of_permutations"][0]
 
+    if single_geneset:
+        table=table.loc[:,['observed','setname_A','setname_B','empirical_pvalue']]
+        for i in set(table['setname_A'].values.tolist()).union(set(table['setname_B'].values.tolist())):
+            table=table.append({'setname_A':i, 'setname_B':i, 'observed':0, 'empirical_pvalue':1}, ignore_index=True)
+        print(table)
+
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
 
     annot = table.pivot(
         values="empirical_pvalue", index="setname_A", columns="setname_B"
     ).values
+    if single_geneset:
 
-    fig, axes = plt.subplots(1, 1, figsize=(10, 10))
-    fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
+        fig, axes = plt.subplots(1, 1, figsize=(10, 10))
+        fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
 
-    pivot_table = pivot_table.fillna(0)
-    mask = pivot_table.T == 0
-    print(mask.shape)
-    print(pivot_table.T.shape)
+        pivot_table = pivot_table.fillna(0)
+        mask = np.triu(np.ones((len(pivot_table),len(pivot_table))))
 
-    g2 = sns.heatmap(
-        pivot_table.T,
-        cmap=palette,
-        ax=axes,
-        square=True,
-        xticklabels=1,
-        yticklabels=1,
-        mask=mask,
-        cbar=True,
-        linewidths=0.1,
-        linecolor="white",
-    )  # ,annot=annot,fmt=""#,mask=mask,
+        g2 = sns.heatmap(
+            (pivot_table.T+pivot_table)/2,
+            cmap=palette,
+            ax=axes,
+            square=True,
+            xticklabels=1,
+            yticklabels=1,
+            mask=mask,
+            cbar=True,
+            linewidths=0.1,
+            linecolor="white",
+        )  # ,annot=annot,fmt=""#,mask=mask,
 
-    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
-    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
-    axes.set_xlabel("")
-    axes.set_ylabel("")
+        g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
+        g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
+        axes.set_xlabel("")
+        axes.set_ylabel("")
 
-    fig.savefig(output_folder + stat_name + "_comparison_heatmap.pdf", format="pdf")
-    # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
+        fig.savefig(output_folder + stat_name + "_comparison_heatmap.pdf", format="pdf")
+        # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
+    else:
+
+
+        fig, axes = plt.subplots(1, 1, figsize=(10, 10))
+        fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
+
+        pivot_table = pivot_table.fillna(0)
+        mask = pivot_table.T == 0
+        print(mask.shape)
+        print(pivot_table.T)
+
+        g2 = sns.heatmap(
+            pivot_table.T,
+            cmap=palette,
+            ax=axes,
+            square=True,
+            xticklabels=1,
+            yticklabels=1,
+            mask=mask,
+            cbar=True,
+            linewidths=0.1,
+            linecolor="white",
+        )  # ,annot=annot,fmt=""#,mask=mask,
+
+        g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
+        g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
+        axes.set_xlabel("")
+        axes.set_ylabel("")
+
+        fig.savefig(output_folder + stat_name + "_comparison_heatmap.pdf", format="pdf")
+        # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
 
 
 def paint_final_table(final_table, output_file):
