@@ -4,7 +4,7 @@ from setuptools import find_packages, setup
 # determining the directory containing setup.py
 setup_path = os.path.abspath(os.path.dirname(__file__))
 
-with open(os.path.join(setup_path, 'README.rst'), encoding='utf-8') as f:
+with open(os.path.join(setup_path, 'README.md'), encoding='utf-8') as f:
     readme = f.read()
 
 setup(

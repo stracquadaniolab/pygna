@@ -5,5 +5,4 @@ steps:
 - name: install-python-3.5
   image: python:3.5-alpine
   commands:
-  - echo "test install"
   - pip install .
