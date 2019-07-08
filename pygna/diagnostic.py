@@ -37,6 +37,7 @@ def plot_diffusion_matrix(nodes, matrix, filename, show_labels=False):
     Shows the weighted adjacency matrix that is the output of a build process
     """
 
+    print(matrix)
     logging.info("Plotting figure as " + str(filename))
     fig, axes = plt.subplots(1)
     axes.imshow(matrix, cmap="PuBu")

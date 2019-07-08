@@ -339,9 +339,10 @@ def analyse_RW(
                 item, max_iter=number_of_permutations, alternative="greater"
             )
             # observed_z=(observed-np.mean(null_d))/np.std(null_d
-            logging.info("Plotting diagnostic" + str(output1.output))
+            
 
             if len(item) > 0 and show_null:
+                logging.info("Plotting diagnostic" + str(output1.output))
                 diagnostic.plot_null_distribution(
                     null_d, observed, output1.output, setname=setname
                 )
@@ -1067,7 +1068,7 @@ def comparison_random_walk(
 
     output1.save_output_summary()  # Save Summary of Analysis
     if show_results:
-        paint.paint_comparison_stats(output1.output_table, output1.output, "RWR")
+        paint.paint_comparison_RW(output1.output_table, output1.output, "RWR")
 
 
 ################################################################################
@@ -1164,7 +1165,7 @@ def build_RWR_diffusion(
             # create a hdf5 file with two objects:
             # - one is the nodes array,
             hdf5_nodes = hdf5_file.create_array(hdf5_file.root, "nodes", nodes)
-            # -  the other is the shorthest path distance matrix
+            # -  the other is the RWR matrix
             hdf5_data = hdf5_file.create_array(
                 hdf5_file.root,
                 "matrix",
@@ -1176,7 +1177,9 @@ def build_RWR_diffusion(
         return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A)
 
     if output_figure:
-        diagnostic.plot_diffusion_matrix(nodes, hdf5_data, output_figure)
+        RW_dict = {}
+        RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(output_file)
+        diagnostic.plot_diffusion_matrix(RW_dict["nodes"], RW_dict["matrix"], output_figure)
 
 
 def build_graph(
