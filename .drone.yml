@@ -6,3 +6,4 @@ steps:
   image: python:3.5
   commands:
   - pip install .
+  - pygna
