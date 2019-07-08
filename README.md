@@ -2,11 +2,11 @@
 
 Current version: 0.4.2-dev
 
-![build](https://circleci.com/gh/stracquadaniolab/baghera/tree/master.svg?style=svg)
+[![Build Status](http://drone.stracquadaniolab.org/api/badges/stracquadaniolab/pygna/status.svg)](http://drone.stracquadaniolab.org/stracquadaniolab/pygna)
 ![platform](https://anaconda.org/stracquadaniolab/baghera/badges/platforms.svg)
 ![anaconda](https://anaconda.org/stracquadaniolab/baghera/badges/version.svg)
 
-PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code. 
+PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code.
 
 For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](#getting-started) guide. For the complete API check the official [Documentation](#documentation)
 
@@ -33,7 +33,7 @@ A typical `pygna` analysis consists of 3 steps:
 3. Run the analysis you are interested into.
 4. Once you have the output tables, you can choose to visualise one or more plots.
 
-Otherwise you can check the snakemake pipeline for the full analysis of a geneset. 
+Otherwise you can check the snakemake pipeline for the full analysis of a geneset.
 
 We provide the data for a minimum working example in the zip folder named `min_working_example`.
 The examples below show some basic analysis that can be carried out with pygna
@@ -51,7 +51,7 @@ Running `pygna` on this input as follows:
     $ pygna pygna paint-datasets-stats interactome_table_RW.csv  ../min_working_example/ interactome
 
 ### Example 2: Running pygna GNA analysis
-    
+
     $ cd ./your-path/min-working-example/
 
 skip this step if the matrix is already computed
@@ -66,7 +66,7 @@ If you don't include the --show-results flag at the comparison step, plot the ma
 
     $ pygna paint-comparison-RW GO_cc_interactome_table_association_RW.csv  ../min_working_example/ comparison_stats
 
-The -k flag, keeps the -B geneset and permutes only on the set A. 
+The -k flag, keeps the -B geneset and permutes only on the set A.
 If setname B is not passed, the analysis is run between each couple of setnames in the geneset.
 
     $ pygna comparison-random-walk barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ../min_working_example/ GO_cc_interactome --number-of-permutations 50 --show-results
