@@ -1,0 +1,8 @@
+kind: pipeline
+name: default
+
+steps:
+- name: test-install
+  image: python:3.5-alpine
+  commands:
+  - pip install .
