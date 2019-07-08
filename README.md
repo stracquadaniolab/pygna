@@ -8,7 +8,7 @@ Current version: 0.4.2-dev
 
 PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code. 
 
-For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](#getting-started) guide. For the complete API check the official [Documentation](Documentation)
+For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](#getting-started) guide. For the complete API check the official [Documentation](#documentation)
 
 ![Infographic](docs/pygna_infographic-01.png)
 
@@ -28,9 +28,11 @@ Please note, that `pip` will not install non Python requirements.
 
 A typical `pygna` analysis consists of 3 steps:
 
-1. step 1.
-2. step 2.
-3. step 3.
+1. Generate the RWR and SP matrices for the network you are using ( once they are generated, you won't need to repeat the same step again)
+2. Make sure that the input genesets are in the right format. If a network uses entrez ID, and your file is in HUGO symbols, use the pygna utility for the name conversion.
+3. Run the analysis you are interested into.
+
+Otherwise you can check the snakemake pipeline for the full analysis of a geneset. 
 
 ### Example
 
