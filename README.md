@@ -6,7 +6,11 @@ Current version: 0.4.2-dev
 ![platform](https://anaconda.org/stracquadaniolab/baghera/badges/platforms.svg)
 ![anaconda](https://anaconda.org/stracquadaniolab/baghera/badges/version.svg)
 
-A simple intro.
+PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code. 
+
+For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](Gettingstarted) guide. For the complete API check the official [Documentation](Documentation)
+
+![Infographic](docs/pygna_infographic-01.png)
 
 ## Installation
 
