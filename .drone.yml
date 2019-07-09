@@ -2,16 +2,16 @@ kind: pipeline
 name: pygna
 
 steps:
-- name: install-py3.5
-  image: python:3.5
-  commands:
-  - pip install .
-  - pygna
+# - name: install-py3.5
+#   image: python:3.5
+#   commands:
+#   - pip install .
+#   - pygna
 
-- name: build
-  image: python:3.5
-  commands:
-  - python setup.py sdist bdist_wheel
+# - name: build
+#   image: python:3.5
+#   commands:
+#   - python setup.py sdist bdist_wheel
 
 # - name: publish
 #   image: python:3.5
@@ -34,6 +34,7 @@ steps:
   - conda config --add channels conda-forge
   - conda install conda-build anaconda-client
   - conda config --set anaconda_upload yes
-  - mkdir conda-build
-  - conda build . --no-build-id --output-folder ./conda-build
+#   - mkdir conda-build
+#   - conda build . --no-build-id --output-folder ./conda-build
+  - printenv
   - anaconda -t ${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab ./conda-bld/**/*.bz2
