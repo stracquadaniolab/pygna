@@ -22,4 +22,4 @@ steps:
       from_secret: TWINE_PASSWORD
   commands:
   - pip install twine
-  - twine upload --repository testpy dist/*
+  - twine upload --repository https://test.pypi.org/legacy/ dist/*
