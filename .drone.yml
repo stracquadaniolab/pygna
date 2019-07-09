@@ -15,5 +15,11 @@ steps:
 
 - name: publish
   image: python:3.5
+  environment:
+    TWINE_USERNAME:
+      from_secret: TWINE_USERNAME
+    TWINE_PASSWORD:
+      from_secret: TWINE_PASSWORD
   commands:
+  - pip install twine
   - twine upload --repository testpy dist/*
