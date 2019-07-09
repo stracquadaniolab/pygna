@@ -37,4 +37,4 @@ steps:
 #   - mkdir conda-build
 #   - conda build . --no-build-id --output-folder ./conda-build
   - printenv
-  - anaconda -t ${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab ./conda-bld/**/*.bz2
+  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab ./conda-bld/**/*.bz2
