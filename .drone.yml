@@ -34,7 +34,6 @@ steps:
   - conda config --add channels conda-forge
   - conda install conda-build anaconda-client
   - conda config --set anaconda_upload yes
-#   - mkdir conda-build
-#   - conda build . --no-build-id --output-folder ./conda-build
-  - printenv
+  - mkdir conda-build
+  - conda build . --no-build-id --output-folder ./conda-build
   - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab ./conda-bld/**/*.bz2
