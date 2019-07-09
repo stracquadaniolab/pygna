@@ -1,6 +1,6 @@
 package:
   name: pygna
-  version: 0.4.2-dev
+  version: 0.4.2
 
 source:
   path: .
@@ -15,8 +15,9 @@ build:
 requirements:
   host:
     - python
+    - pip
     - setuptools
-    - numpy
+    - numpy >=1.16
     - scipy
     - matplotlib
     - pyyaml
@@ -28,7 +29,7 @@ requirements:
 
   run:
     - python
-    - numpy
+    - numpy >=1.16
     - scipy
     - matplotlib
     - pyyaml
