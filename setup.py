@@ -41,6 +41,7 @@ setup(
     # test info and requirements
     test_suite='tests',
     tests_require=[],
+    python_requires='>=3',
 
     # package deployment info
     include_package_data=True,

@@ -13,13 +13,22 @@ steps:
   commands:
   - python setup.py sdist bdist_wheel
 
-- name: publish
-  image: python:3.5
-  environment:
-    TWINE_USERNAME:
-      from_secret: TWINE_USERNAME
-    TWINE_PASSWORD:
-      from_secret: TWINE_PASSWORD
+# - name: publish
+#   image: python:3.5
+#   environment:
+#     TWINE_USERNAME:
+#       from_secret: TWINE_USERNAME
+#     TWINE_PASSWORD:
+#       from_secret: TWINE_PASSWORD
+#   commands:
+#   - pip install twine
+#   - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+
+- name: conda
+  image: continuumio/miniconda3
   commands:
-  - pip install twine
-  - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  - conda config --set always_yes yes
+  - conda config --add channels bioconda
+  - conda config --add channels conda-forge
+  - conda install conda-build
+  - conda build
