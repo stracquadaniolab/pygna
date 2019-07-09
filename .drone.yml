@@ -2,11 +2,11 @@ kind: pipeline
 name: pygna
 
 steps:
-# - name: install-py3.5
-#   image: python:3.5
-#   commands:
-#   - pip install .
-#   - pygna
+- name: install-py3.5
+  image: python:3.5
+  commands:
+  - pip install .
+  - pygna
 
 # - name: build
 #   image: python:3.5
@@ -38,4 +38,4 @@ steps:
   - conda config --set anaconda_upload yes
   - mkdir conda-build
   - conda build . --no-build-id --output-folder ./conda-build
-  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab ./conda-build/**/*.bz2
+  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress --private ./conda-build/**/pygna*.bz2
