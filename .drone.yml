@@ -30,9 +30,10 @@ steps:
     ANACONDA_API_TOKEN:
         from_secret: ANACONDA_TOKEN
   commands:
-  - conda config --set always_yes yes
   - conda config --add channels bioconda
   - conda config --add channels conda-forge
   - conda install conda-build anaconda-client
   - conda config --set anaconda_upload yes
-  - conda build .
+  - mkdir conda-build
+  - conda build . --no-build-id --output-folder ./conda-build
+  - anaconda -t ${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab ./conda-bld/**/*.bz2
