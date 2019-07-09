@@ -1,9 +1,19 @@
 kind: pipeline
-name: default
+name: pygna
 
 steps:
-- name: install-python-3.5
+- name: install-py3.5
   image: python:3.5
   commands:
   - pip install .
   - pygna
+
+- name: build
+  image: python:3.5
+  commands:
+  - python setup.py sdist bdist_wheel
+
+- name: publish
+  image: python:3.5
+  commands:
+  - twine upload --repository testpy dist/*
