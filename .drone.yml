@@ -8,21 +8,27 @@ steps:
   - pip install .
   - pygna
 
-# - name: build
-#   image: python:3.5
-#   commands:
-#   - python setup.py sdist bdist_wheel
+- name: build
+  image: python:3.5
+  commands:
+  - python setup.py sdist bdist_wheel
+  when:
+    event:
+    - tag
 
-# - name: publish
-#   image: python:3.5
-#   environment:
-#     TWINE_USERNAME:
-#       from_secret: TWINE_USERNAME
-#     TWINE_PASSWORD:
-#       from_secret: TWINE_PASSWORD
-#   commands:
-#   - pip install twine
-#   - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+- name: publish
+  image: python:3.5
+  environment:
+    TWINE_USERNAME:
+      from_secret: TWINE_USERNAME
+    TWINE_PASSWORD:
+      from_secret: TWINE_PASSWORD
+  commands:
+  - pip install twine
+  - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  when:
+    event:
+    - tag
 
 - name: conda
   image: continuumio/miniconda3
@@ -39,3 +45,6 @@ steps:
   - mkdir conda-build
   - conda build . --no-build-id --output-folder ./conda-build
   - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress --private ./conda-build/**/pygna*.bz2
+  when:
+    event:
+    - tag
