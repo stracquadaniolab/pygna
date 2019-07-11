@@ -8,7 +8,7 @@ Current version: 1.0.2-dev
 
 PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code.
 
-For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](#getting-started) guide. For the complete API check the official [Documentation](#documentation)
+For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](#getting-started) guide.
 
 ![Infographic](docs/pygna_infographic-01.png)
 
@@ -31,11 +31,12 @@ A typical `pygna` analysis consists of 3 steps:
 1. Generate the RWR and SP matrices for the network you are using ( once they are generated, you won't need to repeat the same step again)
 2. Make sure that the input genesets are in the right format. If a network uses entrez ID, and your file is in HUGO symbols, use the pygna utility for the name conversion.
 3. Run the analysis you are interested into.
-4. Once you have the output tables, you can choose to visualise one or more plots.
+4. Once you have the output tables, you can choose to visualize one or more plots.
 
-Otherwise you can check the snakemake pipeline for the full analysis of a geneset.
+Otherwise you can check our [snakemake workflow](https://github.com/stracquadaniolab/workflow-pygna) for the full geneset analysis;
+our workflow contains sample data that you can use to familiarize with our software.
 
-We provide the data for a minimum working example in the zip folder named `min_working_example`.
+
 The examples below show some basic analysis that can be carried out with pygna
 
 ### Example 1: Running pygna GNT analysis
@@ -88,7 +89,7 @@ The official documentation for `pygna` can be found on [readthedocs](https://pyg
 
 ## Citation
 
-A unified framework for geneset network analysis. Viola Fanfani and Giovanni Stracquadanio. bioRxiv [To appear]
+A unified framework for geneset network analysis. Viola Fanfani and Giovanni Stracquadanio. bioRxiv 699926 [To appear]
 
 ## Issues
 
