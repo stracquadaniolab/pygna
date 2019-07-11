@@ -25,7 +25,7 @@ steps:
       from_secret: TWINE_PASSWORD
   commands:
   - pip install twine
-  - twine upload --repository-url https://test.pypi.org/legacy/ dist/*
+  - twine upload dist/*
   when:
     event:
     - tag
