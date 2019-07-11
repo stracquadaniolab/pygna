@@ -35,7 +35,7 @@ steps:
   commands:
   - mkdir conda-build
   - conda build . --no-build-id --output-folder ./conda-build
-  - conda convert -p all ./conda-build/**/pygna*.bz2
+  - conda convert -p all ./conda-build/**/pygna*.bz2 -o ./conda-build
   - ls -l ./conda-build/**/**
   - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 

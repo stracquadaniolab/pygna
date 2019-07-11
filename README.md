@@ -88,7 +88,7 @@ The official documentation for `pygna` can be found on [readthedocs](https://pyg
 
 ## Citation
 
-A unified framework for geneset network analysis. Viola Fanfani and Giovanni Stracquadanio. bioRxiv 699926 [To appear]
+A unified framework for geneset network analysis. Viola Fanfani, Giovanni Stracquadanio. bioRxiv 699926; doi: https://doi.org/10.1101/699926
 
 ## Issues
 
