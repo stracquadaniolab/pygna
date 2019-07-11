@@ -1,6 +1,6 @@
 # PyGNA: a Python framework for geneset network analysis
 
-Current version: 1.0.2-dev
+Current version: 1.1.0-dev
 
 [![Build Status](http://drone.stracquadaniolab.org/api/badges/stracquadaniolab/pygna/status.svg)](http://drone.stracquadaniolab.org/stracquadaniolab/pygna)
 ![platform](https://anaconda.org/stracquadaniolab/pygna/badges/platforms.svg)
