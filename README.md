@@ -46,7 +46,7 @@ Running `pygna` on this input as follows:
 
     $ pygna build-RWR-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
 
-    $ pygna test_topology_rwr --number-of-permutations 50 barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example1
+    $ pygna test-topology-rwr --number-of-permutations 50 barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example1
 
     $ pygna paint-datasets-stats interactome_table_RW.csv ./ example1
 
@@ -88,9 +88,7 @@ The official documentation for `pygna` can be found on [readthedocs](https://pyg
 
 ## Citation
 
-A unified framework for geneset network analysis.
-Viola Fanfani and  Giovanni Stracquadanio
-bioRxiv XX; doi: XX
+A unified framework for geneset network analysis. Viola Fanfani and Giovanni Stracquadanio. bioRxiv [To appear]
 
 ## Issues
 
