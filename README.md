@@ -72,7 +72,7 @@ The -k flag, keeps the -B geneset and permutes only on the set A.
 
 If setname B is not passed, the analysis is run between each couple of setnames in the geneset.
 
-    $ pygna comparison-random-walk barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example2_full --number-of-permutations 50 --show-results
+    $ pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example2_full --number-of-permutations 50 --show-results
 
 You can look at the plot of the results in the `example2_full_RWR_comparison_heatmap.pdf` file, and the corresponding table in  `example_full_table_association_rwr.csv`.
 
