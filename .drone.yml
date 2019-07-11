@@ -25,7 +25,7 @@ steps:
       from_secret: TWINE_PASSWORD
   commands:
   - pip install twine
-  - twine upload dist/*
+  - twine upload --skip-existing dist/*
 
 - name: conda
   image: stracquadaniolab/ci-build-python3.6
