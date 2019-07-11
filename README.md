@@ -3,8 +3,8 @@
 Current version: 1.0.0-dev
 
 [![Build Status](http://drone.stracquadaniolab.org/api/badges/stracquadaniolab/pygna/status.svg)](http://drone.stracquadaniolab.org/stracquadaniolab/pygna)
-![platform](https://anaconda.org/stracquadaniolab/baghera/badges/platforms.svg)
-![anaconda](https://anaconda.org/stracquadaniolab/baghera/badges/version.svg)
+![platform](https://anaconda.org/stracquadaniolab/pygna/badges/platforms.svg)
+![anaconda](https://anaconda.org/stracquadaniolab/pygna/badges/version.svg)
 
 PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code.
 
