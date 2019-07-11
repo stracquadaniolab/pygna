@@ -46,7 +46,7 @@ Running `pygna` on this input as follows:
 
     $ pygna build-RWR-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
 
-    $ pygna analyse-RW --number-of-permutations 50 barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example1
+    $ pygna test_topology_rwr --number-of-permutations 50 barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example1
 
     $ pygna paint-datasets-stats interactome_table_RW.csv ./ example1
 
@@ -62,11 +62,11 @@ skip this step if the matrix is already computed
 
 The association analysis is run N x M times (N number of genesets, M number of pathways), we use only 50 permutations in this example to avoid long computations; however, the recommended value is 1000.
 
-    $ pygna comparison-random-walk barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example2 -B GO_cc_subset.gmt -k --number-of-permutations 50 --show-results
+    $ pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example2 -B GO_cc_subset.gmt -k --number-of-permutations 50 --show-results
 
 If you don't include the --show-results flag at the comparison step, plot the matrix as follows
 
-    $ pygna paint-comparison-RW example2_table_association_RW.csv ./ comparison_stats
+    $ pygna paint-comparison-RW example2_table_association_rwr.csv ./ comparison_stats
 
 The -k flag, keeps the -B geneset and permutes only on the set A.
 
@@ -74,7 +74,7 @@ If setname B is not passed, the analysis is run between each couple of setnames 
 
     $ pygna comparison-random-walk barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ./ example2_full --number-of-permutations 50 --show-results
 
-You can look at the plot of the results in the `example2_full_RWR_comparison_heatmap.pdf.pdf` file, and the corresponding table in  `example_full_table_association_RW.csv`.
+You can look at the plot of the results in the `example2_full_RWR_comparison_heatmap.pdf` file, and the corresponding table in  `example_full_table_association_rwr.csv`.
 
 
 ## Documentation

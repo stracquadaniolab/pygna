@@ -1,6 +1,10 @@
 Changelog
 =========
 
+v1.0.0
+------
+All names changed to test_topology and test_association convention
+
 07/06/2019
 ----------
 Single geneset analysis, added dataset dimension filter.
@@ -18,7 +22,6 @@ v0.2.1
 ------
 Temporary or redundant functions removed
 New utility function for reading csv files(deseq)
-
 
 v0.2.0
 ------
