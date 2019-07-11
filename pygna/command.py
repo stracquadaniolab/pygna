@@ -30,56 +30,21 @@ from matplotlib import pyplot as plt
 
 
 def __read_distance_matrix(distance_matrix_filename, in_memory=False):
-    """ Reads the large matrix .lm text file for the diffusion matrix and creates
-    a hdf5 file to work with it
+
+    """ 
+    Reads the large matrix .Uses a hdf5 file to work with it
+    :params in_memory: pass the flag to store matrix in memory
     """
-    # filename="/home/viola/Documents/UniEssex/repos/geneset-network-analysis/processed_data/barabasi_distance_matrix.lm"
-    if distance_matrix_filename.endswith("lm"):
 
-        # with open(distance_matrix_filename) as f:
-        #    nodes_names = f.readline()[:-7].replace("'","").replace("\t",",").replace(" ","").split(",")
-        # hdf5_file.close()
-        hdf5_path = "/home/viola/Documents/UniEssex/repos/geneset-network-analysis/processed_data/barabasi_distance_matrix.hdf5"
-        with tables.open_file(hdf5_path, mode="w") as hdf5_file:
+    if distance_matrix_filename.endswith("hdf5"):
 
-            line_index = 0
-            with open(distance_matrix_filename, "r") as f:
-                for line in f:
-                    if line_index == 0:
-                        nodes_name = (
-                            line[:-7]
-                            .replace("'", "")
-                            .replace("\t", ",")
-                            .replace(" ", "")
-                            .split(",")
-                        )
-                        # TODO ricalcola matrix e rimuovi -7
-                        hdf5_nodes = hdf5_file.create_array(
-                            hdf5_file.root, "nodes", nodes_name
-                        )
-
-                        line_index += 1
-                        hdf5_data = hdf5_file.create_array(
-                            hdf5_file.root,
-                            "matrix",
-                            np.zeros((len(nodes_name), len(nodes_name))),
-                        )
-                    else:
-                        i, j, sp = [int(x) for x in line.replace("\n", "").split("\t")]
-                        hdf5_data[i, j] = sp
-                        line_index += 1
-                        if line_index % 13329 == 0:
-                            print(line_index // 13329)
-
-    elif distance_matrix_filename.endswith("hdf5"):
-        # hdf5_file="/home/viola/Documents/UniEssex/repos/geneset-network-analysis/processed_data/barabasi_distance_matrix.hdf5"
         hdf5_nodes, hdf5_data = ps.Hdf5MatrixParser().read(
             distance_matrix_filename, in_memory
         )
         if type(hdf5_nodes[0]) == bytes:
             hdf5_nodes = [i.decode() for i in hdf5_nodes]
     else:
-        logging.error("invalid input format for matrix")
+        logging.error("Invalid input format for matrix, use .hdf5")
 
     return hdf5_nodes, hdf5_data
 
@@ -119,7 +84,7 @@ def network_summary(
 ################################################################################
 
 
-def analyse_total_degree(
+def test_topology_total_degree(
     network_file: "network file",
     geneset_file: "GMT geneset file",
     outpath: "output folder where to place all generated files",
@@ -131,7 +96,7 @@ def analyse_total_degree(
     show_results: "barplot of results" = False,
     show_null: "plot null distribution" = False,
     symbol: "True if we want to print th output in symbol names" = False,
-):
+    ):
 
     """
         Performs the analysis of total degree of the .
@@ -148,7 +113,7 @@ def analyse_total_degree(
     setnames = [key for key in geneset.keys()]
 
     output1 = out.Output(
-        network_file, outpath, prefix, "analyse_total_degree", geneset_file, setnames
+        network_file, outpath, prefix, "topology_total_degree", geneset_file, setnames
     )
     logging.info("Output-folder= " + output1.output)
     output1.create_st_table_empirical("table_total_degree")
@@ -167,7 +132,6 @@ def analyse_total_degree(
                 alternative="greater",
                 cores=cores,
             )
-            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
 
             logging.info("Setname:" + setname)
             if n_mapped < size_cut:
@@ -202,8 +166,7 @@ def analyse_total_degree(
     if show_results:
         paint.paint_datasets_stats(output1.output_table, output1.output, "total_degree")
 
-
-def analyse_internal_degree(
+def test_topology_internal_degree(
     network_file: "network file",
     geneset_file: "GMT geneset file",
     outpath: "output folder where to place all generated files",
@@ -215,7 +178,7 @@ def analyse_internal_degree(
     show_results: "barplot of results" = False,
     show_null: "plot null distribution" = False,
     symbol: "True if we want to print th output in symbol names" = False,
-):
+    ):
 
     """
         Performs the analysis of internal degree.
@@ -232,7 +195,7 @@ def analyse_internal_degree(
     setnames = [key for key in geneset.keys()]
 
     output1 = out.Output(
-        network_file, outpath, prefix, "analyse_internal_degree", geneset_file, setnames
+        network_file, outpath, prefix, "topology_internal_degree", geneset_file, setnames
     )
     logging.info("Output-folder= " + output1.output)
     output1.create_st_table_empirical("table_internal_degree")
@@ -249,7 +212,6 @@ def analyse_internal_degree(
                 alternative="greater",
                 cores=cores,
             )
-            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
 
             logging.info("Setname:" + setname)
 
@@ -286,11 +248,10 @@ def analyse_internal_degree(
             output1.output_table, output1.output, "internal_degree"
         )
 
-
-def analyse_RW(
+def test_topology_rwr(
     network_file: "network file, use a network with weights",
     geneset_file: "GMT geneset file",
-    RW_dict_file: "pickle obtained calculating a random walk matrix",
+    RW_dict_file: "hdf5 RWR matrix obtained with pygna ",
     outpath: "output folder where to place all generated files",
     prefix: "prefix to add to all generated files",
     setname: "Geneset to analyse" = None,
@@ -302,10 +263,12 @@ def analyse_RW(
     show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
     show_results: "barplot of results" = False,
     show_null: "plot null distribution" = False,
-):
+    ):
     """
-        Performs the analysis of random walk probabilities. Given the RW matrix ( either normal random walk or RW with restart),
-        it compares the probability of walking between thhe genes in the geneset compared to those of walking between the nodes
+        Performs the analysis of random walk probabilities. 
+        Given the RW matrix ( either normal random walk or RW with restart),
+        it compares the probability of walking between the genes in the geneset 
+        compared to those of walking between the nodes
         of a geneset with the same size
     """
 
@@ -313,7 +276,7 @@ def analyse_RW(
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     geneset = ps.__load_geneset(geneset_file, setname)
-    RW_dict = {}  # ps.DiffusionDictParser().read(RW_dict_file)
+    RW_dict = {}  
 
     RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
         RW_dict_file, in_memory=in_memory
@@ -321,7 +284,7 @@ def analyse_RW(
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(
-        network_file, outpath, prefix, "analyse_RW", geneset_file, setnames
+        network_file, outpath, prefix, "topology_rwr", geneset_file, setnames
     )
 
     logging.info("Output-folder= " + output1.output)
@@ -335,12 +298,11 @@ def analyse_RW(
 
         item = set(item).intersection(set(list(network.nodes)))
         if len(item) > size_cut:
+            # test
             observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
                 item, max_iter=number_of_permutations, alternative="greater"
             )
-            # observed_z=(observed-np.mean(null_d))/np.std(null_d
             
-
             if len(item) > 0 and show_null:
                 logging.info("Plotting diagnostic" + str(output1.output))
                 diagnostic.plot_null_distribution(
@@ -352,6 +314,7 @@ def analyse_RW(
             logging.info(
                 "Null mean: %g null variance: %g" % (np.mean(null_d), np.var(null_d))
             )
+            # saving output
             output1.update_st_table_empirical(
                 setname,
                 n_mapped,
@@ -384,8 +347,7 @@ def analyse_RW(
     if show_results:
         paint.paint_datasets_stats(output1.output_table, output1.output, "RW")
 
-
-def analyse_module(
+def test_topology_module(
     network_file: "network file",
     geneset_file: "GMT geneset file",
     outpath: "output folder where to place all generated files",
@@ -398,9 +360,9 @@ def analyse_module(
     show_results: "barplot of results" = False,
     show_null: "plot null distribution" = False,
     symbol: "True if we want to print th output in symbol names" = False,
-):
+    ):
     """
-        Performs network module analysis.
+        Performs geneset network topology module analysis.
 
         It computes a p-value for the largest connected component
         of the geneset being bigger than the one expected by chance
@@ -413,7 +375,7 @@ def analyse_module(
     setnames = [key for key in geneset.keys()]
 
     output1 = out.Output(
-        network_file, outpath, prefix, "analyse_module", geneset_file, setnames
+        network_file, outpath, prefix, "topology_module", geneset_file, setnames
     )
     logging.info("Output-folder= " + output1.output)
     output1.create_st_table_empirical("table_module")
@@ -437,7 +399,7 @@ def analyse_module(
                     converter = Converter()
                     LCC = converter.entrez2symbol(LCC)
 
-                output1.add_GMT_entry(setname, "module_analysis", LCC)
+                output1.add_GMT_entry(setname, "topology_module", LCC)
 
             observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
                 item, max_iter=number_of_permutations, alternative="greater"
@@ -480,11 +442,10 @@ def analyse_module(
     if show_results:
         paint.paint_datasets_stats(output1.output_table, output1.output, "module")
 
-
-def analyse_location(
+def test_topology_sp(
     network_file: "network file",
-    distance_matrix_filename: "distance matrix file generated by pygna",
     geneset_file: "GMT geneset file",
+    distance_matrix_filename: "distance hdf5 matrix file generated by pygna",
     outpath: "output folder where to place all generated files",
     prefix: "prefix to add to all generated files",
     setname: "Geneset to analyse" = None,
@@ -494,19 +455,21 @@ def analyse_location(
     in_memory: "set if you want the large matrix to be read in memory" = False,
     show_matrix: "plotting flag, if true the distance matrix for each geneset is saved " = False,
     show_results: "barplot of results" = False,
-):
+    ):
     """
-        Performs network location analysis.
+        Performs geneset network topology shortest path analysis.
 
         It computes a p-value for the average shortest path length
         of the geneset being smaller than expected by chance
         for a geneset of the same size.
+
     """
 
     network = ps.__load_network(network_file)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
+
     geneset = ps.__load_geneset(geneset_file, setname)
-    # distance_matrix = ps.DistanceMatrixParser().read(distance_matrix_file)
+
     diz = {}
     diz["nodes"], diz["matrix"] = __read_distance_matrix(
         distance_matrix_filename, in_memory=in_memory
@@ -518,7 +481,7 @@ def analyse_location(
         distance_matrix_filename,
         outpath,
         prefix,
-        "analyse_location",
+        "topology_sp",
         geneset_file,
         setnames,
     )
@@ -576,9 +539,12 @@ def test_degree_distribution(
     setname: "Geneset to analyse" = None,
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     show_results: "barplot of results" = False,
-):
+    ):
     """
-        Performs degree distribution test
+        Performs degree distribution test.
+        Kolmogorov-Smirnov statistic on 2 samples.
+        H0 is that the geneset is drawn from the same distribution of all the other nodes. 
+        H0 rejected if statistic is greater.
     """
     network = ps.__load_network(network_file)
 
@@ -599,7 +565,6 @@ def test_degree_distribution(
         item = set(item)
         if len(item) > size_cut:
             observed, pvalue, n_mapped, n_geneset = st_test.apply_test(item)
-            # observed_z=(observed-np.mean(null_d))/np.std(null_d)
 
             logging.info("Setname:" + setname)
             if n_mapped < size_cut:
@@ -642,7 +607,7 @@ def test_diffusion_weights(
     show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
     show_results: "barplot of results" = False,
     show_null: "plot null distribution" = False,
-):
+    ):
 
     """
         Performs the analysis of random walk diffusion weights. Given the RW matrix
@@ -732,8 +697,7 @@ def test_diffusion_weights(
 ######### associations and COMPARISONS #########################################
 ################################################################################
 
-# TODO: add size cut
-def comparison_shortest_path(
+def test_association_sp(
     network_file: "network file",
     A_geneset_file: "GMT geneset file, if it's the only parameter passed the analysis is gonna be run on all the couples of datasets, otherwise specify the other files and setnames",
     distance_matrix_filename: "distance matrix file generated by pygna",
@@ -742,16 +706,17 @@ def comparison_shortest_path(
     setname_A: "Geneset A to analyse" = None,
     B_geneset_file: "GMT geneset file" = None,
     setname_B: "Geneset B to analyse" = None,
+    size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     keep: "if true, keeps the geneset B unpermuted" = False,
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     show_matrix: "plotting flag, if true the diffusion matrix for each pair of genesets is saved" = False,
     show_results: "heatmap of results" = False,
-):
+    ):
     """
         Performs comparison of network location analysis. If the flag
-        --keep  is passed, one of the B geneset is kept
+        --keep  is passed, the B geneset is kept
         fixed, and doesnt't get permuted
 
         It computes a p-value for the shortest path distance
@@ -767,9 +732,9 @@ def comparison_shortest_path(
     """
 
     if keep:
-        analysis_name_str = "association_SP"
+        analysis_name_str = "association_sp"
     else:
-        analysis_name_str = "comparison_SP"
+        analysis_name_str = "comparison_sp"
 
     network = ps.__load_network(network_file)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
@@ -850,7 +815,7 @@ def comparison_shortest_path(
             network_file,
             outpath,
             prefix,
-            "comparison_shortest_path",
+            analysis_name_str,
             A_geneset_file,
             sets_A,
             B_geneset_file,
@@ -896,17 +861,17 @@ def comparison_shortest_path(
         paint.paint_comparison_stats(output1.output_table, output1.output + "/", "sp")
 
 
-def comparison_random_walk(
+def test_association_rwr(
     network_file: "network file",
     A_geneset_file: "GMT geneset file",
-    RW_dict_file: "pickle obtained calculating a random walk matrix",
+    RW_dict_file: ".hdf5 file with the RWR matrix obtained by pygna",
     outpath: "output folder where to place all generated files",
     prefix: "prefix to add to all generated files",
     setname_A: "Geneset A to analyse" = None,
     B_geneset_file: "GMT geneset file" = None,
     setname_B: "Geneset B to analyse" = None,
-    length_filter=20,
-    keep=False,
+    size_cut: "removes all genesets with a mapped length < size_cut" = 20,
+    keep: "if true, keeps the geneset B unpermuted" =False,
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
@@ -929,9 +894,9 @@ def comparison_random_walk(
     """
 
     if keep:
-        analysis_name_str = "association_RW"
+        analysis_name_str = "association_rwr"
     else:
-        analysis_name_str = "comparison_RW"
+        analysis_name_str = "comparison_rwr"
 
     network = ps.__load_network(network_file)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
@@ -956,7 +921,6 @@ def comparison_random_walk(
         else:
             geneset_B = None
 
-    # define analysis and network  (network, genesetA, genesetB, diz={})
     st_comparison = sc.StatisticalComparison(
         sc.comparison_random_walk, network, n_proc=cores, diz=RW_dict
     )
@@ -975,7 +939,7 @@ def comparison_random_walk(
         output1.create_comparison_table_empirical("table_" + analysis_name_str)
 
         for pair in itertools.combinations(setnames, 2):
-            if len(pair[0]) > length_filter and len(pair[1]) > length_filter:
+            if len(pair[0]) > size_cut and len(pair[1]) > size_cut:
 
                 logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
 
@@ -1019,7 +983,7 @@ def comparison_random_walk(
             network_file,
             outpath,
             prefix,
-            "association_RW",
+            analysis_name_str,
             A_geneset_file,
             sets_A,
             B_geneset_file,
@@ -1032,7 +996,7 @@ def comparison_random_walk(
         for set_A, item_A in geneset_A.items():
             for set_B, item_B in geneset_B.items():
 
-                if len(item_A) > length_filter and len(item_B) > length_filter:
+                if len(item_A) > size_cut and len(item_B) > size_cut:
                     logging.info("Analysing " + str(set_A) + " and " + str(set_B))
                     n_overlaps = len(set(item_A).intersection(set(item_B)))
 

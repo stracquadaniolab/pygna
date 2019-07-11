@@ -23,19 +23,18 @@ def main():
     argh dispatch
     """
     argh.dispatch_commands([# network summary
-                            cmd.network_graphml,
                             cmd.network_summary,
-                            # single set analyses
-                            cmd.analyse_total_degree,
-                            cmd.analyse_internal_degree,
-                            cmd.analyse_module,
-                            cmd.analyse_location,
-                            cmd.analyse_RW,
+                            # geneset network topoly analyses
+                            cmd.test_topology_total_degree,
+                            cmd.test_topology_internal_degree,
+                            cmd.test_topology_module,
+                            cmd.test_topology_sp,
+                            cmd.test_topology_rwr,
                             cmd.test_degree_distribution,
                             cmd.test_diffusion_weights,
                             # comparison analysis
-                            cmd.comparison_shortest_path,
-                            cmd.comparison_random_walk,
+                            cmd.test_association_sp,
+                            cmd.test_association_rwr,
                             # building functions
                             cmd.build_distance_matrix,
                             cmd.build_RWR_diffusion,
@@ -46,6 +45,7 @@ def main():
                             paint.paint_comparison_stats,
                             paint.paint_comparison_RW,
                             paint.plot_adjacency,
+                            cmd.network_graphml,
                             # utils
                             utils.convert_gmt,
                             utils.geneset_from_table,

@@ -45,7 +45,7 @@ class KSTest:
             )
             logging.info("Observed Distribution evaluated")
             # iterations, the null distribution is a vector where ones represent rejected hypothesis
-            stats, pvalue = scipy.stats.ks_2samp(observed, baseline)
+            stats, pvalue = scipy.stats.ks_2samp(observed, baseline, alternative='greater')
             # computing empirical pvalue
 
             return stats, pvalue, len(mapped_geneset), len(geneset)

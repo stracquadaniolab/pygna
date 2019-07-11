@@ -271,9 +271,11 @@ def write_graph_summary(graph, output_folder, prefix):
 
     fig, axes = plt.subplots(1, figsize=(10, 10))
     g1 = sns.distplot(degree, hist=True, kde=True, rug=False, ax=axes)
+    perc=np.percentile(degree,99)
+    g1 = sns.distplot(degree[degree>perc], hist=False, kde=False, rug=True,color='r', ax=axes)
     sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
     g1.set_ylabel("Density")
-    g1.set_xlabel("Network Degree")
+    g1.set_xlabel("Degree")
     fig.savefig(output_folder + prefix + "_degree.pdf", format="pdf")
     fig.savefig(output_folder + prefix + "_degree.png", format="png")
 

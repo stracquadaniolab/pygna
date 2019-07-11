@@ -1,28 +1,29 @@
-Single Set Analysis
-===================
+Geneset Network Topology Analysis
+==================================
 
-A type of analysis that can be performed with PyGNA is
+Here are all the GNT analyses that pygna can perform. 
+For each of them a single geneset topology is tested with the specified test statistics.
 
 
-Module analysis
----------------
+GNT Module analysis
+-------------------
 
-.. autofunction:: pygna.command.analyse_module
+.. autofunction:: pygna.command.test_topology_module
 
-Degree analysis
----------------
+GNT Degree analysis
+-------------------
 
-.. autofunction:: pygna.command.analyse_internal_degree
-.. autofunction:: pygna.command.analyse_total_degree
+.. autofunction:: pygna.command.test_topology_internal_degree
+.. autofunction:: pygna.command.test_topology_total_degree
 
 .. autofunction:: pygna.command.test_degree_distribution
 
-Localisation Analysis
----------------------
+GNT Shortest Path Analysis
+---------------------------
 
-.. autofunction:: pygna.command.analyse_location
+.. autofunction:: pygna.command.test_topology_sp
 
-Interactions probabilistic Analysis
+GNT Random Walk Analysis
 -----------------------------------
 
-.. autofunction:: pygna.command.analyse_RW
+.. autofunction:: pygna.command.test_topology_rwr

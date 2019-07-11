@@ -157,7 +157,8 @@ def weights_diffusion_statistic(
     matrix, weights, geneset_index, diz={}, observed_flag=False
 ):
 
-    """ Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
+    """ 
+    
     """
 
     if matrix.shape[1] != weights.shape[0]:

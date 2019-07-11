@@ -27,8 +27,11 @@ genesets and networks are reported with entrez identifiers, while for interpreta
 prefer to read the names as gene symbols.
 
 We provide a function to convert gmt names
+
 .. autofunction:: pygna.utils.convert_gmt 
+
 whose core is the converter class 
+
 .. autoclass:: pygna.utils.Converter
 
 Drawing Graphml files for Cytoscape
