@@ -29,9 +29,6 @@ steps:
   commands:
   - pip install twine
   - twine upload dist/*
-  when:
-    event:
-    - tag
 
 - name: conda
   image: stracquadaniolab/ci-build-python3.6
@@ -42,7 +39,5 @@ steps:
   - mkdir conda-build
   - conda build . --no-build-id --output-folder ./conda-build
   - conda convert -p all ./conda-build/**/pygna*.bz2
-  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress --private ./conda-build/**/pygna*.bz2
-  when:
-    event:
-    - tag
+  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress ./conda-build/**/*.bz2
+
