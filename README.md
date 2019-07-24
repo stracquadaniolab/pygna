@@ -94,3 +94,4 @@ A unified framework for geneset network analysis. Viola Fanfani, Giovanni Stracq
 ## Issues
 
 Please post an issue to report a bug or request new features.
+We are now working on code refactoring and standardising the I/O behaviour. 
