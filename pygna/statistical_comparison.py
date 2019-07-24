@@ -53,7 +53,6 @@ class StatisticalComparison:
         observed = self.__comparison_statistic(
             self.__network, mapped_genesetA, mapped_genesetB, self.__diz
         )
-        logging.info("Observed %f." % (observed))
 
         # iterations
         null_distribution = StatisticalComparison.get_comparison_null_distribution_mp(
@@ -82,7 +81,6 @@ class StatisticalComparison:
     def get_comparison_null_distribution_mp(
         self, genesetA, genesetB, max_iter=100, keep=False
     ):
-        print(int(self.__n_proc))
         p = multiprocessing.Pool(self.__n_proc)
 
         n_trial = int(max_iter / self.__n_proc)

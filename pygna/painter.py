@@ -128,16 +128,16 @@ class Painter_RW(Painter):
         )
 
 
-def paint_datasets_stats(
-    table_filename, output_folder, stat_name, alternative="greater"
-):
+def paint_datasets_stats( table_filename: 'pygna results table',
+                            output_file: 'figure file, use pdf or png extension',
+                            alternative="greater"
+    ):
 
     palette_binary = RdBu_4.mpl_colors[0::3]
     with open(table_filename, "r") as f:
-        table = pd.read_table(f, sep=",")
-    print(table.head())
-    # table=table.sort_values(by=["empirical_pvalue","observed"],ascending=[True, False])
+        table = pd.read_csv(f, sep=",")
 
+    stat_name = table["analysis"][0]
     n_permutations = table["number_of_permutations"][0]
     data = pd.DataFrame()
     if alternative == "greater":
@@ -171,9 +171,6 @@ def paint_datasets_stats(
 
         data = data.reset_index(drop=True)
         data["ind"] = data.index
-
-        # Example data
-        print(data["err"].values[:, np.newaxis].shape)
 
         g = sns.catplot(
             x="value",
@@ -210,6 +207,7 @@ def paint_datasets_stats(
         g.set_xlabels(stat_name)
         g.set_ylabels("")
         g.despine(bottom=True, left=True)
+
     else:
 
         for i, row in table.sort_values(
@@ -247,8 +245,6 @@ def paint_datasets_stats(
         # data=data.iloc[0:20]
 
         # fig, ax = plt.subplots(1, 1, figsize=(10, 20), sharex=True,sharey=True)
-        # Example data
-        print(data["err"].values[:, np.newaxis].shape)
 
         g = sns.catplot(
             x="value",
@@ -286,17 +282,21 @@ def paint_datasets_stats(
         g.set_ylabels("")
         g.despine(bottom=True, left=True)
 
-    plt.savefig(output_folder + stat_name + "_results.pdf", format="pdf")
-    # plt.savefig(output_folder+"PA_fisher_"+dataset_name+".jpg", format='jpg')
+    if output_file.endswith('.pdf'):
+        plt.savefig(output_file, format="pdf")
+    elif output_file.endswith('.png'):
+        plt.savefig(output_file, format="png")
+    else:
+        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
+        fig.savefig(output_file+'.png', format="png")
 
-
-def paint_comparison_stats(table_filename, output_folder, stat_name):
+def paint_comparison_stats(table_filename, output_file):
 
     palette = RdBu_11.mpl_colors  # [0::3]
     with open(table_filename, "r") as f:
         table = pd.read_table(f, sep=",")
-    print(table.head())
 
+    stat_name = table["analysis"][0]
     n_permutations = table["number_of_permutations"][0]
 
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
@@ -328,30 +328,35 @@ def paint_comparison_stats(table_filename, output_folder, stat_name):
     axes.set_xlabel("")
     axes.set_ylabel("")
 
-    fig.savefig(output_folder + stat_name + "_comparison_heatmap.pdf", format="pdf")
-    # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
+    if output_file.endswith('.pdf'):
+        plt.savefig(output_file, format="pdf")
+    elif output_file.endswith('.png'):
+        plt.savefig(output_file, format="png")
+    else:
+        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
+        fig.savefig(output_file+'.png', format="png")
 
 
-def paint_comparison_RW(table_filename, output_folder, stat_name, single_geneset=False):
+def paint_comparison_RW(table_filename, output_file, single_geneset=False):
 
     palette = OrRd_9.mpl_colors  # [0::3]
     with open(table_filename, "r") as f:
         table = pd.read_table(f, sep=",")
-    print(table.head())
 
+    stat_name= table["analysis"][0]
     n_permutations = table["number_of_permutations"][0]
 
     if single_geneset:
         table=table.loc[:,['observed','setname_A','setname_B','empirical_pvalue']]
         for i in set(table['setname_A'].values.tolist()).union(set(table['setname_B'].values.tolist())):
             table=table.append({'setname_A':i, 'setname_B':i, 'observed':0, 'empirical_pvalue':1}, ignore_index=True)
-        print(table)
 
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
 
     annot = table.pivot(
         values="empirical_pvalue", index="setname_A", columns="setname_B"
     ).values
+
     if single_geneset:
 
         fig, axes = plt.subplots(1, 1, figsize=(10, 10))
@@ -378,8 +383,6 @@ def paint_comparison_RW(table_filename, output_folder, stat_name, single_geneset
         axes.set_xlabel("")
         axes.set_ylabel("")
 
-        fig.savefig(output_folder + stat_name + "_comparison_heatmap.pdf", format="pdf")
-        # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
     else:
 
 
@@ -409,8 +412,14 @@ def paint_comparison_RW(table_filename, output_folder, stat_name, single_geneset
         axes.set_xlabel("")
         axes.set_ylabel("")
 
-        fig.savefig(output_folder + stat_name + "_comparison_heatmap.pdf", format="pdf")
-        # fig.savefig(output_folder+"fig_comparison_heatmap.jpeg", format='jpeg')
+
+    if output_file.endswith('.pdf'):
+        plt.savefig(output_file, format="pdf")
+    elif output_file.endswith('.png'):
+        plt.savefig(output_file, format="png")
+    else:
+        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
+        fig.savefig(output_file+'.png', format="png")
 
 
 def paint_final_table(final_table, output_file):

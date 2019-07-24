@@ -30,7 +30,7 @@ def main():
                             cmd.test_topology_module,
                             cmd.test_topology_sp,
                             cmd.test_topology_rwr,
-                            cmd.test_degree_distribution,
+                            #cmd.test_degree_distribution,
                             cmd.test_diffusion_weights,
                             # comparison analysis
                             cmd.test_association_sp,
