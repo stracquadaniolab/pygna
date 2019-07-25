@@ -290,7 +290,15 @@ def paint_datasets_stats( table_filename: 'pygna results table',
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         fig.savefig(output_file+'.png', format="png")
 
-def paint_comparison_stats(table_filename, output_file):
+def paint_comparison_stats(table_filename: 'pygna comparison output', 
+                            output_file: 'output figure file, specify png or pdf file',
+                            rwr: 'use rwr is the table comes from a rwr analysis'= False,
+                            within: 'use true if the comparison has been done for a single file'=False):
+
+    """
+    paints a comparison stats table using a barplot, 
+    specify within if the comparison has been done on the same 
+    """
 
     palette = RdBu_11.mpl_colors  # [0::3]
     with open(table_filename, "r") as f:
@@ -336,12 +344,19 @@ def paint_comparison_stats(table_filename, output_file):
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         fig.savefig(output_file+'.png', format="png")
 
+def paint_comparison_matrix(table_filename: 'pygna comparison output', 
+                            output_file: 'output figure file, specify png or pdf file',
+                            rwr: 'use rwr is the table comes from a rwr analysis'= False,
+                            single_geneset: 'use true if the comparison has been done for a single file'=False,
+                            annotate: 'set true if uou want to print the pvalue inside the cell' = False):
 
-def paint_comparison_RW(table_filename, output_file, single_geneset=False):
-
-    palette = OrRd_9.mpl_colors  # [0::3]
+    if rwr:
+        palette = OrRd_9.mpl_colors
+    else:
+        palette = RdBu_11.mpl_colors
+        
     with open(table_filename, "r") as f:
-        table = pd.read_table(f, sep=",")
+        table = pd.read_csv(f, sep=",")
 
     stat_name= table["analysis"][0]
     n_permutations = table["number_of_permutations"][0]
@@ -351,67 +366,62 @@ def paint_comparison_RW(table_filename, output_file, single_geneset=False):
         for i in set(table['setname_A'].values.tolist()).union(set(table['setname_B'].values.tolist())):
             table=table.append({'setname_A':i, 'setname_B':i, 'observed':0, 'empirical_pvalue':1}, ignore_index=True)
 
+
+
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
-
-    annot = table.pivot(
-        values="empirical_pvalue", index="setname_A", columns="setname_B"
-    ).values
-
+    pivot_table = pivot_table.fillna(0)
+    matrix = (pivot_table.T+pivot_table)-pivot_table.T*np.eye(len(pivot_table))
     if single_geneset:
-
-        fig, axes = plt.subplots(1, 1, figsize=(10, 10))
-        fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
-
-        pivot_table = pivot_table.fillna(0)
         mask = np.triu(np.ones((len(pivot_table),len(pivot_table))))
-
-        g2 = sns.heatmap(
-            (pivot_table.T+pivot_table)/2,
-            cmap=palette,
-            ax=axes,
-            square=True,
-            xticklabels=1,
-            yticklabels=1,
-            mask=mask,
-            cbar=True,
-            linewidths=0.1,
-            linecolor="white",
-        )  # ,annot=annot,fmt=""#,mask=mask,
-
-        g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
-        g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
-        axes.set_xlabel("")
-        axes.set_ylabel("")
-
     else:
+        mask = np.ones((len(pivot_table),len(pivot_table)))-np.tril(np.ones((len(pivot_table),len(pivot_table))))
 
+    if annotate:
+        annot = table.pivot(
+            values="empirical_pvalue", index="setname_A", columns="setname_B"
+        )
+        annot = annot.fillna(0)
+        annot = (annot.T.values+annot.values)-annot.T.values*np.eye(len(annot))
+    else:
+        annot=False
 
-        fig, axes = plt.subplots(1, 1, figsize=(10, 10))
-        fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
-
-        pivot_table = pivot_table.fillna(0)
-        mask = pivot_table.T == 0
-        print(mask.shape)
-        print(pivot_table.T)
-
+    fig, axes = plt.subplots(1, 1, figsize=(10, 10))
+    fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
+    
+    if rwr:
+        print('plotting rwr')
         g2 = sns.heatmap(
-            pivot_table.T,
-            cmap=palette,
-            ax=axes,
-            square=True,
-            xticklabels=1,
-            yticklabels=1,
-            mask=mask,
-            cbar=True,
-            linewidths=0.1,
-            linecolor="white",
-        )  # ,annot=annot,fmt=""#,mask=mask,
-
-        g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
-        g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
-        axes.set_xlabel("")
-        axes.set_ylabel("")
-
+                matrix,
+                cmap=palette,
+                ax=axes,
+                square=True,
+                xticklabels=1,
+                yticklabels=1,
+                mask=mask,
+                annot=annot,
+                cbar=True,
+                linewidths=0.1,
+                linecolor="white",
+            )  
+    else:
+        g2 = sns.heatmap(
+                matrix,
+                cmap=palette,
+                ax=axes,
+                square=True,
+                xticklabels=1,
+                yticklabels=1,
+                mask=mask,
+                annot=annot,
+                center=0,
+                cbar=True,
+                linewidths=0.1,
+                linecolor="white",
+            )  
+    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
+    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
+    axes.set_xlabel("")
+    axes.set_ylabel("")
 
     if output_file.endswith('.pdf'):
         plt.savefig(output_file, format="pdf")
@@ -421,8 +431,7 @@ def paint_comparison_RW(table_filename, output_file, single_geneset=False):
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         fig.savefig(output_file+'.png', format="png")
 
-
-def paint_final_table(final_table, output_file):
+def paint_association_table(final_table, output_file):
 
     out.apply_multiple_testing_correction(
         final_table, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.05
@@ -470,65 +479,13 @@ def paint_final_table(final_table, output_file):
     plt.savefig(output_file + ".pdf", f="pdf")
     plt.savefig(output_file + ".png", f="png")
 
-    diz = {}
-    analysis = []
-    for a, tab in table.groupby(["analysis"]):
-        analysis.append(a)
-        tab = tab.sort_values(by=["empirical_pvalue", "observed"], ascending=False)
-        tab = tab.reset_index()
-        tab["rank"] = tab.index.values
-        print(tab.head())
-        diz[a] = {}
-        tab = tab.sort_values(by=["setname"], ascending=False)
-        print(tab.head())
-        diz[a]["ranking"] = [
-            (i) for i in zip(tab.index.values.tolist(), tab["setname"].values.tolist())
-        ]
-        diz[a]["tab"] = tab
-        print(tab[["setname", "rank"]])
-
-    M_corr = np.zeros((len(analysis), len(analysis)))
-    M_pvalue = np.zeros((len(analysis), len(analysis)))
-    for i in range(len(analysis)):
-        for j in range(len(analysis)):
-            s_corr, s_pvalue = stats.spearmanr(
-                diz[analysis[i]]["tab"]["rank"].values,
-                diz[analysis[j]]["tab"]["rank"].values,
-                axis=0,
-                nan_policy="propagate",
-            )
-            print(
-                "%s, %s : spearman r--- corr: %f, p %f"
-                % (analysis[i], analysis[j], s_corr, s_pvalue)
-            )
-            M_corr[i, j] = s_corr
-            M_pvalue[i, j] = s_pvalue
-
-    labels = [""]
-    for k in analysis:
-        labels.append(k)
-
-    f, ax = plt.subplots(1, 2, figsize=(10, 5))
-    plt.xticks(np.arange(6))
-    plt.yticks(np.arange(6))
-    ax[0].imshow(M_corr)
-    ax[0].set_yticklabels(labels)
-    ax[0].set_xticklabels(labels, rotation=90)
-    ax[0].set_title("spearman r")
-
-    ax[1].imshow(M_pvalue)
-    ax[1].set_xticklabels(analysis, rotation=90)
-    ax[1].set_title("pvalue")
-    plt.savefig(output_file + "_corr.pdf", f="pdf")
-
-
 def plot_adjacency(
     network: "network_filename",
     output_folder: "output_folder",
     prefix: "prefix for the file",
     clusters_file: "file of clusters to order the nodes" = None,
     size: "number of genes to plot, allows to cut the adjacency matrix" = None,
-):
+    ):
 
     """
     This function plots the adjacency matrix of a network. If a geneset file is passed,

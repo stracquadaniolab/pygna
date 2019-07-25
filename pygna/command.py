@@ -167,7 +167,7 @@ def test_topology_total_degree(
                     diagnostic.plot_null_distribution(
                         null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
                     )
-
+    output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
 
@@ -240,7 +240,7 @@ def test_topology_internal_degree(
                     diagnostic.plot_null_distribution(
                         null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
                     )
-
+    output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(
             output1.output_table_results, results_figure, alternative='greater',
@@ -284,8 +284,6 @@ def test_topology_rwr(
 
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-
-    #output1.set_diffusion_matrix(rwr_matrix_filename)
 
     st_test = st.StatisticalTest(st.geneset_RW_statistic, network, RW_dict)
 
@@ -331,6 +329,7 @@ def test_topology_rwr(
                 % (setname, size_cut)
             )
 
+    output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater',)
 
@@ -411,6 +410,7 @@ def test_topology_module(
                         null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
                     )
 
+    output1.close_temporary_table()
     if output_LCC:
         output1.create_GMT_output(output_LCC)
 
@@ -494,7 +494,7 @@ def test_topology_sp(
                 "%s remove from results since nodes mapped are < %d"
                 % (setname, size_cut)
             )
-
+    output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='less',)
 
@@ -550,6 +550,7 @@ def test_degree_distribution(
                     setname, n_mapped, n_geneset, 1, observed, pvalue, 0, 0
                 )
 
+    output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
 
@@ -657,6 +658,7 @@ def test_diffusion_weights(
         np.mean(null_d),
         np.var(null_d),
     )
+    output1.close_temporary_table()
 
 ################################################################################
 ######### associations and COMPARISONS #########################################
@@ -809,6 +811,7 @@ def test_association_sp(
                     np.var(null_d),
                 )
 
+    output1.close_temporary_table()
     if results_figure:
         paint.paint_comparison_stats(output1.output_table_results, results_figure)
 
@@ -970,6 +973,7 @@ def test_association_rwr(
                         np.var(null_d),
                     )
 
+    output1.close_temporary_table()
     if results_figure:
         sg= setname_B == None
         paint.paint_comparison_RW(output1.output_table_results, results_figure, single_geneset=sg)
@@ -995,9 +999,7 @@ def build_distance_matrix(
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
 
-    print(type(network))
     distance_matrix = nx.all_pairs_shortest_path_length(network)
-    print(type(distance_matrix))
 
     nodes = list(network.nodes())
 
@@ -1019,25 +1021,8 @@ def build_distance_matrix(
                     j = nodes.index(node_j)
                     if j >= i:  # saves only the upper triangular matrix
                         hdf5_data[i, j] = sp
-
-    elif output_file.endswith(".lm.txt"):
-        # creates the lm.txt file .
-        # The format is node_i \t node_j \t shortest_path
-        visited_nodes = []
-        with open(output_file, "w") as f:
-            f.write(str(nodes)[1:-1].replace(",", "\t") + "\n")
-            for node_i, k in distance_matrix:
-                i = nodes.index(node_i)
-                print(i)
-                visited_nodes.append(node_i)
-                for node_j, sp in k.items():
-                    j = nodes.index(node_j)
-                    if node_j not in visited_nodes:
-                        f.write(str(i) + "\t" + str(j) + "\t" + str(sp) + "\n")
     else:
-        logging.error("enter a valid extension for the output file")
-
-    # pickle.dump(distance_matrix, open(output_file, 'wb'))
+        logging.error("Pass an hd5f file")
 
 
 def build_RWR_diffusion(
@@ -1075,7 +1060,6 @@ def build_RWR_diffusion(
                 "matrix",
                 beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A),
             )
-
             logging.info("Saving network")
     else:
         return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A)

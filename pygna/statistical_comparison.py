@@ -88,9 +88,10 @@ class StatisticalComparison:
             "n_proc = %d, each computing %d permutations "
             % (int(self.__n_proc), n_trial)
         )
-
+        
+        # Don't set up the multicore architecture if only one core is given
         if self.__n_proc == 1:
-
+            
             null_distribution = StatisticalComparison.get_comparison_null_distribution(
                 self, genesetA, genesetB, max_iter, keep
             )
@@ -108,7 +109,6 @@ class StatisticalComparison:
             null_distribution = np.array([])
             for r in results:
                 null_distribution = np.hstack((null_distribution, np.array(r.get())))
-            # print(len(null_distribution))
             p.close()
 
         return np.asarray(null_distribution)
@@ -118,6 +118,7 @@ class StatisticalComparison:
         np.random.seed()
         random_dist = []
 
+        # association statistic, B kept, A bootstrapped
         if keep:
             for i in range(n_samples):
                 random_sample_A = np.random.choice(
@@ -128,7 +129,7 @@ class StatisticalComparison:
                         self.__network, set(random_sample_A), set(genesetB), self.__diz
                     )
                 )
-
+        # association statistic, B kept, A bootstrapped
         else:
             for i in range(n_samples):
                 random_sample_A = np.random.choice(
