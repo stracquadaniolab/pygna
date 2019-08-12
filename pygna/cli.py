@@ -30,7 +30,7 @@ def main():
                             cmd.test_topology_module,
                             cmd.test_topology_sp,
                             cmd.test_topology_rwr,
-                            cmd.test_degree_distribution,
+                            #cmd.test_degree_distribution,
                             cmd.test_diffusion_weights,
                             # comparison analysis
                             cmd.test_association_sp,
@@ -40,10 +40,9 @@ def main():
                             cmd.build_RWR_diffusion,
                             cmd.build_graph,
                             # paint
-                            paint.paint_final_table,
                             paint.paint_datasets_stats,
                             paint.paint_comparison_stats,
-                            paint.paint_comparison_RW,
+                            paint.paint_comparison_matrix,
                             paint.plot_adjacency,
                             cmd.network_graphml,
                             # utils

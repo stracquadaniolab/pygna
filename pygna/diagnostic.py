@@ -51,7 +51,7 @@ def plot_diffusion_matrix(nodes, matrix, filename, show_labels=False):
     # print("Min cc: %g Max cc: %g " % (np.min(cc_len), np.max(cc_len)))
 
 
-def plot_null_distribution(null_distribution, observed, output_folder, setname=None):
+def plot_null_distribution(null_distribution, observed, output_file, setname):
 
     fig, axes = plt.subplots(1, figsize=(10, 10))
     g1 = sns.distplot(null_distribution, hist=True, kde=True, rug=False, ax=axes)
@@ -75,12 +75,18 @@ def plot_null_distribution(null_distribution, observed, output_folder, setname=N
         color="r",
         fontsize=10,
     )
-    # plt.show()
 
     logging.info(
-        "output file for figure: " + output_folder + setname + "_null_distribution.pdf"
+        "Output for diagnostic null distribution: " + output_file
     )
-    fig.savefig(output_folder + setname + "_null_distribution.pdf", format="pdf")
+    if output_file.endswith('.pdf'):
+        fig.savefig(output_file, format="pdf")
+    elif output_file.endswith('.png'):
+        fig.savefig(output_file, format="png")
+    else:
+        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
+        fig.savefig(output_file+'.png', format="png")
+
 
 
 def draw_graph(

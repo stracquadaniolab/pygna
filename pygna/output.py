@@ -11,14 +11,15 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy
+import tempfile
+import shutil
 
 
 class Output:
     def __init__(
         self,
         network_filename,
-        output_path,
-        prefix,
+        output_table_results_file,
         analysis,
         geneset_file,
         setnames,
@@ -26,10 +27,12 @@ class Output:
         setnames_B=None,
     ):
 
+
+
         self.network_filename = network_filename
         self.analysis = analysis
-        self.output_path = output_path
-        self.output = self.output_path + prefix + "_"
+        self.output_table_results = output_table_results_file
+        self.output_gmt = None
         self.text = []
         self.geneset_filename = geneset_file
         self.setnames = setnames
@@ -38,68 +41,67 @@ class Output:
         self.diffusion_matrix_file = None
         self.GMT_dict = {}
 
-        try:
-            # today = datetime.now()
-            os.listdir(self.output_path)
+        if not self.output_table_results.endswith('.csv'):
+            logging.warning('The output table is saved as csv file, the name does not match the file extension')
 
-            # dirs=glob.glob(self.output_path+today.strftime('%Y%m%d')+"_*")
-            # print(dirs)
-            # if dirs:
-            #    iter=[int(i[len(self.output_path+today.strftime('%Y%m%d'))+1:]) for i in dirs]
-            #    print(iter)
-            #    self.output_folder=today.strftime('%Y%m%d')+"_"+str(max(iter)+1)
-            # else:
-            #    self.output_folder= today.strftime('%Y%m%d')+"_0"
-            # os.mkdir(self.output_path+self.output_folder)
-
-        except FileNotFoundError:
-            logging.error("Output path doesn't exists")
-            sys.exit(-1)
 
     def set_diffusion_matrix(self, diffusion_matrix_file):
         self.diffusion_matrix_file = diffusion_matrix_file
 
-    def add_output_text(self, text):
+    # def add_output_text(self, text):
 
-        """Add text to the output. text an be both a string or a list
-        of values convertible to strings.
-        """
+    #     """Add text to the output. text an be both a string or a list
+    #     of values convertible to strings.
+    #     """
 
-        if type(text) == str:
-            self.text.append(text)
-        elif type(text) == list:
-            for t in text:
-                self.text.append(str(t))
-        else:
-            logging.error("Text needs to be a string or a list of strings")
+    #     if type(text) == str:
+    #         self.text.append(text)
+    #     elif type(text) == list:
+    #         for t in text:
+    #             self.text.append(str(t))
+    #     else:
+    #         logging.error("Text needs to be a string or a list of strings")
 
-    def save_output_summary(self):
+    # def save_output_summary(self):
 
-        """Summary.txt is written using the input configurations
-        and the text that has been added to the output instance"""
+    #     """Summary.txt is written using the input configurations
+    #     and the text that has been added to the output instance"""
 
-        with open(self.output + "summary.txt", "w") as file1:
-            file1.write("Network= " + str(self.network_filename))
-            file1.write("\n Input file= " + str(self.geneset_filename))
-            file1.write("\n Analysis= " + str(self.analysis))
-            file1.write("\n Setnames = " + str(self.setnames))
-            if self.geneset_filename_B:
-                file1.write("\n Geneset file B= " + str(self.geneset_filename_B))
-            if self.setnames_B:
-                file1.write("\n Setname B= " + str(self.setnames_B))
-            if self.diffusion_matrix_file:
-                file1.write("\n Diffusion matrix= " + str(self.diffusion_matrix_file))
-            for line in self.text:
-                file1.write("\n" + line)
+    #     with open(self.output + "summary.txt", "w") as file1:
+    #         file1.write("Network= " + str(self.network_filename))
+    #         file1.write("\n Input file= " + str(self.geneset_filename))
+    #         file1.write("\n Analysis= " + str(self.analysis))
+    #         file1.write("\n Setnames = " + str(self.setnames))
+    #         if self.geneset_filename_B:
+    #             file1.write("\n Geneset file B= " + str(self.geneset_filename_B))
+    #         if self.setnames_B:
+    #             file1.write("\n Setname B= " + str(self.setnames_B))
+    #         if self.diffusion_matrix_file:
+    #             file1.write("\n Diffusion matrix= " + str(self.diffusion_matrix_file))
+    #         for line in self.text:
+    #             file1.write("\n" + line)
 
     ## Tables for stats
-    def create_st_table_empirical(self, output_table_file):
+    def create_st_table_empirical(self):
 
-        self.output_table = self.output + output_table_file + ".csv"
-        with open(self.output_table, "w") as f:
-            f.write(
+        tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+        self.table_file_name = tmp.name
+        #with open(self.output_table_results, "w") as f:
+        try:
+            tmp.write(
                 "analysis,setname,n_mapped,n_geneset,number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network,geneset\n"
             )
+        finally:
+            tmp.close()
+    
+    def close_temporary_table(self):
+        print('saving from %s to %s' %(self.table_file_name, self.output_table_results))
+        shutil.copy(self.table_file_name, self.output_table_results)   
+        #with open(self.table_file_name, "r") as f:
+        #    with open(self.output_table_results, "w") as f2:
+        #        shutil.copyfileobj(f, f2)   
+        os.remove(self.table_file_name)
+
 
     def update_st_table_empirical(
         self,
@@ -113,7 +115,8 @@ class Output:
         var_null,
     ):
 
-        with open(self.output_table, "a") as f:
+        #with open(self.output_table_results, "a") as f:
+        with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
                     [
@@ -137,12 +140,16 @@ class Output:
             )
 
     ## Tables for comparisons
-    def create_comparison_table_empirical(self, output_table_file):
-        self.output_table = self.output + output_table_file + ".csv"
-        with open(self.output_table, "w") as f:
-            f.write(
+    def create_comparison_table_empirical(self):
+        tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
+        self.table_file_name = tmp.name
+        try:
+            tmp.write(
                 "analysis,setname_A,setname_B,n_geneset_A,n_mapped_A,n_geneset_B,n_mapped_B,n_overlaps,number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network\n"
             )
+        finally:
+            tmp.close()
+        #with open(self.output_table_results, "w") as f:
 
     def update_comparison_table_empirical(
         self,
@@ -159,7 +166,8 @@ class Output:
         mean_null,
         var_null,
     ):
-        with open(self.output_table, "a") as f:
+        #with open(self.output_table_results, "a") as f:
+        with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
                     [
@@ -193,13 +201,13 @@ class Output:
             self.GMT_dict[key] = {}
             self.GMT_dict[key]["descriptor"] = descriptor
             self.GMT_dict[key]["genes"] = gene_list
-            logging.info("Key added to dictionary" + str(key))
+            
         else:
-            logging.info("Key Already Exists: " + str(key))
+            logging.warning("Key Already Exists: " + str(key))
 
-    def create_GMT_output(self):
-        output_file = self.output + "LCC_gene_list.gmt"
-        print_GMT(self.GMT_dict, output_file)
+    def create_GMT_output(self, output_gmt):
+        self.output_gmt = output_gmt
+        print_GMT(self.GMT_dict, self.output_gmt)
 
 
 def print_GMT(GMT_dictionary, output_file):
@@ -221,7 +229,7 @@ def print_GMT(GMT_dictionary, output_file):
 
 def apply_multiple_testing_correction(
     table_file, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
-):
+        ):
 
     with open(table_file, "r+") as f:
         table = pd.read_csv(f)

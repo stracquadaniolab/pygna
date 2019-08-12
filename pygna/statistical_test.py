@@ -9,11 +9,10 @@ import pygna.diagnostic as diag
 import multiprocessing
 import time
 
-
 class StatisticalTest:
     def __init__(self, test_statistic, network, diz={}):
-        self.__test_statistic = test_statistic
 
+        self.__test_statistic = test_statistic
         self.__network = network
         self.__diz = diz
 
@@ -42,7 +41,6 @@ class StatisticalTest:
             # TODO: remove begin
             # verbose_localisation_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
             # TODO: remove end
-            logging.info("Observed %f." % observed)
             # iterations
             null_distribution = StatisticalTest.get_null_distribution_mp(
                 self, mapped_geneset, max_iter, n_proc=cores
@@ -64,7 +62,7 @@ class StatisticalTest:
 
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
 
-        print("n_proc=" + str(n_proc))
+        
 
         if n_proc == 1:
             null_distribution = StatisticalTest.get_null_distribution(
@@ -75,7 +73,6 @@ class StatisticalTest:
 
             p = multiprocessing.Pool(n_proc)
             n_trial = int(iter / n_proc)
-            print("n_trial=" + str(n_trial))
             results = [
                 p.apply_async(
                     StatisticalTest.get_null_distribution, args=(self, geneset, n_trial)
@@ -182,13 +179,11 @@ def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=Fa
     """
     degree = nx.degree(network)
     total = np.array([degree[g] for g in geneset])
-    # print(total)
 
     subgraph = network.subgraph(geneset)
     degree_internal = nx.degree(subgraph)
     internal = np.array([degree_internal[g] for g in geneset])
 
-    ##print(degree_internal)
 
     ratio = internal / total
     ratio[total == 0] = 0.5
