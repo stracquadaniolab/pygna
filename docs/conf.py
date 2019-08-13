@@ -24,9 +24,9 @@ copyright = 'Viola Fanfani & Giovanni Stracquadanio'
 author = 'Viola Fanfani & Giovanni Stracquadanio'
 
 # The short X.Y version
-version = '1.1.0-dev'
+version = '2.0.0-dev'
 # The full version, including alpha/beta/rc tags
-release = '1.1.0-dev'
+release = '2.0.0-dev'
 
 
 # -- General configuration ---------------------------------------------------
