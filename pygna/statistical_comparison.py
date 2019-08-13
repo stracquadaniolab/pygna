@@ -18,12 +18,11 @@ class StatisticalComparison:
         self.__diz = diz
         self.__n_proc = n_proc
 
-        print(type(self.__network))
         if (type(self.__network) is nx.Graph) or (type(self.__network) is nx.DiGraph):
             self.__universe = set(self.__network.nodes())
         elif type(self.__network) is dict:
             self.__universe = set(self.__network.keys())
-            # print (self.__network [list(self.__network.keys())[0]])
+            
         else:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
@@ -58,8 +57,6 @@ class StatisticalComparison:
         null_distribution = StatisticalComparison.get_comparison_null_distribution_mp(
             self, mapped_genesetA, mapped_genesetB, max_iter, keep
         )
-        # null_distribution=np.array([0,0,0,0,0,0,0,0])
-        # computing empirical pvalue
         pvalue = 1
         if alternative == "greater":
             pvalue = np.sum(null_distribution >= observed) / float(
@@ -165,8 +162,6 @@ def comparison_shortest_path(network, genesetA, genesetB, diz={}):
     if len(genesetA_index) == 0 or len(genesetB_index) == 0:
         sys.exit()
 
-    # logging.info("len_A, len_B, intersection= %d, %d, %d" %(len(genesetA_index), len(genesetB_index), len( set(genesetA_index).intersection(set(genesetB_index)) ) ) )
-
     for u in genesetA_index:
         min_du = float("inf")
         for v in genesetB_index:
@@ -176,12 +171,10 @@ def comparison_shortest_path(network, genesetA, genesetB, diz={}):
             elif u == v:
                 min_du = 0
 
-        # logging.info("min_du= %d" %min_du)
         cum_sum += min_du
 
     cum_sum_v = 0
     for v in genesetB_index:
-        # logging.info(set(genesetA_index).intersection(set([v])))
         min_dv = float("inf")
         for u in genesetA_index:
             d_uv = diz["matrix"][v][u] + diz["matrix"][u][v]
@@ -189,7 +182,6 @@ def comparison_shortest_path(network, genesetA, genesetB, diz={}):
                 min_dv = d_uv
             elif u == v:
                 min_dv = 0
-        # logging.info("min_dv= %d" %min_dv)
         cum_sum_v += min_dv
 
         cum_sum += min_dv
@@ -198,7 +190,6 @@ def comparison_shortest_path(network, genesetA, genesetB, diz={}):
 
     d_A = st.geneset_localisation_statistic(network, genesetA, diz)
     d_B = st.geneset_localisation_statistic(network, genesetB, diz)
-    # logging.info("d_AB= %f,d_A= %f, d_B=%f" %(d_AB, d_A, d_B))
     return d_AB - (d_A + d_B) / 2
 
 
@@ -218,10 +209,10 @@ def comparison_random_walk(network, genesetA, genesetB, diz={}):
 
     probAB = [
         diz["matrix"][i, j] for i in genesetA_index for j in genesetB_index
-    ]  # if i!=j]
+    ]  
     probBA = [
         diz["matrix"][i, j] for i in genesetB_index for j in genesetA_index
-    ]  # if i!=j]
+    ]  
 
-    prob = np.sum(probAB) + np.sum(probBA)  # /(len(probAB)+len(probBA))
+    prob = np.sum(probAB) + np.sum(probBA)  
     return prob

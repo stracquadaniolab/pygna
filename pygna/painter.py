@@ -50,7 +50,6 @@ class Painter_RW(Painter):
         fig.subplots_adjust(left=0.2, right=0.99, bottom=0.2, top=0.99)
         axes.set_title("Diffusion matrix of geneset's nodes")
         mask = np.eye(self.RW_matrix.shape[0])
-        print(np.min(self.RW_matrix))
 
         logging.info(
             str(np.array(self.geneset)[:, np.newaxis].shape) + str(self.RW_matrix.shape)
@@ -94,14 +93,13 @@ class Painter_RW(Painter):
     def restrict_network(self, geneset):
 
         self.__network = nx.DiGraph(
-            self.__network.subgraph(max(nx.connected_components(network), key=len))
+            self.__network.subgraph(max(nx.connected_components(self.__network), key=len))
         )
 
     def add_annotation_nodes_in_geneset(self, geneset, annotation="in_subset"):
 
         logging.info("adding annotation to nodes in geneset")
-        logging.info(
-            "%d genes in geneset,%d mapped in network ",
+        logging.info("%d genes in geneset,%d mapped in network ",
             (len(geneset), len(self.__universe.intersection(set(geneset)))),
         )
         geneset = self.__universe.intersection(set(geneset))
@@ -288,61 +286,7 @@ def paint_datasets_stats( table_filename: 'pygna results table',
         plt.savefig(output_file, format="png")
     else:
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
-        fig.savefig(output_file+'.png', format="png")
-
-def paint_comparison_stats(table_filename: 'pygna comparison output', 
-                            output_file: 'output figure file, specify png or pdf file',
-                            rwr: 'use rwr is the table comes from a rwr analysis'= False,
-                            within: 'use true if the comparison has been done for a single file'=False):
-
-    """
-    paints a comparison stats table using a barplot, 
-    specify within if the comparison has been done on the same 
-    """
-
-    palette = RdBu_11.mpl_colors  # [0::3]
-    with open(table_filename, "r") as f:
-        table = pd.read_table(f, sep=",")
-
-    stat_name = table["analysis"][0]
-    n_permutations = table["number_of_permutations"][0]
-
-    pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
-
-    annot = table.pivot(
-        values="empirical_pvalue", index="setname_A", columns="setname_B"
-    ).values
-
-    fig, axes = plt.subplots(1, 1, figsize=(10, 10))
-    fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
-
-    pivot_table = pivot_table.fillna(0)
-
-    g2 = sns.heatmap(
-        pivot_table.T,
-        cmap=palette,
-        ax=axes,
-        square=True,
-        xticklabels=1,
-        yticklabels=1,
-        cbar=True,
-        center=0,
-        linewidths=0.1,
-        linecolor="white",
-    )  # ,annot=annot,fmt=""
-
-    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
-    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
-    axes.set_xlabel("")
-    axes.set_ylabel("")
-
-    if output_file.endswith('.pdf'):
-        plt.savefig(output_file, format="pdf")
-    elif output_file.endswith('.png'):
-        plt.savefig(output_file, format="png")
-    else:
-        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
-        fig.savefig(output_file+'.png', format="png")
+        plt.savefig(output_file+'.png', format="png")
 
 def paint_comparison_matrix(table_filename: 'pygna comparison output', 
                             output_file: 'output figure file, specify png or pdf file',
@@ -365,7 +309,6 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         table=table.loc[:,['observed','setname_A','setname_B','empirical_pvalue']]
         for i in set(table['setname_A'].values.tolist()).union(set(table['setname_B'].values.tolist())):
             table=table.append({'setname_A':i, 'setname_B':i, 'observed':0, 'empirical_pvalue':1}, ignore_index=True)
-
 
 
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
@@ -431,58 +374,10 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         fig.savefig(output_file+'.png', format="png")
 
-def paint_association_table(final_table, output_file):
-
-    out.apply_multiple_testing_correction(
-        final_table, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.05
-    )
-
-    with open(final_table) as f:
-        table = pd.read_csv(f)
-
-    table["log"] = -np.log10(table["empirical_pvalue"].values)
-    table["log"] = table["log"].replace(
-        to_replace=np.inf, value=np.max(table[table["log"] != np.inf]["log"]) + 0.5
-    )
-
-    setnames = list(set(table.setname.values.tolist()))
-
-    f, ax = plt.subplots(1, figsize=(8, 20))
-    g = sns.barplot(
-        x="log",
-        y="setname",
-        hue="analysis",
-        data=table,
-        palette=sns.color_palette("muted", len(setnames)),
-    )
-    ax.axvline(
-        x=1.3,
-        ymin=0,
-        ymax=len(setnames),
-        alpha=0.5,
-        color="k",
-        linestyle="--",
-        linewidth=0.5,
-    )
-    ax.axvline(
-        x=4,
-        ymin=0,
-        ymax=len(setnames),
-        alpha=0.5,
-        color="k",
-        linestyle="--",
-        linewidth=0.5,
-    )
-    plt.subplots_adjust(left=0.4)
-    plt.subplots_adjust(right=0.99)
-    ax.set_xlabel("-log(empirical pvalue)")
-    plt.savefig(output_file + ".pdf", f="pdf")
-    plt.savefig(output_file + ".png", f="png")
 
 def plot_adjacency(
     network: "network_filename",
-    output_folder: "output_folder",
-    prefix: "prefix for the file",
+    output_file: 'use png or pdf for output figure', 
     clusters_file: "file of clusters to order the nodes" = None,
     size: "number of genes to plot, allows to cut the adjacency matrix" = None,
     ):
@@ -514,8 +409,6 @@ def plot_adjacency(
     if size:
         matrix = matrix[0 : int(size), 0 : int(size)]
         nodelabels = nodelabels[:, 0 : int(size)]
-
-    print(nodelabels.shape)
 
     if clusters_file:
         f, axes = plt.subplots(
@@ -586,8 +479,6 @@ def plot_adjacency(
             cmap="Set3",
             ax=axes[1, 0],
         )
-        # plt.imshow(nx.adjacency_matrix(graph, nodelist=nodelist).toarray(), cmap='Greys')
-        # plt.title("Adjacency Matrix")
     else:
         f, axes = plt.subplots(1, 1, figsize=(10, 10))
         sns.heatmap(
@@ -602,9 +493,10 @@ def plot_adjacency(
             yticklabels=False,
         )
 
-    plt.savefig(output_folder + prefix + "_adjacency_matrix.png", f="png")
-    plt.savefig(output_folder + prefix + "_adjacency_matrix.pdf", f="pdf")
-
-    # fig,axes=plt.subplots(1, 3, figsize=(8,10),gridspec_kw={'width_ratios': [1,3,4],"wspace":0.025})
-    # fig.subplots_adjust(left=0.2,right=0.80)
-
+    if output_file.endswith('.pdf'):
+        plt.savefig(output_file, format="pdf")
+    elif output_file.endswith('.png'):
+        plt.savefig(output_file, format="png")
+    else:
+        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
+        f.savefig(output_file+'.png', format="png")

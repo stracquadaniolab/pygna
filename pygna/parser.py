@@ -35,21 +35,6 @@ def __load_geneset(filename, setname=None):
 
     return geneset
 
-
-def __read_RW_matrix(RW_matrix_filename, in_memory=False):
-    """ Reads matrix from hdf5 file
-    """
-
-    if RW_matrix_filename.endswith("hdf5"):
-        hdf5_nodes, hdf5_data = Hdf5MatrixParser().read(RW_matrix_filename, in_memory)
-        if type(hdf5_nodes[0]) == bytes:
-            hdf5_nodes = [i.decode() for i in hdf5_nodes]
-    else:
-        logging.error("invalid input format for matrix")
-
-    return hdf5_nodes, hdf5_data
-
-
 class Parser:
     def __init__(self):
         pass
@@ -141,7 +126,7 @@ class Hdf5MatrixParser(Parser):
     def read(self, filename, in_memory=False):
 
         if in_memory:
-            print("in_memory")
+            logging.info('Kept in memory')
             with tables.open_file(filename, mode="r", driver="H5FD_CORE") as hdf5_file:
                 hdf5_nodes = list(hdf5_file.root.nodes[:])
                 hdf5_data = hdf5_file.root.matrix[:]

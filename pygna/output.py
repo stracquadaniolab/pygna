@@ -26,9 +26,6 @@ class Output:
         geneset_file_B=None,
         setnames_B=None,
     ):
-
-
-
         self.network_filename = network_filename
         self.analysis = analysis
         self.output_table_results = output_table_results_file
@@ -48,45 +45,11 @@ class Output:
     def set_diffusion_matrix(self, diffusion_matrix_file):
         self.diffusion_matrix_file = diffusion_matrix_file
 
-    # def add_output_text(self, text):
-
-    #     """Add text to the output. text an be both a string or a list
-    #     of values convertible to strings.
-    #     """
-
-    #     if type(text) == str:
-    #         self.text.append(text)
-    #     elif type(text) == list:
-    #         for t in text:
-    #             self.text.append(str(t))
-    #     else:
-    #         logging.error("Text needs to be a string or a list of strings")
-
-    # def save_output_summary(self):
-
-    #     """Summary.txt is written using the input configurations
-    #     and the text that has been added to the output instance"""
-
-    #     with open(self.output + "summary.txt", "w") as file1:
-    #         file1.write("Network= " + str(self.network_filename))
-    #         file1.write("\n Input file= " + str(self.geneset_filename))
-    #         file1.write("\n Analysis= " + str(self.analysis))
-    #         file1.write("\n Setnames = " + str(self.setnames))
-    #         if self.geneset_filename_B:
-    #             file1.write("\n Geneset file B= " + str(self.geneset_filename_B))
-    #         if self.setnames_B:
-    #             file1.write("\n Setname B= " + str(self.setnames_B))
-    #         if self.diffusion_matrix_file:
-    #             file1.write("\n Diffusion matrix= " + str(self.diffusion_matrix_file))
-    #         for line in self.text:
-    #             file1.write("\n" + line)
-
     ## Tables for stats
     def create_st_table_empirical(self):
 
         tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         self.table_file_name = tmp.name
-        #with open(self.output_table_results, "w") as f:
         try:
             tmp.write(
                 "analysis,setname,n_mapped,n_geneset,number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network,geneset\n"
@@ -95,11 +58,7 @@ class Output:
             tmp.close()
     
     def close_temporary_table(self):
-        print('saving from %s to %s' %(self.table_file_name, self.output_table_results))
         shutil.copy(self.table_file_name, self.output_table_results)   
-        #with open(self.table_file_name, "r") as f:
-        #    with open(self.output_table_results, "w") as f2:
-        #        shutil.copyfileobj(f, f2)   
         os.remove(self.table_file_name)
 
 
@@ -115,7 +74,6 @@ class Output:
         var_null,
     ):
 
-        #with open(self.output_table_results, "a") as f:
         with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
@@ -149,7 +107,6 @@ class Output:
             )
         finally:
             tmp.close()
-        #with open(self.output_table_results, "w") as f:
 
     def update_comparison_table_empirical(
         self,
@@ -166,7 +123,6 @@ class Output:
         mean_null,
         var_null,
     ):
-        #with open(self.output_table_results, "a") as f:
         with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
@@ -247,11 +203,15 @@ def apply_multiple_testing_correction(
     table.to_csv(table_file, index=False)
 
 
-def write_graph_summary(graph, output_folder, prefix):
+def write_graph_summary(graph, output_file, net_name=None):
 
     """
-    This function takes a graph as input and writes the network properties in a file
+    This function takes a graph as input and writes the network
+    properties in a text file
     """
+
+    if not net_name:
+        net_name = 'network'
 
     D = dict(nx.degree(graph))
     degree = np.array(list(dict(nx.degree(graph)).values()))
@@ -264,8 +224,8 @@ def write_graph_summary(graph, output_folder, prefix):
 
     density = (2 * n_edges) / ((n_nodes) * (n_nodes - 1))
 
-    with open(output_folder + prefix + "_graph_summary.txt", "w") as file1:
-        file1.write("Network Summary for %s " % str(prefix))
+    with open(output_file, "w") as file1:
+        file1.write("Network Summary for %s " % str(net_name))
         file1.write("\n---------------------------------------------------\n")
         file1.write("\nInfo: " + nx.info(graph))
         file1.write("\nOther Properties::\n ")
@@ -277,15 +237,6 @@ def write_graph_summary(graph, output_folder, prefix):
         file1.write("\n\t- disconnected nodes = " + str(np.sum(degree == 0)))
         file1.write("\n\t- average clustering" + str(nx.average_clustering(graph)))
 
-    fig, axes = plt.subplots(1, figsize=(10, 10))
-    g1 = sns.distplot(degree, hist=True, kde=True, rug=False, ax=axes)
-    perc=np.percentile(degree,99)
-    g1 = sns.distplot(degree[degree>perc], hist=False, kde=False, rug=True,color='r', ax=axes)
-    sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
-    g1.set_ylabel("Density")
-    g1.set_xlabel("Degree")
-    fig.savefig(output_folder + prefix + "_degree.pdf", format="pdf")
-    fig.savefig(output_folder + prefix + "_degree.png", format="png")
 
     largest_cc = nx.Graph(graph.subgraph(max(nx.connected_components(graph), key=len)))
 
@@ -300,8 +251,8 @@ def write_graph_summary(graph, output_folder, prefix):
 
     density = (2 * n_edges) / ((n_nodes) * (n_nodes - 1))
 
-    with open(output_folder + prefix + "_graph_summary.txt", "a") as file1:
-        file1.write("\n\nLargest Connected Component Summary for %s \n " % str(prefix))
+    with open(output_file, "a") as file1:
+        file1.write("\n\nLargest Connected Component Summary for %s \n " % str(net_name))
         file1.write(
             "-----------------------------------------------------------------\n"
         )

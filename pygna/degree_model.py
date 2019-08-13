@@ -166,7 +166,7 @@ def plot_adjacency(graph, output_folder, prefix):
     plt.savefig(output_folder + prefix + "VIP.png")
 
 
-def generate_vip_network(
+def generate_hdn_network(
     output_folder,
     prefix,
     n_nodes: "number of nodes in the network" = 1000,
@@ -174,14 +174,11 @@ def generate_vip_network(
     vip_prob: "probability of the connection of VIP" = 0.3,
     vip_percentage=0.05,
     number_of_simulations=5,
-):
+    ):
 
     """ This function generates a simulated network using the VIP model
     """
-    # ym=YamlConfig()
-    # config=ym.load_config(input_file)
 
-    # bm=BlockModel(np.array(config["BlockModel"]["matrix"]), n_nodes=config["BlockModel"]["n_nodes"], nodes_percentage=config["BlockModel"]["nodes_percentage"] )
     dm = DegreeModel(
         network_prob=network_prob,
         vip_prob=vip_prob,
@@ -194,10 +191,3 @@ def generate_vip_network(
         dm.write_network(output_folder + prefix + "_s_" + str(i) + "_network.tsv")
         dm.write_genelist(output_folder + prefix + "_s_" + str(i) + "_genes.gmt")
         plot_adjacency(dm.graph, output_folder, prefix=prefix + "_s_" + str(i))
-
-
-# z=nx.utils.create_degree_sequence(100,powerlaw_sequence)
-# G=nx.configuration_model(z)
-# G=nx.Graph(G)
-# G.remove_edges_from(G.selfloop_edges())
-

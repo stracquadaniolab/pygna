@@ -55,34 +55,41 @@ def __read_distance_matrix(distance_matrix_filename, in_memory=False):
 
 
 def network_summary(network_file: 'network file',
-                     output_folder: 'folder for the summary output',
-                     geneset_file: 'geneset file'=None,
-                     setname: 'specify a single geneset'=None
+                     text_output: 'output text file for the summary',
+                     degree_figure_file: 'pdf or png file for the degree distribution',
+                     c_components_figure_file: 'pdf or png file for the connected components distribution',
+                     geneset_input_file: 'geneset file'= None,
+                     setname: 'specify a single geneset'= None
     ):
 
     """
     This function saves the principal info of a graph:
-    - network properties (output_folder/network_graph_summary.txt)
-    - degree distribution (output_folder/network_degree.pdf)
+    - network properties
+    - degree distribution
+    - connected components diagnostic
 
     If a geneset/setname is passed to the function, the properties of
-    the subgraph are evaluated:
-    - network properties (output_folder/setname_graph_summary.txt)
-    - degree distribution (output_folder/setname_degree.pdf)
+    the subgraph are evaluated
     """
 
     network = ps.__load_network(network_file)
 
-    if geneset_file:
-        geneset = ps.__load_geneset(geneset_file, setname)
-        for setname, item in geneset.items():
-            graph = nx.subgraph(network, item)
-            out.write_graph_summary(graph, output_folder, setname)
+    if geneset_input_file:
+        if not setname:
+            logging.error('Missing setname name, specify  a unique setname')
+        else:
+            geneset = ps.__load_geneset(geneset_input_file, setname)
+            for setname, item in geneset.items():
+
+                graph = nx.subgraph(network, item)
+                out.write_graph_summary(graph, text_output, setname+" on "+network_file)
+                diagnostic.plot_connected_components(nx.connected_components(graph),c_components_figure_file)
+                diagnostic.plot_degree(nx.degree(graph), degree_figure_file)
 
     else:
-
-        out.write_graph_summary(network, output_folder, 'network')
-
+        out.write_graph_summary(network, text_output, network_file)
+        diagnostic.plot_connected_components(nx.connected_components(network),c_components_figure_file)
+        diagnostic.plot_degree(nx.degree(network), degree_figure_file)
 
 ################################################################################
 ######### SINGLE SET ANALYSES ##################################################
@@ -120,7 +127,7 @@ def test_topology_total_degree(
         network_file, output_table, "topology_total_degree", geneset_file, setnames
     )
     logging.info("Results file = " + output1.output_table_results)
-    # Create table, TODO: use temporary file
+    # Create table
     output1.create_st_table_empirical()
 
     st_test = st.StatisticalTest(st.geneset_total_degree_statistic, network)
@@ -163,10 +170,12 @@ def test_topology_total_degree(
                     np.mean(null_d),
                     np.var(null_d),
                 )
+
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(
                         null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
                     )
+
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
@@ -289,7 +298,7 @@ def test_topology_rwr(
 
     for setname, item in geneset.items():
 
-        item = set(item) #.intersection(set(list(network.nodes)))
+        item = set(item) 
         if len(item) > size_cut:
             # test
             observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
@@ -465,7 +474,7 @@ def test_topology_sp(
 
     for setname, item in geneset.items():
 
-        item = set(item)#.intersection(set(list(network.nodes)))
+        item = set(item)
         if len(item) > size_cut:
             logging.info("Setname:" + setname)
             observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
@@ -637,7 +646,6 @@ def test_diffusion_weights(
     observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
         geneset, max_iter=number_of_permutations, alternative="greater", cores=cores
     )
-    # observed_z=(observed-np.mean(null_d))/np.std(null_d
 
     if show_null:
         logging.info("Plotting diagnostic %s" % (str(output1.output)))
@@ -813,7 +821,7 @@ def test_association_sp(
 
     output1.close_temporary_table()
     if results_figure:
-        paint.paint_comparison_stats(output1.output_table_results, results_figure)
+        paint.paint_comparison_matrix(output1.output_table_results, results_figure)
 
 
 def test_association_rwr(
@@ -975,8 +983,7 @@ def test_association_rwr(
 
     output1.close_temporary_table()
     if results_figure:
-        sg= setname_B == None
-        paint.paint_comparison_RW(output1.output_table_results, results_figure, single_geneset=sg)
+        paint.paint_comparison_matrix(output1.output_table_results, results_figure, rwr=True)
 
 
 ################################################################################
@@ -986,15 +993,14 @@ def test_association_rwr(
 
 def build_distance_matrix(
     network_file: "network file",
-    output_file: "distance matrix output file, use a format between .lm.txt and .hdf5",
+    output_file: "distance matrix output file, use .hdf5",
     giant_component_only: "compute the shortest paths only for nodes in the giant component" = True,
-):
+    ):
     """
         Build a shortest path distance matrix for a given network.
         Matrix can be saved as a lm.txt file or a .hdf5 one.
     """
 
-    # network = ps.__load_network(network_file)
     network = ps.__load_network(network_file)
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
@@ -1025,12 +1031,11 @@ def build_distance_matrix(
         logging.error("Pass an hd5f file")
 
 
-def build_RWR_diffusion(
+def build_rwr_diffusion(
     network_file: "network file",
     beta=0.85,
     output_file: "distance matrix output file (use .hdf5) " = None,
-    output_figure: "diffusion matrix output filename" = None,
-):
+    ):
     """
         Build the RWR_diffusion_matrix
     """
@@ -1064,103 +1069,62 @@ def build_RWR_diffusion(
     else:
         return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A)
 
-    if output_figure:
-        RW_dict = {}
-        RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(output_file)
-        diagnostic.plot_diffusion_matrix(RW_dict["nodes"], RW_dict["matrix"], output_figure)
-
-
-def build_graph(
-    network_file: "network file",
-    geneset_file: "geneset file",
-    output_folder: "graphml network for visualisation",
-    setname: "setname" = None,
-    giant_component_only: "compute the shortest paths only for nodes in the giant component" = True,
-):
-    """
-        Build a shortest path distance matrix for a given network.
-    """
-    network = ps.__load_network(network_file)
-    geneset = ps.__load_geneset(geneset_file, setname)
-
-    if giant_component_only:
-        network = network.subgraph(max(nx.connected_components(network), key=len))
-
-    for setname in geneset:
-        print(setname)
-        new_network = nx.Graph()
-        new_network_minimal = nx.Graph()
-        for s in geneset[setname]:
-            if s in network.nodes():
-                l0 = np.inf
-                for t in geneset[setname]:
-                    if (t in network.nodes()) & (s != t):
-                        path = nx.shortest_path(network, source=s, target=t)
-                        if l0 > len(path):
-                            l0 = len(path)
-                            new_network_minimal.add_path(path)
-                        new_network.add_path(path)
-
-        dict_nodes = {}
-        for n in new_network.nodes():
-            if n in geneset[setname]:
-                dict_nodes[n] = True
-            else:
-                dict_nodes[n] = False
-        nx.set_node_attributes(new_network, dict_nodes, "in_subset")
-        nx.write_graphml(new_network, output_folder + setname + ".graphml")
-
-        dict_nodes = {}
-        for n in new_network_minimal.nodes():
-            if n in geneset[setname]:
-                dict_nodes[n] = True
-            else:
-                dict_nodes[n] = False
-        nx.set_node_attributes(new_network_minimal, dict_nodes, "in_subset")
-
-        nx.write_graphml(
-            new_network_minimal, output_folder + setname + "_minimal.graphml"
-        )
-
-
 def network_graphml(
     network_file: "network file",
     geneset_file: "geneset file",
-    output_folder: "graphml network for visualisation",
-    prefix: "prefix for the new file",
+    output_file: "graphml file for network for visualisation",
     setname: "setname" = None,
-    giant_component_only: "compute the shortest paths only for nodes in the giant component" = True,
-):
+    giant_component_only: "saves only the giant component of the network" = True,
+    minimal: 'saves only the minimal graph' = False, 
+    ):
     """
-        Build a shortest path distance matrix for a given network.
+    This function generates a graphml file with nodes annotation.
+    Given a geneset, with k setnames, each node has k False/True
+    annotations for each set. 
+    
+    Warning: without minimal, this function saves the full network.
+    The minimal graph saves only the nodes in the geneset and those that
+    connect them with a shortest path.
     """
+
     network = ps.__load_network(network_file)
     geneset = ps.__load_geneset(geneset_file, setname)
 
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
 
-    for setname in geneset:
-        # print(setname)
-        # new_network = nx.Graph()
-        # new_network_minimal = nx.Graph()
-        # for s in geneset[setname]:
-        #     if s in network.nodes():
-        #         l0 = np.inf
-        #         for t in geneset[setname]:
-        #             if (t in network.nodes()) & (s != t):
-        #                 path = nx.shortest_path(network, source=s, target=t)
-        #                 if l0 > len(path):
-        #                     l0 = len(path)
-        #                     new_network_minimal.add_path(path)
-        #                 new_network.add_path(path)
+    if minimal:
 
-        dict_nodes = {}
-        for n in network.nodes():
-            if n in geneset[setname]:
-                dict_nodes[n] = True
-            else:
-                dict_nodes[n] = False
-        nx.set_node_attributes(network, dict_nodes, setname)
+        for setname in geneset:
+            new_network_minimal = nx.Graph()
+            for s in geneset[setname]:
+                if s in network.nodes():
+                    l0 = np.inf
+                    for t in geneset[setname]:
+                        if (t in network.nodes()) & (s != t):
+                            path = nx.shortest_path(network, source=s, target=t)
+                            if l0 > len(path):
+                                l0 = len(path)
+                                new_network_minimal.add_path(path)
 
-    nx.write_graphml(network, output_folder + prefix + ".graphml")
+    
+            dict_nodes = {}
+            for n in new_network_minimal.nodes():
+                if n in geneset[setname]:
+                    dict_nodes[n] = True
+                else:
+                    dict_nodes[n] = False
+            nx.set_node_attributes(new_network_minimal, dict_nodes, setname)
+    
+    else:
+
+        for setname in geneset:
+            dict_nodes = {}
+            for n in network.nodes():
+                if n in geneset[setname]:
+                    dict_nodes[n] = True
+                else:
+                    dict_nodes[n] = False
+            nx.set_node_attributes(network, dict_nodes, setname)
+
+    nx.write_graphml(network, output_file)

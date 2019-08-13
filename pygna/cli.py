@@ -22,8 +22,9 @@ def main():
     """
     argh dispatch
     """
-    argh.dispatch_commands([# network summary
+    argh.dispatch_commands([# network summary and graph file
                             cmd.network_summary,
+                            cmd.network_graphml,
                             # geneset network topoly analyses
                             cmd.test_topology_total_degree,
                             cmd.test_topology_internal_degree,
@@ -37,20 +38,17 @@ def main():
                             cmd.test_association_rwr,
                             # building functions
                             cmd.build_distance_matrix,
-                            cmd.build_RWR_diffusion,
-                            cmd.build_graph,
+                            cmd.build_rwr_diffusion,
                             # paint
                             paint.paint_datasets_stats,
-                            paint.paint_comparison_stats,
                             paint.paint_comparison_matrix,
                             paint.plot_adjacency,
-                            cmd.network_graphml,
                             # utils
                             utils.convert_gmt,
                             utils.geneset_from_table,
                             utils.convert_csv_names,
                              #simulations
-                            dm.generate_vip_network,
+                            dm.generate_hdn_network,
                             bm.generate_simulated_network,])
 
 if __name__ == "__main__":
