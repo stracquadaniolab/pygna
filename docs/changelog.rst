@@ -1,6 +1,8 @@
 Changelog
 =========
 
+Latest Version
+--------------
 v2.0.1
 +++++++
 Documentation changed, likely to change in the near future.
@@ -10,8 +12,10 @@ v2.0.0
 +++++++
 IO conventions changed, introduced temporary files. 
 Now the package should be fully compatible with snakemake
-conventions. 
+conventions.
 
+Older Version
+-------------
 
 v1.0.0
 ++++++
