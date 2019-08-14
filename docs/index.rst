@@ -8,17 +8,12 @@ Welcome to PyGNA!
 
 PyGNA is a Geneset Network Analysis python package: it performs various analyses on biological networks and genesets.
 
-File parsing
-------------
-
-Before the real analysis the user needs to create an input dataset suitable for the analysis tools.
-
-
 .. toctree::
     :maxdepth: 2
 
     quickstart
     tutorial
+    CLI
     API
     simulations
     changelog

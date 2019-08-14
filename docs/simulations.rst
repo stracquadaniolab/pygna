@@ -57,30 +57,7 @@ The **BlockModel** parameters are those used to generate the SBM:
 Example simulated dataset generation and Analysis
 -------------------------------------------------
 
-**Generation of the network and SP/RWR matrices**
+**Generation of the network and genesets**
 
-.. code-block:: bash
+>>>> pygna generate-simulated-network ../simulationBM.yaml
 
-  pygna generate-simulated-network "/home/viola/Desktop/geneset-network-analysis/analyses/simulationBM.yaml"
-
-  pygna build-distance-matrix '/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0.tsv' '/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0_SP.hdf5'
-
-  pygna build-RWR-diffusion '/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0.tsv' --output-file '/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0_RWR'
-
-**Analysis**
-
-.. code-block:: bash
-
-  #!/bin/bash
-
-  NETWORK='/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0.tsv'
-  GMTFILE='/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_genes_0.gmt'
-  OUTPATH='/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/'
-  DISTANCEM='/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0_SP.hdf5'
-  DIFFUSIONM='/home/viola/Desktop/geneset-network-analysis/processed_data/simulated_data/attempt1_network_0_RWR.pickle'
-  NP=1000
-  CORES=1
-
-  pygna analyse-module $NETWORK  $GMTFILE $OUTPATH --number-of-permutations $NP --cores $CORES --create-output-LCC --show-results
-  pygna analyse-location $NETWORK $DISTANCEM $GMTFILE $OUTPATH --number-of-permutations $NP --cores $CORES --show-results
-  pygna analyse-RW $NETWORK $GMTFILE $DIFFUSIONM $OUTPATH --number-of-permutations $NP --cores $CORES --show-results
