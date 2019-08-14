@@ -3,11 +3,10 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to PyGNA Documentation!
+Welcome to PyGNA!
 ===============================
 
-PyGNA is a Geneset Network Analysis python package: it performs various analyses
-on biological networks and genesets.
+PyGNA is a Geneset Network Analysis python package: it performs various analyses on biological networks and genesets.
 
 File parsing
 ------------
@@ -18,15 +17,11 @@ Before the real analysis the user needs to create an input dataset suitable for 
 .. toctree::
     :maxdepth: 2
 
-    changelog
-    parsing
-    single_set_analysis
-    comparison
-    utilities
-    pipelines
+    quickstart
+    tutorial
+    API
     simulations
-    logging
-
+    changelog
 
 Indices and tables
 ==================

@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath("../../pygna/"))
 
 # -- Project information -----------------------------------------------------
 
-project = 'geneset_network_analysis_tool'
+project = 'PyGNA'
 copyright = 'Viola Fanfani & Giovanni Stracquadanio'
 author = 'Viola Fanfani & Giovanni Stracquadanio'
 
@@ -91,6 +91,16 @@ html_theme = 'alabaster'
 #
 # html_theme_options = {}
 
+
+html_theme_options = {
+    "description": "A scalable tool for geneset analysis of biological networks",
+    'logo':'pygna_logo.png',
+    "github_user": "stracquadaniolab",
+    "github_repo": "pygna",
+    "fixed_sidebar": True,
+    "logo_name": False,  # noqa
+}
+
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
@@ -107,8 +117,10 @@ html_theme = 'alabaster'
 # refs: http://alabaster.readthedocs.io/en/latest/installation.html#sidebars
 html_sidebars = {
     '**': [
-        'relations.html',  # needs 'show_related': True theme option to display
-        'searchbox.html',
+        "about.html",
+        "navigation.html",
+        "relations.html",
+        "searchbox.html",
     ]
 }
 

@@ -8,9 +8,11 @@ and identify clusters into it.
 
 The function to generate a simulated dataset is:
 
-.. autofunction:: pygna.degree_model.generate_vip_network
+.. autofunction:: pygna.degree_model.generate_hdn_network
+
 .. autofunction:: pygna.block_model.generate_simulated_network
 
+.. autofunction:: pygna.painter.plot_adjacency
 
 All the parameters can be specified in a yaml file that is passed as input. As output,
 we obtain a file with the network and a .gmt file where the nodes have been grouped
