@@ -16,6 +16,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath("../../pygna/"))
 
+sys.path.insert(0, os.path.abspath("../../pygna/docs/"))
+
 
 # -- Project information -----------------------------------------------------
 
@@ -91,7 +93,7 @@ html_theme = 'alabaster'
 # documentation.
 #
 # html_theme_options = {}
-
+html_static_path = ['_static/']
 
 html_theme_options = {
     "description": "A scalable tool for geneset analysis of biological networks",
