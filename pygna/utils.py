@@ -102,24 +102,6 @@ class Converter:
                 unknown_counter += 1
                 geneset_entrez.append("<" + i + ">")
 
-                # if (self.map_table["Synonyms"].str.contains(i).any() or self.map_table["Previous symbols"].str.contains(i).any()) :
-
-                #     name=self.map_table[self.map_table["Synonyms"].str.match("(^|.*,\s)%s(, .*|$| $)" %i)].loc[:,self.entrez_column].values.tolist()
-                #     previous=self.map_table[self.map_table["Previous symbols"].str.match("(^|.*,\s)%s(,.*|$| $)" %i)].loc[:,self.entrez_column].values.tolist()
-                #     name=list(set(name).union(set(previous)))
-
-                #     if len(name)==1:
-                #         geneset_entrez.append(str(int(name[0])))
-                #     elif len(name)>1:
-                #         geneset_entrez.append(str(int(name[0])))
-                #         logging.warning("for gene %s there are multiple mapping sites: " %i + str(name))
-                #     else:
-                #         unknown_counter+=1
-                #         geneset_entrez.append("<"+i+">")
-                # else:
-                #     unknown_counter+=1
-                #     geneset_entrez.append("<"+i+">")
-
         if unknown_counter > 0:
             logging.warning(
                 "%d/%d terms that couldn't be mapped" % (unknown_counter, len(geneset))
@@ -130,16 +112,17 @@ class Converter:
 
 def convert_gmt(
     gmt_file: "gmt file to be converted",
-    output_file: "output file",
+    output_gmt_file: "output file",
     conversion: "e2s or s2e",
     converter_map_filename: "tsv table used to convert gene names" = "../../../primary_data/entrez_name.tsv",
     entrez_col: "name of the entrez column" = "NCBI Gene ID",
     symbol_col: "name of the symbol column" = "Approved symbol",
-):
+    ):
+
+    ''' name conversion table '''
 
     GMTparser = parser.GMTParser()
     genesets_dict = GMTparser.read(gmt_file, read_descriptor=True)
-    print(genesets_dict)
 
     converter = Converter(converter_map_filename, entrez_col, symbol_col)
 
@@ -153,7 +136,7 @@ def convert_gmt(
     else:
         logging.error("conversion type not understood")
 
-    output.print_GMT(genesets_dict, output_file)
+    output.print_GMT(genesets_dict, output_gmt_file)
 
 
 def geneset_from_table(
@@ -166,7 +149,7 @@ def geneset_from_table(
     alternative: "alternative to use for the filter, with less the filter is applied <threshold, otherwise >= threshold" = "less",
     threshold: "threshold for the filter" = 0.01,
     descriptor: "descriptor for the gmt file" = None,
-):
+    ):
 
     """
     This function converts a csv file to a gmt allowing to filter the elements
@@ -183,6 +166,8 @@ def geneset_from_table(
         logging.error("only csv files supported")
 
     threshold = float(threshold)
+
+    table=clean_table(table, stat_col=filter_column)
 
     table = filter_table(
         table, filter_column=filter_column, alternative=alternative, threshold=threshold
@@ -210,10 +195,10 @@ def geneset_from_table(
 
     if output_csv:
 
-        if output_csv.endswith(".gmt"):
+        if output_csv.endswith(".csv"):
             table.to_csv(output_csv, sep=",", index=False)
         else:
-            logging.error("specify gmt output")
+            logging.error("specify csv output")
 
 
 def filter_table(
@@ -221,7 +206,7 @@ def filter_table(
     filter_column: "column with the values to be filtered" = "padj",
     alternative: "alternative to use for the filter, with less the filter is applied <threshold, otherwise >= threshold" = "less",
     threshold: "threshold for the filter" = 0.01,
-):
+    ):
 
     """
     This function filters a table according to a filter rule.
@@ -249,7 +234,7 @@ def convert_csv_names(
     converter_map_filename: "tsv table used to convert gene names" = "../../../primary_data/entrez_name.tsv",
     entrez_col: "name of the entrez column" = "NCBI Gene ID",
     symbol_col: "name of the symbol column" = "Approved symbol",
-):
+    ):
 
     with open(csv_file, "r") as f:
         table = pd.read_csv(f)
@@ -276,7 +261,7 @@ def convert_csv_names(
 
 
 def clean_table(table, stat_col="stat"):
-    logging.info("deseq table has %d rows" % len(table))
+    logging.info("original table has %d rows" % len(table))
     table = table.dropna(subset=[stat_col])
-    logging.info("deseq table cleaned has %d rows" % len(table))
+    logging.info("cleaned table has %d rows" % len(table))
     return table

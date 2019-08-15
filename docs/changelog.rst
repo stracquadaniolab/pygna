@@ -3,6 +3,13 @@ Changelog
 
 Latest Version
 --------------
+
+v2.0.4
++++++++
+Fully working version with documentation for basic functionalities.
+Complete API docs missing. 
+
+
 v2.0.1
 +++++++
 Documentation changed, likely to change in the near future.

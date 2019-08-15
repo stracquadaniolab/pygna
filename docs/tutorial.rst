@@ -14,7 +14,8 @@ network as the BioGRID one) and some statistic is evaluated.
 Networks are read as tab separated text files with each couple of nodes that have an edge
 between them: node_a  node_b
 
-Genesets use the gmt format, where each genesets has a name \tab descriptor \tab gene1 \tab gene2...
+Genesets use the gmt format, where each genesets:
+`name \tab descriptor \tab gene1 \tab gene2`
 
 Each gmt file can have a single geneset or multiple of them, PyGNA is able to both analyse all of them
 or to restrict the analysis to a single geneset ( specifying the setname of interest ).
@@ -140,11 +141,28 @@ Association tests:
 Analysis of a geneset from a table (e.g. DeSeq2)
 ------------------------------------------------
 
+We understand that in many cases the genes one wants to analyse are in a table-like format.
+Hence, we provide a function to create a gmt geneset from a table, with the possibility of 
+applying a filter to the data. You can even just use it to return a gmt with all the genes
+in a column by applying a dummy filter. 
 
+**NOTE**: In case you would like to apply more filters, just use the output_csv instead of
+gmt, this way the first filters would just cut the original data returning the same table
+format. 
 
+Here is how to obtain a gmt file of the significant genes obtained by DeSeq2.
+we are here using *diff_exp* as name for the output geneset and we are filtering for padj<0.01.
 
+>>> pygna geneset-from-table <deseq>.csv diff_exp <deseq>.gmt --descriptor deseq
 
+Here is how to tweak the default behaviour to filter any csv table.
 
+The filter is applied using the values in the filter_column (for example pvalues) and cutting using the 
+alternative and threshold parameters to specify what the filter should be. Bare in mind the filter 
+is supposed to be applied to **numerical values**. The output gmt will have the gene-names in the <name_column>
+
+>>> pygna geneset-from-table <filename>.csv <setname> <filename>.gmt --name-colum <gene_names_column> --filter-column <filter-col>
+<'less'> --threshold <th> --descriptor <descriptor string>
 
 Pipelines
 ---------
