@@ -42,12 +42,11 @@ to speed up the process*
 
 >>> pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
 
->>> pygna test-topology-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 ../min_working_example/results/_topology_rwr.csv 
---number-of-permutations 1000 --cores 4
+>>> pygna test-topology-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_topology_rwr.csv --number-of-permutations 1000 --cores 4
 
->>> pygna paint-datasets-stats interactome_table_RW.csv ./ example1
+>>> pygna paint-datasets-stats table_topology_rwr.csv barplot_rwr.png
 
-You can look at the plot of the results in the `example1_results.pdf` file, and the corresponding table in  `example1_table_RW.csv`.
+You can look at the plot of the results in the `barplot_rwr.png` file, and the corresponding table in  `table_topology_rwr.csv`.
 
 Example 2: Running pygna GNA analysis
 +++++++++++++++++++++++++++++++++++++
@@ -65,7 +64,7 @@ The association analysis is run N x M times (N number of genesets, M number of p
 
 >>> pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_association_rwr.csv -B disgenet_cancer_groups_subset.gmt --keep --number-of-permutations 100 --cores 4
 
-If you don't include the --show-results flag at the comparison step, plot the matrix as follows
+If you don't include the --results-figure flag at the comparison step, plot the matrix as follows
 
 >>> pygna paint-comparison-matrix table_association_rwr.csv heatmap_association_rwr.png --rwr --annotate
 
@@ -79,7 +78,7 @@ WARNING: In this case, both A and B genesets are the same, usually you would use
 
 If setname B is not passed, the analysis is run between each couple of setnames in the geneset.
 
->>> pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_within_comparison_rwr.csv --number-of-permutations 100 --cores 4 --show-results
+>>> pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_within_comparison_rwr.csv --number-of-permutations 100 --cores 4
 
 >>> pygna paint-comparison-matrix table_within_comparison_rwr.csv heatmap_within_comparison_rwr.png --rwr --single-geneset
 
