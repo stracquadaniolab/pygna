@@ -4,6 +4,10 @@ Changelog
 Latest Version
 --------------
 
+v2.0.5
++++++++
+Solved problem in function from table to gmt. 
+
 v2.0.4
 +++++++
 Fully working version with documentation for basic functionalities.
