@@ -3,6 +3,9 @@ Changelog
 
 Latest Version
 --------------
+v2.0.7
++++++++
+Updated requirements (python >=3.6)
 
 v2.0.5
 +++++++
