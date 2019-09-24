@@ -882,7 +882,7 @@ def test_association_rwr(
             geneset_B = None
 
     st_comparison = sc.StatisticalComparison(
-        sc.comparison_random_walk, network, n_proc=cores, diz=RW_dict
+        sc.comparison_random_walk, network, n_proc=cores, diz=RW_dict 
     )
 
     if not geneset_B:
@@ -897,8 +897,7 @@ def test_association_rwr(
         output1.create_comparison_table_empirical()
 
         for pair in itertools.combinations(setnames, 2):
-            if len(pair[0]) > size_cut and len(pair[1]) > size_cut:
-
+            if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
                 logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
 
                 n_overlaps = len(
@@ -927,6 +926,9 @@ def test_association_rwr(
                     np.mean(null_d),
                     np.var(null_d),
                 )
+            else:
+                logging.warning("Geneset A has %d terms and Geneset B has %d terms. \
+                \nOne of them is too short, analysis not done" %(len(set(geneset_A[pair[0]])), len(set(geneset_A[pair[1]])) ))
 
     else:
 

@@ -143,7 +143,6 @@ class StatisticalComparison:
                         self.__diz,
                     )
                 )
-
         return random_dist
 
 
