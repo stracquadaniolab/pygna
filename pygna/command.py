@@ -736,7 +736,7 @@ def test_association_sp(
     )
 
     if not geneset_B:  # Analysis of genesets inside a single file
-
+        #TODO: check size-cut
         logging.info("Analysising all the sets in " + A_geneset_file)
         setnames = [key for key in geneset_A.keys()]
 
