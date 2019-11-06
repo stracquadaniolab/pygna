@@ -78,7 +78,6 @@ class StatisticalComparison:
     def get_comparison_null_distribution_mp(
         self, genesetA, genesetB, max_iter=100, keep=False
     ):
-        p = multiprocessing.Pool(self.__n_proc)
 
         n_trial = int(max_iter / self.__n_proc)
         logging.info(
@@ -94,6 +93,8 @@ class StatisticalComparison:
             )
 
         else:
+            
+            p = multiprocessing.Pool(self.__n_proc)
 
             results = [
                 p.apply_async(

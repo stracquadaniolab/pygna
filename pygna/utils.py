@@ -266,3 +266,36 @@ def clean_table(table, stat_col="stat"):
     table = table.dropna(subset=[stat_col])
     logging.info("cleaned table has %d rows" % len(table))
     return table
+
+def generate_group_gmt( input_table:"table to get the geneset from",
+                        output_gmt:'output_gmt_file',
+                        name_col = 'Gene',
+                        group_col = 'Cancer',
+                        descriptor = 'cancer_genes',
+                            ):
+
+    '''
+    This function generates a gmt file of multiple setnames.
+    From the table file, it groups the names in the group_col (the column you
+    want to use to group them) and prints the genes in the name_col.
+    Set the descriptor according to your needs
+    '''
+
+    if input_table.endswith('.csv'):
+        with open(input_table, 'r') as f:
+            table = pd.read_csv(f, usecols = [name_col, group_col])
+    elif (input_table.endswith('.tsv') or input_table.endswith('.txt')):        
+        with open(input_table, 'r') as f:
+            table = pd.read_csv(f, sep='\t', usecols = [name_col, group_col])
+    else:
+        sys.exit('pass correct input (csv/tsv/txt)')
+
+    diz = {}
+    for g, group in table.groupby([group_col]):
+        if len(group)<10:
+            print('warning: %s has less than 10 genes' %g)
+        diz[g]={}
+        diz[g]['genes']=group[name_col].astype(str).values.tolist()
+        diz[g]['descriptor'] = descriptor
+    
+    out.print_GMT(diz, output_gmt)

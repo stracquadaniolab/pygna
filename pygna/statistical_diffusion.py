@@ -163,7 +163,6 @@ def weights_diffusion_statistic(
 
     if matrix.shape[1] != weights.shape[0]:
         logging.warning("pass the right shape for the weights")
-
     try:
         product = np.matmul(matrix, weights)
     except:
@@ -171,4 +170,25 @@ def weights_diffusion_statistic(
 
     w = [product[i] for i in geneset_index]
     stat = np.sum(w) / len(w)
+    return stat
+
+def hotnet_diffusion_statistic(
+    matrix, weights, geneset_index, diz={}, observed_flag=False
+):
+
+    """
+    Applies the diagonal matrix of weights and gets all rows and
+    columns according to the genelist
+    """
+
+    weights = np.diagonal(weights)
+    if matrix.shape[1] != weights.shape[0]:
+        logging.warning("pass the right shape for the weights")
+    try:
+        product = np.matmul(matrix, weights)
+    except:
+        logging.warning("error in matrix multiplication")
+
+    prob = [product[i,j] for i in geneset_index for j in geneset_index if i != j]
+    stat = np.sum(prob)  
     return stat
