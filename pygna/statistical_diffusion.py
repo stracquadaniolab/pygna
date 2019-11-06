@@ -181,7 +181,7 @@ def hotnet_diffusion_statistic(
     columns according to the genelist
     """
 
-    weights = np.diagonal(weights)
+    weights =np.diagflat(weights.T)
     if matrix.shape[1] != weights.shape[0]:
         logging.warning("pass the right shape for the weights")
     try:

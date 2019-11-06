@@ -696,7 +696,8 @@ def test_diffusion_hotnet(
         logging.warning(
             "Error: the function takes a csv file as input, the read file has less than 2 columns, check that the table is comma separated"
         )
-    table[name_column] = table[name_column].fillna(0).apply(int).apply(str)
+    
+    table[name_column] = table[name_column].fillna(0).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
     geneset = utils.filter_table(
         table,
