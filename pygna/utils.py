@@ -165,7 +165,7 @@ def geneset_from_table(
     else:
         logging.error("only csv files supported")
 
-    table[name_column]=table[name_column].astype(str)
+    table[name_column]=table[name_column].fillna(0).apply(int).apply(str)
     threshold = float(threshold)
 
     table=clean_table(table, stat_col=filter_column)
