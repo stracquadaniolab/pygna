@@ -31,7 +31,7 @@ from matplotlib import pyplot as plt
 
 def __read_distance_matrix(distance_matrix_filename, in_memory=False):
 
-    """ 
+    """
     Reads the large matrix .Uses a hdf5 file to work with it
     :params in_memory: pass the flag to store matrix in memory
     """
@@ -269,9 +269,9 @@ def test_topology_rwr(
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset)" = None,
     ):
     """
-        Performs the analysis of random walk probabilities. 
+        Performs the analysis of random walk probabilities.
         Given the RW matrix ( either normal random walk or RW with restart),
-        it compares the probability of walking between the genes in the geneset 
+        it compares the probability of walking between the genes in the geneset
         compared to those of walking between the nodes
         of a geneset with the same size
     """
@@ -281,7 +281,7 @@ def test_topology_rwr(
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
-    RW_dict = {}  
+    RW_dict = {}
     RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
         rwr_matrix_filename, in_memory=in_memory
     )
@@ -298,7 +298,7 @@ def test_topology_rwr(
 
     for setname, item in geneset.items():
 
-        item = set(item) 
+        item = set(item)
         if len(item) > size_cut:
             # test
             observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
@@ -333,7 +333,7 @@ def test_topology_rwr(
 
 
         else:
-            logging.info(   
+            logging.info(
                 "%s removed from results since nodes mapped are < %d"
                 % (setname, size_cut)
             )
@@ -524,7 +524,7 @@ def test_degree_distribution(
     """
         Performs degree distribution test.
         Kolmogorov-Smirnov statistic on 2 samples.
-        H0 is that the geneset is drawn from the same distribution of all the other nodes. 
+        H0 is that the geneset is drawn from the same distribution of all the other nodes.
         H0 rejected if statistic is greater.
     """
     network = ps.__load_network(network_file)
@@ -604,7 +604,7 @@ def test_diffusion_weights(
         logging.warning(
             "Error: the function takes a csv file as input, the read file has less than 2 columns, check that the table is comma separated"
         )
-
+    table[name_column] = table[name_column].fillna(0).apply(int).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
     geneset = utils.filter_table(
         table,
@@ -616,9 +616,6 @@ def test_diffusion_weights(
     RW_dict = {}
     RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename)
 
-    # Decoding nodes
-    nodes = [i.decode() for i in RW_dict["nodes"]]
-
     # setting output
     output1 = out.Output(
         network_file,
@@ -629,14 +626,14 @@ def test_diffusion_weights(
         geneset_file,
     )
     logging.info("Results file = " + output1.output_table_results)
-    output1.create_st_table_empirical("table_diffusion_weights")
+    output1.create_st_table_empirical()
     output1.set_diffusion_matrix(rwr_matrix_filename)
 
     # initialising test
 
     st_test = sd.DiffusionTest(
         sd.weights_diffusion_statistic,
-        nodes,
+        RW_dict["nodes"],
         RW_dict["matrix"],
         table,
         names_col=name_column,
@@ -646,13 +643,6 @@ def test_diffusion_weights(
     observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
         geneset, max_iter=number_of_permutations, alternative="greater", cores=cores
     )
-
-    if show_null:
-        logging.info("Plotting diagnostic %s" % (str(output1.output)))
-
-        diagnostic.plot_null_distribution(
-            null_d, observed, output1.output, setname="diffusion"
-        )
 
     logging.info("Observed: %g p-value: %g" % (observed, pvalue))
     logging.info("Null mean: %g null variance: %g" % (np.mean(null_d), np.var(null_d)))
@@ -882,7 +872,7 @@ def test_association_rwr(
             geneset_B = None
 
     st_comparison = sc.StatisticalComparison(
-        sc.comparison_random_walk, network, n_proc=cores, diz=RW_dict 
+        sc.comparison_random_walk, network, n_proc=cores, diz=RW_dict
     )
 
     if not geneset_B:
@@ -1077,13 +1067,13 @@ def network_graphml(
     output_file: "graphml file for network for visualisation",
     setname: "setname" = None,
     giant_component_only: "saves only the giant component of the network" = True,
-    minimal: 'saves only the minimal graph' = False, 
+    minimal: 'saves only the minimal graph' = False,
     ):
     """
     This function generates a graphml file with nodes annotation.
     Given a geneset, with k setnames, each node has k False/True
-    annotations for each set. 
-    
+    annotations for each set.
+
     Warning: without minimal, this function saves the full network.
     The minimal graph saves only the nodes in the geneset and those that
     connect them with a shortest path.
@@ -1109,7 +1099,7 @@ def network_graphml(
                                 l0 = len(path)
                                 new_network_minimal.add_path(path)
 
-    
+
             dict_nodes = {}
             for n in new_network_minimal.nodes():
                 if n in geneset[setname]:
@@ -1117,7 +1107,7 @@ def network_graphml(
                 else:
                     dict_nodes[n] = False
             nx.set_node_attributes(new_network_minimal, dict_nodes, setname)
-    
+
     else:
 
         for setname in geneset:
