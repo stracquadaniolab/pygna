@@ -128,23 +128,23 @@ class DiffusionTest:
 
         return np.asarray(null_distribution)
 
-    def get_null_distribution(self, geneset_index, n_samples):
-
+    def get_null_distribution(self, geneset_index, n_samples, randomize="index"):
         np.random.seed()
         random_dist = []
         for i in range(n_samples):
             random_weights = self.weights.copy()
-            np.random.shuffle(random_weights)
-            random_dist.append(
-                self.test_statistic(
-                    self.diffusion_matrix,
-                    random_weights,
-                    geneset_index,
-                    self.diz,
-                    observed_flag=True,
+            if randomize != "index":
+                np.random.shuffle(random_weights)
+            else:
+                np.random.shuffle(geneset_index)
+            random_dist.append(self.test_statistic(
+                self.diffusion_matrix,
+                random_weights,
+                geneset_index,
+                self.diz,
+                observed_flag=True,
                 )
             )
-
         return random_dist
 
 
@@ -157,8 +157,8 @@ def weights_diffusion_statistic(
     matrix, weights, geneset_index, diz={}, observed_flag=False
 ):
 
-    """ 
-    
+    """
+
     """
 
     if matrix.shape[1] != weights.shape[0]:
