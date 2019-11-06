@@ -33,6 +33,7 @@ def main():
                             cmd.test_topology_rwr,
                             #cmd.test_degree_distribution,
                             cmd.test_diffusion_weights,
+                            cmd.test_diffusion_hotnet,
                             # comparison analysis
                             cmd.test_association_sp,
                             cmd.test_association_rwr,
@@ -47,6 +48,7 @@ def main():
                             utils.convert_gmt,
                             utils.geneset_from_table,
                             utils.convert_csv_names,
+                            utils.generate_group_gmt,
                              #simulations
                             dm.generate_hdn_network,
                             bm.generate_simulated_network,])
