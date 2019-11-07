@@ -819,7 +819,6 @@ def test_association_sp(
     )
 
     if not geneset_B:  # Analysis of genesets inside a single file
-        #TODO: check size-cut
         logging.info("Analysising all the sets in " + A_geneset_file)
         setnames = [key for key in geneset_A.keys()]
 
@@ -831,31 +830,42 @@ def test_association_sp(
         logging.info("Results file = " + output1.output_table_results)
         output1.create_comparison_table_empirical()
 
-        for pair in itertools.combinations(setnames, 2):
-            logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
-            overlaps = set(geneset_A[pair[0]]).intersection(set(geneset_A[pair[1]]))
 
-            observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                set(geneset_A[pair[0]]),
-                set(geneset_A[pair[1]]),
-                max_iter=number_of_permutations,
-                keep=keep,
-            )
-            # Save the results
-            output1.update_comparison_table_empirical(
-                pair[0],
-                pair[1],
-                len(set(geneset_A[pair[0]])),
-                A_mapped,
-                len(set(geneset_A[pair[1]])),
-                B_mapped,
-                len(overlaps),
-                number_of_permutations,
-                observed,
-                pvalue,
-                np.mean(null_d),
-                np.var(null_d),
-            )
+        for pair in itertools.combinations(setnames, 2):
+            if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
+                logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
+
+
+
+
+        for pair in itertools.combinations(setnames, 2):
+            if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
+                logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
+
+                n_overlaps = len(
+                    set(geneset_A[pair[0]]).intersection(set(geneset_A[pair[1]]))
+                )
+                observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
+                    set(geneset_A[pair[0]]),
+                    set(geneset_A[pair[1]]),
+                    max_iter=number_of_permutations,
+                    keep=keep,
+                )
+                # Save the results
+                output1.update_comparison_table_empirical(
+                    pair[0],
+                    pair[1],
+                    len(set(geneset_A[pair[0]])),
+                    A_mapped,
+                    len(set(geneset_A[pair[1]])),
+                    B_mapped,
+                    n_overlaps,
+                    number_of_permutations,
+                    observed,
+                    pvalue,
+                    np.mean(null_d),
+                    np.var(null_d),
+                )
 
     else:  # Analysis of genesets into two different gmt files
 
@@ -880,27 +890,27 @@ def test_association_sp(
         for set_A, item_A in geneset_A.items():
             for set_B, item_B in geneset_B.items():
                 n_overlaps = len(set(item_A).intersection(set(item_B)))
+                    if len(item_A) > size_cut and len(item_B) > size_cut:
+                    observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
+                        set(item_A), set(item_B), max_iter=number_of_permutations, keep=keep
+                    )
 
-                observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                    set(item_A), set(item_B), max_iter=number_of_permutations, keep=keep
-                )
+                    logging.info("Observed: %g p-value: %g" % (observed, pvalue))
 
-                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-
-                output1.update_comparison_table_empirical(
-                    set_A,
-                    set_B,
-                    len(set(item_A)),
-                    A_mapped,
-                    len(set(item_B)),
-                    B_mapped,
-                    n_overlaps,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
+                    output1.update_comparison_table_empirical(
+                        set_A,
+                        set_B,
+                        len(set(item_A)),
+                        A_mapped,
+                        len(set(item_B)),
+                        B_mapped,
+                        n_overlaps,
+                        number_of_permutations,
+                        observed,
+                        pvalue,
+                        np.mean(null_d),
+                        np.var(null_d),
+                    )
 
     output1.close_temporary_table()
     if results_figure:
