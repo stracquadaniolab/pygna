@@ -835,13 +835,6 @@ def test_association_sp(
             if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
                 logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
 
-
-
-
-        for pair in itertools.combinations(setnames, 2):
-            if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
-                logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
-
                 n_overlaps = len(
                     set(geneset_A[pair[0]]).intersection(set(geneset_A[pair[1]]))
                 )
@@ -890,7 +883,7 @@ def test_association_sp(
         for set_A, item_A in geneset_A.items():
             for set_B, item_B in geneset_B.items():
                 n_overlaps = len(set(item_A).intersection(set(item_B)))
-                    if len(item_A) > size_cut and len(item_B) > size_cut:
+                if len(item_A) > size_cut and len(item_B) > size_cut:
                     observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
                         set(item_A), set(item_B), max_iter=number_of_permutations, keep=keep
                     )
