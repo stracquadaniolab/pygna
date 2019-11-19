@@ -310,7 +310,6 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         for i in set(table['setname_A'].values.tolist()).union(set(table['setname_B'].values.tolist())):
             table=table.append({'setname_A':i, 'setname_B':i, 'observed':0, 'empirical_pvalue':1}, ignore_index=True)
 
-
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
     pivot_table = pivot_table.fillna(0)
     matrix = (pivot_table.T+pivot_table)-pivot_table.T*np.eye(len(pivot_table))
