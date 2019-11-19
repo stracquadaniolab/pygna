@@ -11,6 +11,7 @@ import pygna.output as out
 import pygna.parser as ps
 import multiprocessing
 import time
+from adjustText import adjust_text
 import seaborn as sns
 from palettable.colorbrewer.diverging import *
 from palettable.colorbrewer.sequential import *
@@ -288,17 +289,17 @@ def paint_datasets_stats( table_filename: 'pygna results table',
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         plt.savefig(output_file+'.png', format="png")
 
-def paint_comparison_matrix(table_filename: 'pygna comparison output', 
+def paint_comparison_matrix(table_filename: 'pygna comparison output',
                             output_file: 'output figure file, specify png or pdf file',
-                            rwr: 'use rwr is the table comes from a rwr analysis'= False,
-                            single_geneset: 'use true if the comparison has been done for a single file'=False,
+                            rwr: 'use rwr is the table comes from a rwr analysis' = False,
+                            single_geneset: 'use true if the comparison has been done for a single file' = False,
                             annotate: 'set true if uou want to print the pvalue inside the cell' = False):
 
     if rwr:
         palette = OrRd_9.mpl_colors
     else:
         palette = RdBu_11.mpl_colors
-        
+
     with open(table_filename, "r") as f:
         table = pd.read_csv(f, sep=",")
 
@@ -330,7 +331,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
 
     fig, axes = plt.subplots(1, 1, figsize=(10, 10))
     fig.subplots_adjust(left=0.3, right=0.99, bottom=0.3, top=0.99)
-    
+
     if rwr:
         print('plotting rwr')
         g2 = sns.heatmap(
@@ -345,7 +346,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
                 cbar=True,
                 linewidths=0.1,
                 linecolor="white",
-            )  
+            )
     else:
         g2 = sns.heatmap(
                 matrix,
@@ -360,7 +361,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
                 cbar=True,
                 linewidths=0.1,
                 linecolor="white",
-            )  
+            )
     g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
     g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
     axes.set_xlabel("")
@@ -377,7 +378,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
 
 def plot_adjacency(
     network: "network_filename",
-    output_file: 'use png or pdf for output figure', 
+    output_file: 'use png or pdf for output figure',
     clusters_file: "file of clusters to order the nodes" = None,
     size: "number of genes to plot, allows to cut the adjacency matrix" = None,
     ):
@@ -500,3 +501,36 @@ def plot_adjacency(
     else:
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         f.savefig(output_file+'.png', format="png")
+
+
+def paint_volcano_plot(df_in, output_figure,
+                 p_col="empirical_pvalue",
+                 id_col="setname_B",
+                 plotting_col="observed",
+                 threshold_x=0.1,
+                 threshold_y=0.1,
+                 ylabel='-log10(pvalue)',
+                 xlabel='observed',
+                 annot=False,
+                 color=False):
+    df = pd.read_csv(df_in, sep=",")
+    df[plotting_col] = (df[plotting_col]-df['mean(null)'])/df['var(null)']
+    df2 = df[(df[plotting_col] < threshold_x) | (df[p_col] < threshold_y)].copy()  # Non Significant
+    df1 = df[(df[plotting_col] >= threshold_x) & (df[p_col] >= threshold_y)].copy()  # Significant
+    fig, ax = plt.subplots(1, figsize=(8, 10))
+    ax.scatter(df1[plotting_col], df1[p_col], marker="o", s=50, alpha=1, edgecolors=None, color='blue')
+    ax.scatter(df2[plotting_col], df2[p_col], marker="+", s=20, alpha=1, edgecolors=None, color='red')
+    #print(np.min(df_in[plotting_col].values), np.max(df_in[plotting_col].values))
+    ax.axhline(y=threshold_y, xmin=0, xmax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
+    ax.axvline(x=threshold_x, ymin=0, ymax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    if annot:
+        texts = []
+        for key, row in df1.iterrows():
+            texts.append(plt.text(row[plotting_col], row[p_col], row[id_col].replace("_", "\n"), fontsize=6))
+            # ax.annotate(row[id_col].replace(";", "\n"), xy=(row[plotting_col], row[p_col]),
+            #                xytext=(row[plotting_col]+0.01,row[p_col]-0.01),
+            #                fontsize=6,rotation=-20)
+        adjust_text(texts, only_move={'text': 'y'})
+    plt.savefig(output_figure, format='pdf')
