@@ -1,2 +1,0 @@
-analysis,setname,n_mapped,n_geneset,number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network,geneset
-test,/Users/fcassano/PycharmProjects/pygna/data/dataset.csv,2931,3676,500,109019.59918256255,0.596,109019.59918256252,5.192311966668861e-22,/Users/fcassano/PycharmProjects/pygna/data/net.tsv,test_diffusion_weights
