@@ -158,7 +158,9 @@ def weights_diffusion_statistic(
 ):
 
     """
-
+    Not in use.
+    This statistic reweights the original weights and 
+    returns the average reweighted statistic.
     """
 
     if matrix.shape[1] != weights.shape[0]:
@@ -172,11 +174,13 @@ def weights_diffusion_statistic(
     stat = np.sum(w) / len(w)
     return stat
 
+
 def hotnet_diffusion_statistic(
     matrix, weights, geneset_index, diz={}, observed_flag=False
-):
+    ):
 
     """
+    HOTNET2 like diffusion.
     Applies the diagonal matrix of weights and gets all rows and
     columns according to the genelist
     """

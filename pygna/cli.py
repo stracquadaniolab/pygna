@@ -9,7 +9,6 @@ import networkx as nx
 import pygna.command as cmd
 import pygna.painter as paint
 import pygna.utils as utils
-import pygna.KS_test as KS
 import pygna.block_model as bm
 import pygna.degree_model as dm
 """
@@ -31,8 +30,6 @@ def main():
                             cmd.test_topology_module,
                             cmd.test_topology_sp,
                             cmd.test_topology_rwr,
-                            #cmd.test_degree_distribution,
-                            cmd.test_diffusion_weights,
                             cmd.test_diffusion_hotnet,
                             # comparison analysis
                             cmd.test_association_sp,
