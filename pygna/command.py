@@ -590,8 +590,8 @@ def test_diffusion_hotnet(
     )
     if n_mapped < size_cut:
         logging.info(
-            "%s remove from results since nodes mapped are < %d"
-            % (setname, size_cut)
+            "Results removed, since nodes mapped are < %d"
+            % (size_cut)
         )
     else:
         logging.info("Observed: %g p-value: %g" % (observed, pvalue))
