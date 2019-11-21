@@ -543,13 +543,17 @@ def test_diffusion_hotnet(
 
     # Read geneset
     with open(geneset_file, "r") as f:
-        table = pd.read_csv(geneset_file, sep=",")
+        table = pd.read_csv(f, sep=",")
+        table[name_column]=table[name_column].fillna(0).apply(int).apply(str)
+        
     if len(table.columns) < 2:
         logging.error(
             "Error: the function takes a csv file as input, the read file has less than 2 columns, check that the table is comma separated"
         )
     
     # Filter table for significant genes
+    print(table.head())
+    print(table.columns)
     table[name_column] = table[name_column].fillna(0).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
     geneset = utils.filter_table(

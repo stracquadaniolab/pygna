@@ -13,7 +13,6 @@ import pygna.painter as paint
 import pandas as pd
 import scipy
 import time
-import scipy.linalg.interpolative
 from copy import copy, deepcopy
 import itertools
 import tables
