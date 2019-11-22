@@ -116,7 +116,7 @@ def plot_null_distribution(null_distribution, observed, output_file, setname):
 
     sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
     axes.annotate(
-        "observed=%d" % observed,
+        "observed=%f" % observed,
         xy=(observed, ymax-ymax/10),
         xytext=(observed,ymax-ymax/20),
         color="r",
