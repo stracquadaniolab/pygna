@@ -521,6 +521,7 @@ def test_diffusion_hotnet(
     filter_condition: "Condition for significance" = "less",
     filter_threshold: "threshold for significance" = 0.01,
     weight: "RW" = "RW",
+    normalise : 'pass this flag for using only positive values in the analysis',
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
@@ -552,8 +553,6 @@ def test_diffusion_hotnet(
         )
     
     # Filter table for significant genes
-    print(table.head())
-    print(table.columns)
     table[name_column] = table[name_column].fillna(0).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
     geneset = utils.filter_table(
@@ -562,6 +561,9 @@ def test_diffusion_hotnet(
         alternative=filter_condition,
         threshold=filter_threshold,
     )[name_column]
+
+    if normalisation:
+        table[weight_column]=np.abs(table[weight_column].values)
 
     if len(geneset) < size_cut:
         logging.error('The number of significant genes is lower than %d. \
