@@ -510,25 +510,24 @@ def test_topology_sp(
 ######### Diffusion test #######################################################
 ################################################################################
 
-def test_diffusion_hotnet(
-    network_file: "network file, use a network with weights",
-    geneset_file: "csv geneset file",
-    rwr_matrix_filename:  "hdf5 RWR matrix obtained with pygna ",
-    output_table: "output results table, use .csv extension",
-    name_column: "Column to use as name (default is deseq2)" = "gene_name",
-    weight_column: "Column to use as weight (default is deseq2)" = "stat",
-    filter_column: "Column used to define the significant genes (default is deseq2)" = "padj",
-    filter_condition: "Condition for significance" = "less",
-    filter_threshold: "threshold for significance" = 0.01,
-    weight: "RW" = "RW",
-    normalise : 'pass this flag for using only positive values in the analysis',
-    size_cut: "removes all genesets with a mapped length < size_cut" = 20,
-    number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
-    cores: "Number of cores for the multiprocessing" = 1,
-    in_memory: "set if you want the large matrix to be read in memory" = False,
-    show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
-    results_figure: "figure where the result figure can be saved (use pdf or png)" = None,
-    ):
+def test_diffusion_hotnet(network_file: "network file, use a network with weights",
+                            geneset_file: "csv geneset file",
+                            rwr_matrix_filename:  "hdf5 RWR matrix obtained with pygna ",
+                            output_table: "output results table, use .csv extension",
+                            name_column: "Column to use as name (default is deseq2)" = "gene_name",
+                            weight_column: "Column to use as weight (default is deseq2)" = "stat",
+                            filter_column: "Column used to define the significant genes (default is deseq2)" = "padj",
+                            filter_condition: "Condition for significance" = "less",
+                            filter_threshold: "threshold for significance" = 0.01,
+                            weight: "RW" = "RW",
+                            normalise : 'pass this flag for using only positive values in the analysis' = False,
+                            size_cut: "removes all genesets with a mapped length < size_cut" = 20,
+                            number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
+                            cores: "Number of cores for the multiprocessing" = 1,
+                            in_memory: "set if you want the large matrix to be read in memory" = False,
+                            show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
+                            results_figure: "figure where the result figure can be saved (use pdf or png)" = None,
+                            ):
 
     """
         Performs the analysis of random walk applying the weights of an upstream analysis.
