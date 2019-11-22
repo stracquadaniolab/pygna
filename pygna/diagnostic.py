@@ -110,15 +110,17 @@ def plot_null_distribution(null_distribution, observed, output_file, setname):
             color="r",
             ax=axes,
         )
-    g4 = axes.stem([observed], [0.01], "r", "r--")
+    
+    ymax = axes.dataLim.y1
+    g4 = axes.stem([observed], [ymax-ymax/10], "r", "r--")
 
     sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
     axes.annotate(
         "observed=%d" % observed,
-        xy=(observed, 0.01),
-        xytext=(observed - 45, 0.01),
+        xy=(observed, ymax-ymax/10),
+        xytext=(observed,ymax-ymax/20),
         color="r",
-        fontsize=10,
+        fontsize=14,
     )
 
     logging.info(
