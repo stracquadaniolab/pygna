@@ -1,22 +1,34 @@
+from abc import ABC, abstractmethod
 import logging
 import pickle
 import networkx as nx
 import tables
-import pandas as pd
 import sys
 
 
-def __load_network(filename):
-    """ Loads network from file
-    """
-    if filename.endswith("tsv"):
-        network = TSVParser().read(filename)
-    elif filename.endswith("gpickle"):
-        network = nx.read_gpickle(filename)
-    else:
-        network = Tab2Parser().read(filename)
+class Parser(ABC):
+    pass
 
-    return network
+
+class Tsv2GraphParser(Parser):
+    """
+    A class that converts TSV -> Graph
+    """
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def convert_network(interactions):
+        """
+        This method converts a list into a networkx file
+        :param interactions: list, containing couples of fields
+        :return: nx.Graph object, containing the network information
+        """
+        graph = nx.Graph()
+        graph.add_edges_from(interactions)
+        graph.remove_edges_from(graph.selfloop_edges())
+        return graph
+
 
 
 def __load_geneset(filename, setname=None):
@@ -42,33 +54,6 @@ class Parser:
     def read(self, filename, organism="9606", int_type=None):
         pass
 
-
-class Tab2Parser(Parser):
-
-    __FIELD_ENTREZ_A__ = 7
-    __FIELD_ENTREZ_B__ = 8
-    __FIELD_ORGANISM_A__ = 15
-    __FIELD_ORGANISM_B__ = 16
-
-    def __init__(self):
-        pass
-
-    def read(self, filename, organism="9606", int_type=None):
-        interactions = []
-        for record in open(filename):
-            fields = record.strip().split("\t")
-            if (
-                fields[Tab2Parser.__FIELD_ORGANISM_A__] == organism
-                and fields[Tab2Parser.__FIELD_ORGANISM_B__] == organism
-            ):
-                gene_a = fields[Tab2Parser.__FIELD_ENTREZ_A__]
-                gene_b = fields[Tab2Parser.__FIELD_ENTREZ_B__]
-                interactions.append((gene_a, gene_b))
-
-        graph = nx.Graph()
-        graph.add_edges_from(interactions)
-        graph.remove_edges_from(graph.selfloop_edges())
-        return graph
 
 
 class TSVParser(Parser):

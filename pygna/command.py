@@ -10,6 +10,7 @@ from pygna.utils import YamlConfig
 import pygna.output as out
 import networkx as nx
 import pygna.parser as ps
+import pygna.reading_class as rc
 import pygna.statistical_test as st
 import pygna.statistical_comparison as sc
 import pygna.diagnostic as diagnostic
@@ -71,7 +72,8 @@ def network_summary(network_file: 'network file',
     the subgraph are evaluated
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
 
     if geneset_input_file:
         if not setname:
@@ -115,7 +117,8 @@ def test_topology_total_degree(
         for a geneset of the same size.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
@@ -199,7 +202,8 @@ def test_topology_internal_degree(
         for a geneset of the same size.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
@@ -275,7 +279,8 @@ def test_topology_rwr(
         of a geneset with the same size
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     geneset = ps.__load_geneset(geneset_file, setname)
@@ -360,7 +365,8 @@ def test_topology_module(
         of the geneset being bigger than the one expected by chance
         for a geneset of the same size.
     """
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
@@ -447,7 +453,8 @@ def test_topology_sp(
 
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     geneset = ps.__load_geneset(geneset_file, setname)
@@ -531,26 +538,27 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 
     """
         Performs the analysis of random walk applying the weights of an upstream analysis.
-        Given a csv file the user needs to specify the columns of interest and 
-        the threshold of significance. 
+        Given a csv file the user needs to specify the columns of interest and
+        the threshold of significance.
         For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic
-        function. 
+        function.
     """
 
     # Reading network file
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read geneset
     with open(geneset_file, "r") as f:
         table = pd.read_csv(f, sep=",")
         table[name_column]=table[name_column].fillna(0).apply(int).apply(str)
-        
+
     if len(table.columns) < 2:
         logging.error(
             "Error: the function takes a csv file as input, the read file has less than 2 columns, check that the table is comma separated"
         )
-    
+
     # Filter table for significant genes
     table[name_column] = table[name_column].fillna(0).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
@@ -661,7 +669,8 @@ def test_association_sp(
     else:
         analysis_name_str = "comparison_sp"
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read matrix
@@ -817,7 +826,8 @@ def test_association_rwr(
     else:
         analysis_name_str = "comparison_rwr"
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read datasets
@@ -963,7 +973,8 @@ def build_distance_matrix(
         Matrix can be saved as a lm.txt file or a .hdf5 one.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
 
@@ -1002,7 +1013,8 @@ def build_rwr_diffusion(
         Build the RWR_diffusion_matrix
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     network = network.subgraph(max(nx.connected_components(network), key=len))
 
     nodes = list(network.nodes())
@@ -1049,7 +1061,8 @@ def network_graphml(
     connect them with a shortest path.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_data()
+    network = ps.Tsv2GraphParser.convert_network(network)
     geneset = ps.__load_geneset(geneset_file, setname)
 
     if giant_component_only:

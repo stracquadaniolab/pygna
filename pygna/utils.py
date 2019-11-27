@@ -1,30 +1,10 @@
-"""Docstring1
-"""
-
-import logging
-import pickle
-import numpy as np
-import networkx as nx
-
-import pygna.statistical_test as st
-import pygna.statistical_comparison as sc
-import pygna.diagnostic as diagnostic
-import pygna.painter as paint
-import pandas as pd
-import scipy
-import time
-from copy import copy, deepcopy
-import itertools
-import tables
-import seaborn as sns
-from matplotlib import pyplot as plt
-
-
 import yaml
 import pandas as pd
 import pygna.parser as parser
 import pygna.output as output
+import pygna.converters as pc
 import logging
+import sys
 
 
 class YamlConfig:
@@ -116,8 +96,7 @@ def convert_gmt(
     converter_map_filename: "tsv table used to convert gene names" = "../../../primary_data/entrez_name.tsv",
     entrez_col: "name of the entrez column" = "NCBI Gene ID",
     symbol_col: "name of the symbol column" = "Approved symbol",
-    ):
-
+):
     ''' name conversion table '''
 
     GMTparser = parser.GMTParser()
@@ -148,8 +127,7 @@ def geneset_from_table(
     alternative: "alternative to use for the filter, with less the filter is applied <threshold, otherwise >= threshold" = "less",
     threshold: "threshold for the filter" = 0.01,
     descriptor: "descriptor for the gmt file" = None,
-    ):
-
+):
     """
     This function converts a csv file to a gmt allowing to filter the elements
     using the values of one of the columns. The user can specify the column used to
@@ -164,10 +142,10 @@ def geneset_from_table(
     else:
         logging.error("only csv files supported")
 
-    table[name_column]=table[name_column].fillna(0).apply(int).apply(str)
+    table[name_column] = table[name_column].fillna(0).apply(int).apply(str)
     threshold = float(threshold)
 
-    table=clean_table(table, stat_col=filter_column)
+    table = clean_table(table, stat_col=filter_column)
 
     table = filter_table(
         table, filter_column=filter_column, alternative=alternative, threshold=threshold
@@ -206,8 +184,7 @@ def filter_table(
     filter_column: "column with the values to be filtered" = "padj",
     alternative: "alternative to use for the filter, with less the filter is applied <threshold, otherwise >= threshold" = "less",
     threshold: "threshold for the filter" = 0.01,
-    ):
-
+):
     """
     This function filters a table according to a filter rule.
     """
@@ -225,54 +202,19 @@ def filter_table(
     return table
 
 
-def convert_csv_names(
-    csv_file: "csv file where to add a name column",
-    conversion: "e2s or s2e",
-    original_name_col: "column name to be converted",
-    new_name_col: "name of the new column with the converted names",
-    output_file: "if none, table is saved in the same input file" = None,
-    converter_map_filename: "tsv table used to convert gene names" = "../../../primary_data/entrez_name.tsv",
-    entrez_col: "name of the entrez column" = "NCBI Gene ID",
-    symbol_col: "name of the symbol column" = "Approved symbol",
-    ):
-
-    with open(csv_file, "r") as f:
-        table = pd.read_csv(f)
-
-    converter = Converter(converter_map_filename, entrez_col, symbol_col)
-
-    if conversion == "e2s":
-        table[new_name_col] = converter.entrez2symbol(
-            table[original_name_col].values.tolist()
-        )
-
-    elif conversion == "s2e":
-        table[new_name_col] = converter.symbol2entrez(
-            table[original_name_col].values.tolist()
-        )
-
-    else:
-        logging.error("conversion type not understood")
-
-    if not output_file:
-        output_file = csv_file
-
-    table.to_csv(output_file, index=False)
-
-
 def clean_table(table, stat_col="stat"):
     logging.info("original table has %d rows" % len(table))
     table = table.dropna(subset=[stat_col])
     logging.info("cleaned table has %d rows" % len(table))
     return table
 
-def generate_group_gmt( input_table:"table to get the geneset from",
-                        output_gmt:'output_gmt_file',
-                        name_col = 'Gene',
-                        group_col = 'Cancer',
-                        descriptor = 'cancer_genes',
-                            ):
 
+def generate_group_gmt(input_table: "table to get the geneset from",
+                       output_gmt: 'output_gmt_file',
+                       name_col='Gene',
+                       group_col='Cancer',
+                       descriptor='cancer_genes',
+                       ):
     '''
     This function generates a gmt file of multiple setnames.
     From the table file, it groups the names in the group_col (the column you
@@ -282,19 +224,33 @@ def generate_group_gmt( input_table:"table to get the geneset from",
 
     if input_table.endswith('.csv'):
         with open(input_table, 'r') as f:
-            table = pd.read_csv(f, usecols = [name_col, group_col])
-    elif (input_table.endswith('.tsv') or input_table.endswith('.txt')):        
+            table = pd.read_csv(f, usecols=[name_col, group_col])
+    elif (input_table.endswith('.tsv') or input_table.endswith('.txt')):
         with open(input_table, 'r') as f:
-            table = pd.read_csv(f, sep='\t', usecols = [name_col, group_col])
+            table = pd.read_csv(f, sep='\t', usecols=[name_col, group_col])
     else:
         sys.exit('pass correct input (csv/tsv/txt)')
 
     diz = {}
     for g, group in table.groupby([group_col]):
-        if len(group)<10:
-            print('warning: %s has less than 10 genes' %g)
-        diz[g]={}
-        diz[g]['genes']=group[name_col].astype(str).values.tolist()
+        if len(group) < 10:
+            print('warning: %s has less than 10 genes' % g)
+        diz[g] = {}
+        diz[g]['genes'] = group[name_col].astype(str).values.tolist()
         diz[g]['descriptor'] = descriptor
-    
+
     out.print_GMT(diz, output_gmt)
+
+
+def convert_csv(csv_file: "csv file where to add a name column",
+                conversion: "e2s or s2e",
+                original_name_col: "column name to be converted",
+                new_name_col: "name of the new column with the converted names",
+                geneset: "the geneset to convert",
+                converter_map_filename: "tsv table used to convert gene names" = "entrez_name.tsv",
+                output_file: "if none, table is saved in the same input file" = None,
+                entrez_col: "name of the entrez column" = "NCBI Gene ID",
+                symbol_col: "name of the symbol column" = "Approved symbol"):
+
+    pc.ConvertCsvNames(csv_file, conversion, original_name_col, new_name_col, geneset, entrez_col, symbol_col,
+                       converter_map_filename, output_file)

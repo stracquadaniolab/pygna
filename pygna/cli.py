@@ -45,7 +45,7 @@ def main():
                             # utils
                             utils.convert_gmt,
                             utils.geneset_from_table,
-                            utils.convert_csv_names,
+                            utils.convert_csv,
                             utils.generate_group_gmt,
                              #simulations
                             dm.generate_hdn_network,
