@@ -28,7 +28,7 @@ def volcano_plot(df,output_file,
                         annot=False):
 
     df2 = df[(df[plotting_col] < threshold_x) | (df[p_col] < threshold_y)].copy()  # Non Significant
-    df1 = df[(df[plotting_col] >= threshold_x) & (df[p_col] >= threshold_y)].copy()  # Significant
+    df1 = df[(np.abs(df[plotting_col]) >= threshold_x) & (df[p_col] >= threshold_y)].copy()  # Significant
 
     fig, ax = plt.subplots(1, figsize=(8, 10))
     ax.scatter(df2[plotting_col], df2[p_col], marker="+", s=20, alpha=1, edgecolors=None, color='blue')
