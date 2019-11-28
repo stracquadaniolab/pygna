@@ -1,10 +1,6 @@
 from pygna.utilities import Utils
-import pygna.reading_class as rc
-import sys
 import logging
 
-# TODO: fix the code below here when pygna.output is re-written
-import pygna.output as output
 
 class TableElaboration(Utils):
     """

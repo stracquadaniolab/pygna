@@ -6,7 +6,7 @@ import pandas as pd
 class ReadingData(ABC):
     """Abstract class used to read different types of file. Each subclass must implement the 'readfile'
     and get_data method"""
-    def __init__(self, filename):
+    def __init__(self):
         super(ReadingData, self).__init__()
 
     @abstractmethod
@@ -27,15 +27,16 @@ class ReadTsv(ReadingData, ABC):
         # TODO Fix documentation about int_type
         """
         :param filename: str, represents the path to the network file
+        :param pd_table: bool, if the results is going to be a pd.dataframe
         :param int_type: Unknown
         """
         super().__init__(filename)
-        self._filename = filename
-        self._int_type = int_type
-        self._pd_table = pd_table
+        self.filename = filename
+        self.int_type = int_type
+        self.pd_table = pd_table
 
-        if not self._pd_table:
-            self._interactions = self._ReadingData__readfile(self._filename)
+        if not self.pd_table:
+            self.interactions = self._ReadingData__readfile(self.filename)
 
     def _ReadingData__readfile(self, filename):
         """
@@ -50,9 +51,9 @@ class ReadTsv(ReadingData, ABC):
                     continue
 
                 fields = record.strip().split("\t")
-                if self._int_type:
+                if self.int_type:
                     types = fields[3].split(";")
-                    if self._int_type in types:
+                    if self.int_type in types:
                         interactions.append((fields[0], fields[1]))
                     else:
                         continue
@@ -66,14 +67,14 @@ class ReadTsv(ReadingData, ABC):
         Returns the data of the tsv file
         :return: list, represents the genes read in the file
         """
-        return self._interactions
+        return self.interactions
 
     def get_pd_data(self):
         """
         Returns the data into a pandas object
         :return: pd.dataframe, represents the data into a pandas object
         """
-        return pd.read_table(self._filename)
+        return pd.read_table(self.filename)
 
 
 class ReadGmt(ReadingData, ABC):
@@ -87,10 +88,10 @@ class ReadGmt(ReadingData, ABC):
         :param read_descriptor: bool, if the descriptor is given. Default = False
         """
         super().__init__(filename)
-        self._filename = filename
-        self._read_descriptor = read_descriptor
+        self.filename = filename
+        self.read_descriptor = read_descriptor
 
-        self._gmt_data = self._ReadingData__readfile(self._filename)
+        self.gmt_data = self._ReadingData__readfile(self.filename)
 
     def _ReadingData__readfile(self, filename):
         """
@@ -102,7 +103,7 @@ class ReadGmt(ReadingData, ABC):
         with open(filename, "r") as f:
             for record in f:
                 fields = record.strip().split("\t")
-                if self._read_descriptor:
+                if self.read_descriptor:
                     gene_lists[fields[0]] = {}
                     gene_lists[fields[0]]["genes"] = fields[2:]
                     gene_lists[fields[0]]["descriptor"] = fields[1]
@@ -115,7 +116,7 @@ class ReadGmt(ReadingData, ABC):
         Returns the data of the gmt file
         :return: dict, represents the genes list
         """
-        return self._gmt_data
+        return self.gmt_data
 
 
 class ReadCsv(ReadingData, ABC):
@@ -130,19 +131,19 @@ class ReadCsv(ReadingData, ABC):
         :param use_cols: list, columns used to be read and grouped
         """
         super().__init__(filename)
-        self._filename = filename
-        self._sep = sep
-        self._use_cols = use_cols
+        self.filename = filename
+        self.sep = sep
+        self.use_cols = use_cols
 
-        self._data = self._ReadingData__readfile()
+        self.data = self._ReadingData__readfile()
 
     def _ReadingData__readfile(self):
         """
         This method read the file and saves the data inside a class attribute
         :return: pd.dataframe, represents teh data read inside the .csv
         """
-        with open(self._filename, "r") as f:
-            table = pd.read_csv(f, sep=self._sep, usecols=self._use_cols)
+        with open(self.filename, "r") as f:
+            table = pd.read_csv(f, sep=self.sep, usecols=self.use_cols)
             return table
 
     def get_data(self):
@@ -150,7 +151,7 @@ class ReadCsv(ReadingData, ABC):
         Returns the data of the csv file
         :return: pd.dataframe, represents teh data read inside the .csv
         """
-        return self._data
+        return self.data
 
     def fill_na_column(self, name_column="gene_name"):
         """
@@ -158,4 +159,4 @@ class ReadCsv(ReadingData, ABC):
         :param name_column: name of the column to filter
         :return null
         """
-        self._data[name_column] = self._data[name_column].fillna(0).apply(int).apply(str)
+        self.data[name_column] = self.data[name_column].fillna(0).apply(int).apply(str)
