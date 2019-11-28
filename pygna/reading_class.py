@@ -4,7 +4,8 @@ import pandas as pd
 
 
 class ReadingData(ABC):
-    """Abstract class used to read different types of file. Each subclass must implement the 'readfile' method"""
+    """Abstract class used to read different types of file. Each subclass must implement the 'readfile'
+    and get_data method"""
     def __init__(self, filename):
         super(ReadingData, self).__init__()
 
@@ -122,24 +123,26 @@ class ReadCsv(ReadingData, ABC):
     A class used to read the .csv data file
     """
 
-    def __init__(self, filename, sep=","):
+    def __init__(self, filename, sep=",", use_cols=None):
         """
         :param filename: str, represents the path to the data file
+        :param sep: str, the separator to be used
+        :param use_cols: list, columns used to be read and grouped
         """
         super().__init__(filename)
         self._filename = filename
         self._sep = sep
+        self._use_cols = use_cols
 
-        self._data = self._ReadingData__readfile(self._filename, sep)
+        self._data = self._ReadingData__readfile()
 
-    def _ReadingData__readfile(self, filename, sep):
+    def _ReadingData__readfile(self):
         """
         This method read the file and saves the data inside a class attribute
-        :param filename:  str, represents the path to the file
         :return: pd.dataframe, represents teh data read inside the .csv
         """
-        with open(filename, "r") as f:
-            table = pd.read_csv(f, sep=sep)
+        with open(self._filename, "r") as f:
+            table = pd.read_csv(f, sep=self._sep, usecols=self._use_cols)
             return table
 
     def get_data(self):
@@ -153,5 +156,6 @@ class ReadCsv(ReadingData, ABC):
         """
         Fill the N/A values with a (str) 0
         :param name_column: name of the column to filter
+        :return null
         """
         self._data[name_column] = self._data[name_column].fillna(0).apply(int).apply(str)

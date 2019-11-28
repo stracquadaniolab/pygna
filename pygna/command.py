@@ -17,7 +17,6 @@ import pygna.diagnostic as diagnostic
 import pygna.painter as paint
 import pygna.utils as utils
 import pygna.statistical_diffusion as sd
-from pygna.utils import Converter
 import pandas as pd
 import scipy
 import time

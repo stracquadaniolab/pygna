@@ -1,6 +1,11 @@
 from pygna.utilities import Utils
+from pygna.elaborators import TableElaboration as tE
 import pygna.reading_class as rc
 import logging
+import sys
+
+# TODO: fix the code below here when pygna.output is re-written
+import pygna.output as output
 
 
 class Converters(Utils):
@@ -46,7 +51,7 @@ class Converters(Utils):
         :param geneset: pd.dataframe, column containing the strings to convert
         :return: list, containing the entrez names
         """
-        logging.info("Converting Symbols -> Entrez ID...")
+        logging.info("Converting Symbols -> Entrez ID")
         geneset_entrez = []
         unknown_counter = 0
         for i in geneset:
@@ -64,8 +69,12 @@ class Converters(Utils):
 
         return geneset_entrez
 
+    @staticmethod
+    def _gmt_output(gmt_data, gmt_output_file):
+        output.print_GMT(gmt_data, gmt_output_file)
 
-class ConvertCsvNames(Converters):
+
+class CsvToCsvEnriched(Converters):
     """
     Class that is used to add a column with the entrezID or Symbols to a CSV file
     """
@@ -111,7 +120,7 @@ class ConvertCsvNames(Converters):
             logging.error("Conversion type not understood")
 
         if self._output:
-            self._print_output()
+            self._csv_output()
 
     def get_data(self):
         """
@@ -120,7 +129,7 @@ class ConvertCsvNames(Converters):
         """
         return self._file_data
 
-    def _print_output(self):
+    def _csv_output(self):
         """
         Method to print the output to file
         :return: null
@@ -139,7 +148,7 @@ class ConvertCsvNames(Converters):
         self._map_table["Previous symbols"] = self._map_table["Previous symbols"].str.upper()
 
 
-class CsvToGmtFiltered(Converters):
+class CsvToGmt(Converters):
     """
     This Class converts a csv file to a gmt allowing to filter the elements using the values of one of the columns.
     The user can specify the column used to retrieve the name of the objects and the filter condition. The output
@@ -147,8 +156,8 @@ class CsvToGmtFiltered(Converters):
     otherwise both can be created.
     """
 
-    def __init__(self, input_file, setname, output_gmt=None, output_csv=None, name_column="Unnamed: 0",
-                 filter_column="padj", alternative="less", threshold=0.01, descriptor=None):
+    def __init__(self, input_file, setname, filter_column, alternative, threshold, output_gmt=None, output_csv=None,
+                 name_column="Unnamed: 0", descriptor=None):
         """
         :param input_file: str, the csv file
         :param setname: str, the name of the set
@@ -169,14 +178,14 @@ class CsvToGmtFiltered(Converters):
         self._name_column = name_column
         self._filter_column = filter_column
         self._alternative = alternative
-        self._threshold = float(threshold)
+        self._threshold = threshold
         self._descriptor = descriptor
 
         self._table = rc.ReadCsv(self._input_file).fill_na_column(self._name_column).get_data()
         self._table = self._elaborate()
 
         if self._output_gmt:
-            self._gmt_output()
+            self._process_gmt()
 
         if self._output_csv:
             self._csv_output()
@@ -186,13 +195,12 @@ class CsvToGmtFiltered(Converters):
         This method performs the cleaning and the filtering of the table
         :return: pd.dataframe, representing the cleaned and filter table
         """
-        table = clean_table(self._table, stat_col=self._filter_column)
-        table = filter_table(
-            table, filter_column=self._filter_column, alternative=self._alternative, threshold=self._threshold
-        )
+        table = tE.clean_table(self._table, self._filter_column)
+        table = tE.filter_table(table, filter_column=self._filter_column, alternative=self._alternative,
+                                threshold=self._threshold)
         return table
 
-    def _gmt_output(self):
+    def _process_gmt(self):
         """
         This method parse the results and save them on a GMT file
         :return: null
@@ -209,8 +217,7 @@ class CsvToGmtFiltered(Converters):
 
         # TODO Maybe it's better to automatically add an extension
         if self._output_gmt.endswith(".gmt"):
-            # TODO Fix below
-            output.print_GMT(gmt_dict, self._output_gmt)
+            super()._gmt_output(gmt_dict, self._output_gmt)
         else:
             logging.error("specify gmt output")
 
@@ -224,3 +231,85 @@ class CsvToGmtFiltered(Converters):
             self._table.to_csv(self._output_csv, sep=",", index=False)
         else:
             logging.error("specify csv output")
+
+
+# TODO GmtToGmtEnriched and CSVtoGMTEnriched classes could be merged into only one. Need re-writing the whole code and
+#  refactor accordingly
+class GmtToGmtEnriched(Converters):
+    """
+    This Class converts a GMT file, adding information about the Entrez ID or the symbol
+    """
+    def __init__(self, gmt_file, output_gmt_file, conversion, entrez_col, symbol_col,
+                 converter_map_filename="entrez_name.tsv"):
+        """
+        :param gmt_file: str, the input GMT file path
+        :param output_gmt_file: str, the output GMT file path
+        :param conversion: str, could be "e2s"-> Entrez2Symbols or "s2e" -> Symbol2Entrez
+        :param entrez_col: str, the name of the entrez column
+        :param symbol_col: str, the name of the symbol column
+        :param converter_map_filename: str, the path to the .tsv used to convert the genes name
+        """
+        super().__init__()
+        self._gmt_file = gmt_file
+        self._output_gmt_file = output_gmt_file
+        self._conversion = conversion
+        self._entrez_col = entrez_col
+        self._symbol_col = symbol_col
+        self._converter_map_filename = converter_map_filename
+
+        self._gmt_data = rc.ReadGmt(self._gmt_file, True).get_data()
+        self._tsv_data = rc.ReadTsv(self._converter_map_filename).get_data()
+
+        if self._conversion == "e2s":
+            for k, d in self._gmt_data.items():
+                self._gmt_data[k]["genes"] = Converters.convert_e2s(d["genes"], self._converter_map_filename,
+                                                                    self._entrez_col, self._symbol_col)
+        elif self._conversion == "s2e":
+            for k, d in self._gmt_data.items():
+                self._gmt_data[k]["genes"] = Converters.convert_s2e(d["genes"], self._converter_map_filename,
+                                                                    self._entrez_col, self._symbol_col)
+        else:
+            logging.error("Conversion type not understood")
+        super()._gmt_output(self._gmt_data, self._output_gmt_file)
+
+
+class GroupGmt(Converters):
+    """
+    This function generates a gmt file of multiple setnames. From the table file, it groups the names in the
+    group_col (the column you want to use to group them) and prints the genes in the name_col. Set the descriptor
+    according to your needs
+    """
+
+    def __init__(self, input_table, output_gmt, name_col="Gene", group_col="Cancer", descriptor="cancer_genes"):
+        """
+        :param input_table: str, the filename path
+        :param output_gmt: str, the output gmt file path
+        :param name_col: str, the name of the column to write the genes
+        :param group_col: str, the name of the column to group
+        :param descriptor: str, the descriptor to use
+        """
+        super().__init__()
+        self._input_table = input_table
+        self._output_gmt = output_gmt
+        self._name_col = name_col
+        self._group_col = group_col
+        self._descriptor = descriptor
+
+        if self._input_table.endswith(".csv"):
+            self._table = rc.ReadCsv(self._input_table, use_cols=[self._name_col, self._group_col]).get_data()
+        elif self._input_table.endswith("tsv") or self._input_table.endswith("txt"):
+            self._table = rc.ReadCsv(self._input_table, sep="\t", use_cols=[self._name_col, self._group_col]).get_data()
+        else:
+            sys.exit('Pass correct input (csv/tsv/txt)')
+        self._gmt_data = self._elaborate()
+        super()._gmt_output(self._gmt_data, self._output_gmt)
+
+    def _elaborate(self):
+        diz = {}
+        for g, group in self._table.groupby([self._group_col]):
+            if len(group) < 10:
+                print('warning: %s has less than 10 genes' % g)
+            diz[g] = {}
+            diz[g]['genes'] = group[self._name_col].astype(str).values.tolist()
+            diz[g]['descriptor'] = self._descriptor
+        return diz
