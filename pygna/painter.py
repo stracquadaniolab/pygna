@@ -16,6 +16,8 @@ import seaborn as sns
 from palettable.colorbrewer.diverging import *
 from palettable.colorbrewer.sequential import *
 import scipy.stats as stats
+from matplotlib.offsetbox import AnchoredText
+import textwrap
 
 def volcano_plot(df,output_file,
                         p_col: 'p value column'="empirical_pvalue",
@@ -27,32 +29,73 @@ def volcano_plot(df,output_file,
                         xlabel='z-score',
                         annot=False):
 
-    df2 = df[(df[plotting_col] < threshold_x) | (df[p_col] < threshold_y)].copy()  # Non Significant
-    df1 = df[(np.abs(df[plotting_col]) >= threshold_x) & (df[p_col] >= threshold_y)].copy()  # Significant
+    logging.info('Significant are considered when  %s > %f and %s > %f' %(p_col, threshold_y, plotting_col, threshold_x) )
+
+    # Non Significant
+    df2 = df[(df[plotting_col] < threshold_x) | (df[p_col] < threshold_y)].copy()  
+    # Significant
+    df1 = df[(np.abs(df[plotting_col]) >= threshold_x) & (df[p_col] >= threshold_y)].copy()  
 
     fig, ax = plt.subplots(1, figsize=(8, 10))
-    ax.scatter(df2[plotting_col], df2[p_col], marker="+", s=20, alpha=1, edgecolors=None, color='blue')
 
-    if len(df1)<1:
+    ax.scatter(df2[plotting_col], df2[p_col], marker="o", s=20, alpha=1, edgecolors=None, color='blue')
+
+    texts=[]
+    texts.append(['Top 5 terms'])
+
+    if len(df1) < 1:
         logging.info('there are no significant terms')
+
+    elif (len(df1) > 5):
+        ax.scatter(df1.iloc[:5,:][plotting_col], df1.iloc[:5,:][p_col], marker="*", s=70, alpha=1, edgecolors=None, color='red')
+        ax.scatter(df1.iloc[5:,:][plotting_col], df1.iloc[5:,:][p_col], marker="+", s=50, alpha=.5, edgecolors=None, color='red')
+
+        for key, row in df1.iloc[:5,:].iterrows():
+            w = textwrap.wrap('-'+row[id_col].replace("_", " "), 30, break_long_words=False)
+            texts.append(w)
     else:
-        ax.scatter(df1[plotting_col], df1[p_col], marker="o", s=50, alpha=1, edgecolors=None, color='red')
+        ax.scatter(df1[plotting_col], df1[p_col], marker="*", s=50, alpha=1, edgecolors=None, color='red')
+        for key, row in df1.iterrows():
+            w = textwrap.wrap('-'+row[id_col].replace("_", " "), 30, break_long_words=False)
+            texts.append(w)
 
-
-    #print(np.min(df_in[plotting_col].values), np.max(df_in[plotting_col].values))
     ax.axhline(y=threshold_y, xmin=0, xmax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
     ax.axvline(x=threshold_x, ymin=0, ymax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
-    ax.set_xlabel(xlabel)
-    ax.set_ylabel(ylabel)
+
+    ax.set_xlabel(xlabel, fontsize=12)
+    ax.set_ylabel(ylabel, fontsize=12)
+
+    ax.spines['top'].set_visible(False)
+    ax.spines['right'].set_visible(False)
+
     if annot:
-        texts = []
-        for key, row in df1.iterrows():
-            texts.append(plt.text(row[plotting_col], row[p_col], row[id_col].replace("_", "\n"), fontsize=6))
+
+        texts = [sublist if type(sublist)==str else item for sublist in texts  for item in sublist]
+        anchored_text = AnchoredText('\n'.join(texts), loc=2, 
+        prop={'fontsize':12})
+        ax.add_artist(anchored_text)
+        #texts = []
+        #for key, row in df1.iterrows():
+        #    texts.append(plt.text(row[plotting_col], row[p_col], row[id_col].replace("_", " "), fontsize=12))
+            #texts.append(plt.text(row[plotting_col], row[p_col], row[id_col].replace("_", "\n"), fontsize=12))
             # ax.annotate(row[id_col].replace(";", "\n"), xy=(row[plotting_col], row[p_col]),
             #                xytext=(row[plotting_col]+0.01,row[p_col]-0.01),
             #                fontsize=6,rotation=-20)
-        adjust_text(texts, only_move={'text': 'y'})
-    plt.savefig(output_file, format='pdf')
+        #adjust_text(texts)
+
+    if output_file.endswith('.pdf'):
+        fig.savefig(output_file, format="pdf")
+    elif output_file.endswith('.png'):
+        fig.savefig(output_file, format="png")
+    else:
+        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
+        fig.savefig(output_file+'.png', format="png")
+
+
+#######################################################
+######## COMMAND FUNCTIONS ############################
+########################################################
+
 
 def paint_datasets_stats( table_filename: 'pygna results table',
                             output_file: 'figure file, use pdf or png extension',
@@ -66,13 +109,18 @@ def paint_datasets_stats( table_filename: 'pygna results table',
     In case you are using a SP test, pass also 'less' as 
     an alternative. 
     '''
+
     palette_binary = RdBu_4.mpl_colors[0::3]
+
     with open(table_filename, "r") as f:
         table = pd.read_csv(f, sep=",")
 
     stat_name = table["analysis"][0]
     n_permutations = table["number_of_permutations"][0]
     data = pd.DataFrame()
+
+    # If greater the test is between 0 and + inf
+    # else is bwteen -inf and 0, I need to set the right bounds
     if alternative == "greater":
         for i, row in table.sort_values(
             by=["empirical_pvalue", "observed"], ascending=[True, False]
@@ -239,6 +287,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
     Pass the annotate flag to have the pvalue annotation on the plot
     '''
 
+    # If rwr we want sequential, non divergent
     if rwr:
         palette = OrRd_9.mpl_colors
     else:
@@ -250,19 +299,26 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
     stat_name= table["analysis"][0]
     n_permutations = table["number_of_permutations"][0]
 
+    # If we only have used one geneset, we need to add 1 col and 1 row
+    # To have a symmetrical matrix for the pivot
     if single_geneset:
         table=table.loc[:,['observed','setname_A','setname_B','empirical_pvalue']]
         for i in set(table['setname_A'].values.tolist()).union(set(table['setname_B'].values.tolist())):
             table=table.append({'setname_A':i, 'setname_B':i, 'observed':0, 'empirical_pvalue':1}, ignore_index=True)
 
+
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
     pivot_table = pivot_table.fillna(0)
+
+    # we make sure we have a triangual matrix (if I have A/B and not B/A 
+    # the pivot is leaving some cells NA )
     matrix = (pivot_table.T+pivot_table)-pivot_table.T*np.eye(len(pivot_table))
     if single_geneset:
         mask = np.triu(np.ones((len(pivot_table),len(pivot_table))))
     else:
         mask = np.ones((len(pivot_table),len(pivot_table)))-np.tril(np.ones((len(pivot_table),len(pivot_table))))
 
+    # Create annotation from pvalues
     if annotate:
         annot = table.pivot(
             values="empirical_pvalue", index="setname_A", columns="setname_B"
@@ -305,6 +361,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
                 linewidths=0.1,
                 linecolor="white",
             )
+
     g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
     g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
     axes.set_xlabel("")
@@ -317,6 +374,64 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
     else:
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         fig.savefig(output_file+'.png', format="png")
+
+
+def paint_volcano_plot(table_filename: 'pygna comparison output',
+                        output_file: 'output figure file, specify png or pdf file',
+                        rwr: 'use rwr is the table comes from a rwr analysis' = False,
+                        id_col="setname_B",
+                        threshold_x=0,
+                        threshold_y=2,
+                        annotate=False):
+
+    '''
+    This function plots the results of of a GNA test of association
+    of a single geneset against multiple pathways.
+    Pass the results table generated by one of the functions
+    and the output figure file (png or pdf).
+
+    From the results table, a multiple testing correction is applied
+    and the results are those plotted.
+
+    The defined threshold are for x: zscore and y: -log10(pvalue)
+    
+    '''
+
+    out.apply_multiple_testing_correction(
+    table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
+        )
+
+    with open(table_filename, "r") as f:
+        df = pd.read_csv(f, sep=",")
+
+    stat_name= df["analysis"][0]
+    n_permutations = df["number_of_permutations"][0]
+
+    # Normalise the plotting value
+    df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
+
+    # If it's a shortest path, mirror the zscore
+    if not rwr:
+        df['zscore']= -df['zscore']
+
+    # When pvalue==0 the -log would be infinite, hence we replace 
+    # pvalue with the permutation resolution - a tenth of the resolution
+    # So that the plotted value is going to be 1 + max_log
+    sig_th = 1/n_permutations - 1/n_permutations/10
+    df['bh_pvalue'] = df['bh_pvalue']+ (df['bh_pvalue']==0.0)*sig_th
+
+    # transform in -log10(pvalue)
+    df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
+
+    volcano_plot(df,output_file, p_col = '-log10(p)', id_col=id_col,
+                        plotting_col="zscore", threshold_x=threshold_x,
+                        threshold_y=threshold_y,ylabel='-log10(pvalue)',
+                        xlabel='absolute z-score', annot=annotate)
+
+
+#######################################################
+#################### EXTRA ############################
+########################################################
 
 
 def plot_adjacency(
@@ -447,51 +562,3 @@ def plot_adjacency(
     else:
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         f.savefig(output_file+'.png', format="png")
-
-
-def paint_volcano_plot(table_filename: 'pygna comparison output',
-                        output_file: 'output figure file, specify png or pdf file',
-                        rwr: 'use rwr is the table comes from a rwr analysis' = False,
-                        id_col="setname_B",
-                        threshold_x=0,
-                        threshold_y=2,
-                        annotate=False):
-
-    '''
-    This function plots the results of of a GNA test of association
-    of a single geneset against multiple pathways.
-    Pass the results table generated by one of the functions
-    and the output figure file (png or pdf).
-
-    From the results table, a multiple testing correction is applied
-    and the results are those plotted.
-
-    The defined threshold are for x: zscore and y: -log10(pvalue)
-    
-    '''
-
-    out.apply_multiple_testing_correction(
-    table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
-        )
-
-    with open(table_filename, "r") as f:
-        df = pd.read_csv(f, sep=",")
-
-    print(df)
-    stat_name= df["analysis"][0]
-    n_permutations = df["number_of_permutations"][0]
-
-
-
-    df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
-
-    print(df['bh_pvalue'].sort_values(ascending= True).drop_duplicates())
-    min_p = df['bh_pvalue'].sort_values(ascending= True).drop_duplicates().values[1]
-    df['bh_pvalue'] = df['bh_pvalue']+ (df['bh_pvalue']==0.0)*0.0001#(min_p-min_p/10)
-
-    df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
-
-    volcano_plot(df,output_file, p_col = '-log10(p)', id_col=id_col,
-                        plotting_col="zscore", threshold_x=threshold_x,
-                        threshold_y=threshold_y,ylabel='-log10(pvalue)',
-                        xlabel='z-score', annot=annotate)
