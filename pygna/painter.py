@@ -320,6 +320,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         fig.savefig(output_file+'.png', format="png")
 
 
+# TODO Skip plot_adiajency
 def plot_adjacency(
     network: "network_filename",
     output_file: 'use png or pdf for output figure',

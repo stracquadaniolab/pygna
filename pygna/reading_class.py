@@ -10,7 +10,7 @@ class ReadingData(ABC):
         super(ReadingData, self).__init__()
 
     @abstractmethod
-    def __readfile(self, filename):
+    def __readfile(self):
         raise NotImplementedError
 
     @abstractmethod
@@ -30,7 +30,7 @@ class ReadTsv(ReadingData, ABC):
         :param pd_table: bool, if the results is going to be a pd.dataframe
         :param int_type: Unknown
         """
-        super().__init__(filename)
+        super().__init__()
         self.filename = filename
         self.int_type = int_type
         self.pd_table = pd_table
@@ -87,7 +87,7 @@ class ReadGmt(ReadingData, ABC):
         :param filename: str, represents the path to the geneset file
         :param read_descriptor: bool, if the descriptor is given. Default = False
         """
-        super().__init__(filename)
+        super().__init__()
         self.filename = filename
         self.read_descriptor = read_descriptor
 
@@ -130,7 +130,7 @@ class ReadCsv(ReadingData, ABC):
         :param sep: str, the separator to be used
         :param use_cols: list, columns used to be read and grouped
         """
-        super().__init__(filename)
+        super().__init__()
         self.filename = filename
         self.sep = sep
         self.use_cols = use_cols
