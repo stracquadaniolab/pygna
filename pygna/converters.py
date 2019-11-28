@@ -223,7 +223,7 @@ class CsvToGmt(Converters):
 
     def _csv_output(self):
         """
-        This method sabe the pd.dataframe on a CSV file
+        This method save the pd.dataframe on a CSV file
         :return: null
         """
         # TODO Maybe it's better to automatically add an extension
@@ -306,6 +306,10 @@ class GroupGmt(Converters):
         super()._gmt_output(self.gmt_data, self.output_gmt)
 
     def _elaborate(self):
+        """
+        This method elaborates the table and returns a dictionary with the grouped columns
+        :return: dict, with the genes and the descriptor
+        """
         diz = {}
         for g, group in self.table.groupby([self.group_col]):
             if len(group) < 10:
