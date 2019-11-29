@@ -5,83 +5,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import pygna.output as out
 import pygna.parser as ps
+import pygna.plots as pp
 import seaborn as sns
-from matplotlib.offsetbox import AnchoredText
-import textwrap
 
 
-def volcano_plot(df, output_file,
-                 p_col: 'p value column' = "empirical_pvalue",
-                 id_col="setname_B",
-                 plotting_col="observed",
-                 threshold_x=0.1,
-                 threshold_y=0.1,
-                 ylabel='-log10(pvalue)',
-                 xlabel='z-score',
-                 annot=False):
-    logging.info(
-        'Significant are considered when  %s > %f and %s > %f' % (p_col, threshold_y, plotting_col, threshold_x))
-
-    # Non Significant
-    df2 = df[(df[plotting_col] < threshold_x) | (df[p_col] < threshold_y)].copy()
-    # Significant
-    df1 = df[(np.abs(df[plotting_col]) >= threshold_x) & (df[p_col] >= threshold_y)].copy()
-
-    fig, ax = plt.subplots(1, figsize=(8, 10))
-
-    ax.scatter(df2[plotting_col], df2[p_col], marker="o", s=20, alpha=1, edgecolors=None, color='blue')
-
-    texts = []
-    texts.append(['Top 5 terms'])
-
-    if len(df1) < 1:
-        logging.info('there are no significant terms')
-
-    elif (len(df1) > 5):
-        ax.scatter(df1.iloc[:5, :][plotting_col], df1.iloc[:5, :][p_col], marker="*", s=70, alpha=1, edgecolors=None,
-                   color='red')
-        ax.scatter(df1.iloc[5:, :][plotting_col], df1.iloc[5:, :][p_col], marker="+", s=50, alpha=.5, edgecolors=None,
-                   color='red')
-
-        for key, row in df1.iloc[:5, :].iterrows():
-            w = textwrap.wrap('-' + row[id_col].replace("_", " "), 30, break_long_words=False)
-            texts.append(w)
-    else:
-        ax.scatter(df1[plotting_col], df1[p_col], marker="*", s=50, alpha=1, edgecolors=None, color='red')
-        for key, row in df1.iterrows():
-            w = textwrap.wrap('-' + row[id_col].replace("_", " "), 30, break_long_words=False)
-            texts.append(w)
-
-    ax.axhline(y=threshold_y, xmin=0, xmax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
-    ax.axvline(x=threshold_x, ymin=0, ymax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
-
-    ax.set_xlabel(xlabel, fontsize=12)
-    ax.set_ylabel(ylabel, fontsize=12)
-
-    ax.spines['top'].set_visible(False)
-    ax.spines['right'].set_visible(False)
-
-    if annot:
-        texts = [sublist if type(sublist) == str else item for sublist in texts for item in sublist]
-        anchored_text = AnchoredText('\n'.join(texts), loc=2,
-                                     prop={'fontsize': 12})
-        ax.add_artist(anchored_text)
-        # texts = []
-        # for key, row in df1.iterrows():
-        #    texts.append(plt.text(row[plotting_col], row[p_col], row[id_col].replace("_", " "), fontsize=12))
-        # texts.append(plt.text(row[plotting_col], row[p_col], row[id_col].replace("_", "\n"), fontsize=12))
-        # ax.annotate(row[id_col].replace(";", "\n"), xy=(row[plotting_col], row[p_col]),
-        #                xytext=(row[plotting_col]+0.01,row[p_col]-0.01),
-        #                fontsize=6,rotation=-20)
-        # adjust_text(texts)
-
-    if output_file.endswith('.pdf'):
-        fig.savefig(output_file, format="pdf")
-    elif output_file.endswith('.png'):
-        fig.savefig(output_file, format="png")
-    else:
-        logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
-        fig.savefig(output_file + '.png', format="png")
+# TODO Refactor and check this
+def volcano_plot(df, output_file, p_col, id_col, plotting_col, threshold_x, threshold_y, y_label, x_label, annot):
+    pp.VolcanoPlot(df, output_file, p_col, id_col, plotting_col, threshold_x, threshold_y, y_label, x_label, annot)
 
 
 #######################################################
@@ -410,8 +340,8 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
 
     volcano_plot(df, output_file, p_col='-log10(p)', id_col=id_col,
                  plotting_col="zscore", threshold_x=threshold_x,
-                 threshold_y=threshold_y, ylabel='-log10(pvalue)',
-                 xlabel='absolute z-score', annot=annotate)
+                 threshold_y=threshold_y, y_label='-log10(pvalue)',
+                 x_label='absolute z-score', annot=annotate)
 
 
 #######################################################
