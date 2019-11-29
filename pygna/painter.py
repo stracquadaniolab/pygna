@@ -31,12 +31,13 @@ def volcano_plot(df,output_file,
 
     logging.info('Significant are considered when  %s > %f and %s > %f' %(p_col, threshold_y, plotting_col, threshold_x) )
 
+    df=df.sort_values(by=[p_col, plotting_col], ascending=False)
     # Non Significant
     df2 = df[(df[plotting_col] < threshold_x) | (df[p_col] < threshold_y)].copy()  
     # Significant
     df1 = df[(np.abs(df[plotting_col]) >= threshold_x) & (df[p_col] >= threshold_y)].copy()  
 
-    fig, ax = plt.subplots(1, figsize=(8, 10))
+    fig, ax = plt.subplots(1, figsize=(6, 8))
 
     ax.scatter(df2[plotting_col], df2[p_col], marker="o", s=20, alpha=1, edgecolors=None, color='blue')
 
@@ -47,8 +48,8 @@ def volcano_plot(df,output_file,
         logging.info('there are no significant terms')
 
     elif (len(df1) > 5):
-        ax.scatter(df1.iloc[:5,:][plotting_col], df1.iloc[:5,:][p_col], marker="*", s=70, alpha=1, edgecolors=None, color='red')
-        ax.scatter(df1.iloc[5:,:][plotting_col], df1.iloc[5:,:][p_col], marker="+", s=50, alpha=.5, edgecolors=None, color='red')
+        ax.scatter(df1.iloc[:5,:][plotting_col], df1.iloc[:5,:][p_col], marker="*", s=70, alpha=.8, edgecolors=None, color='red')
+        ax.scatter(df1.iloc[5:,:][plotting_col], df1.iloc[5:,:][p_col], marker="+", s=50, alpha=.8, edgecolors=None, color='red')
 
         for key, row in df1.iloc[:5,:].iterrows():
             w = textwrap.wrap('-'+row[id_col].replace("_", " "), 30, break_long_words=False)
@@ -72,7 +73,7 @@ def volcano_plot(df,output_file,
 
         texts = [sublist if type(sublist)==str else item for sublist in texts  for item in sublist]
         anchored_text = AnchoredText('\n'.join(texts), loc=2, 
-        prop={'fontsize':12})
+        prop={'fontsize':12}, frameon=False)
         ax.add_artist(anchored_text)
         #texts = []
         #for key, row in df1.iterrows():
@@ -406,6 +407,7 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
 
     stat_name= df["analysis"][0]
     n_permutations = df["number_of_permutations"][0]
+
 
     # Normalise the plotting value
     df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
