@@ -110,12 +110,12 @@ class CsvToCsvEnriched(Converters):
 
         if self.conversion == "e2s":
             self.file_data[self.new_name_col] = \
-                Converters.convert_e2s(self.file_data[self.original_name_col].values.tolist(),
-                                       self.map_table, self.entrez_col, self.symbol_col)
+                super().convert_e2s(self.file_data[self.original_name_col].values.tolist(),
+                                    self.map_table, self.entrez_col, self.symbol_col)
         elif self.conversion == "s2e":
             self.file_data[self.new_name_col] = \
-                Converters.convert_s2e(self.file_data[self.original_name_col].values.tolist(),
-                                       self.map_table, self.entrez_col, self.symbol_col)
+                super().convert_s2e(self.file_data[self.original_name_col].values.tolist(),
+                                    self.map_table, self.entrez_col, self.symbol_col)
         else:
             logging.error("Conversion type not understood")
 
@@ -263,12 +263,12 @@ class GmtToGmtEnriched(Converters):
 
         if self.conversion == "e2s":
             for k, d in self.gmt_data.items():
-                self.gmt_data[k]["genes"] = Converters.convert_e2s(d["genes"], self.converter_map_filename,
-                                                                   self.entrez_col, self.symbol_col)
+                self.gmt_data[k]["genes"] = super().convert_e2s(d["genes"], self.converter_map_filename,
+                                                                self.entrez_col, self.symbol_col)
         elif self.conversion == "s2e":
             for k, d in self.gmt_data.items():
-                self.gmt_data[k]["genes"] = Converters.convert_s2e(d["genes"], self.converter_map_filename,
-                                                                   self.entrez_col, self.symbol_col)
+                self.gmt_data[k]["genes"] = super().convert_s2e(d["genes"], self.converter_map_filename,
+                                                                self.entrez_col, self.symbol_col)
         else:
             logging.error("Conversion type not understood")
         super()._gmt_output(self.gmt_data, self.output_gmt_file)
