@@ -562,7 +562,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
         threshold=filter_threshold,
     )[name_column]
 
-    if normalisation:
+    if normalise:
         table[weight_column]=np.abs(table[weight_column].values)
 
     if len(geneset) < size_cut:
