@@ -1,51 +1,32 @@
 """PyGNA commands main module
 """
-
-from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
-
 import logging
-import pickle
 import numpy as np
-from pygna.utils import YamlConfig
 import pygna.output as out
 import networkx as nx
 import pygna.parser as ps
+import pygna.reading_class as rc
 import pygna.statistical_test as st
 import pygna.statistical_comparison as sc
 import pygna.diagnostic as diagnostic
 import pygna.painter as paint
 import pygna.utils as utils
 import pygna.statistical_diffusion as sd
-from pygna.utils import Converter
 import pandas as pd
 import scipy
-import time
 import scipy.linalg.interpolative
-from copy import copy, deepcopy
 import itertools
 import tables
-import seaborn as sns
-from matplotlib import pyplot as plt
 
 
+# TODO Check and refactor this
 def __read_distance_matrix(distance_matrix_filename, in_memory=False):
-
     """
     Reads the large matrix .Uses a hdf5 file to work with it
-    :params in_memory: pass the flag to store matrix in memory
+    :param distance_matrix_filename: str, the file to read
     """
-
-    if distance_matrix_filename.endswith("hdf5"):
-
-        hdf5_nodes, hdf5_data = ps.Hdf5MatrixParser().read(
-            distance_matrix_filename, in_memory
-        )
-        if type(hdf5_nodes[0]) == bytes:
-            hdf5_nodes = [i.decode() for i in hdf5_nodes]
-    else:
-        logging.error("Invalid input format for matrix, use .hdf5")
-
-    return hdf5_nodes, hdf5_data
+    nodes, data = rc.ReadDistanceMatrix(distance_matrix_filename, in_memory).get_data()
+    return nodes, data
 
 
 ################################################################################
@@ -53,13 +34,12 @@ def __read_distance_matrix(distance_matrix_filename, in_memory=False):
 ################################################################################
 
 
-def network_summary(network_file: 'network file',
-                     text_output: 'output text file for the summary',
-                     degree_figure_file: 'pdf or png file for the degree distribution',
-                     c_components_figure_file: 'pdf or png file for the connected components distribution',
-                     geneset_input_file: 'geneset file'= None,
-                     setname: 'specify a single geneset'= None
-    ):
+def network_summary(network_file: "network file",
+                    text_output: "output text file for the summary",
+                    degree_figure_file: "pdf or png file for the degree distribution",
+                    c_components_figure_file: "pdf or png file for the connected components distribution",
+                    geneset_input_file: "geneset file" = None,
+                    setname: "specify a single geneset" = None):
 
     """
     This function saves the principal info of a graph:
@@ -70,8 +50,8 @@ def network_summary(network_file: 'network file',
     If a geneset/setname is passed to the function, the properties of
     the subgraph are evaluated
     """
-
-    network = ps.__load_network(network_file)
+    logging.info("Evaluating network summary, please wait")
+    network = rc.ReadTsv(network_file).get_network()
 
     if geneset_input_file:
         if not setname:
@@ -79,16 +59,16 @@ def network_summary(network_file: 'network file',
         else:
             geneset = ps.__load_geneset(geneset_input_file, setname)
             for setname, item in geneset.items():
-
                 graph = nx.subgraph(network, item)
                 out.write_graph_summary(graph, text_output, setname+" on "+network_file)
-                diagnostic.plot_connected_components(nx.connected_components(graph),c_components_figure_file)
+                diagnostic.plot_connected_components(nx.connected_components(graph), c_components_figure_file)
                 diagnostic.plot_degree(nx.degree(graph), degree_figure_file)
 
     else:
         out.write_graph_summary(network, text_output, network_file)
-        diagnostic.plot_connected_components(nx.connected_components(network),c_components_figure_file)
+        diagnostic.plot_connected_components(nx.connected_components(network), c_components_figure_file)
         diagnostic.plot_degree(nx.degree(network), degree_figure_file)
+    logging.info("Network summary completed")
 
 ################################################################################
 ######### SINGLE SET ANALYSES ##################################################
@@ -104,8 +84,8 @@ def test_topology_total_degree(
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
-    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset)" = None,
-    ):
+    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                            "(one for each dataset)" = None):
 
     """
         Performs the analysis of total degree of the .
@@ -114,8 +94,8 @@ def test_topology_total_degree(
         of the geneset being bigger than the one expected by chance
         for a geneset of the same size.
     """
-
-    network = ps.__load_network(network_file)
+    logging.info("Evaluating the test topology total degree, please wait")
+    network = rc.ReadTsv(network_file).get_network()
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
@@ -178,6 +158,8 @@ def test_topology_total_degree(
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
+    logging.info("Test topology total degree completed")
+
 
 def test_topology_internal_degree(
     network_file: "network file",
@@ -199,7 +181,7 @@ def test_topology_internal_degree(
         for a geneset of the same size.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
@@ -275,15 +257,13 @@ def test_topology_rwr(
         of a geneset with the same size
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        rwr_matrix_filename, in_memory=in_memory
-    )
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(
@@ -360,7 +340,7 @@ def test_topology_module(
         of the geneset being bigger than the one expected by chance
         for a geneset of the same size.
     """
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
@@ -448,15 +428,13 @@ def test_topology_sp(
 
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
     diz = {}
-    diz["nodes"], diz["matrix"] = __read_distance_matrix(
-        distance_matrix_filename, in_memory=in_memory
-    )
+    diz["nodes"], diz["matrix"] = __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
 
@@ -532,26 +510,26 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 
     """
         Performs the analysis of random walk applying the weights of an upstream analysis.
-        Given a csv file the user needs to specify the columns of interest and 
-        the threshold of significance. 
+        Given a csv file the user needs to specify the columns of interest and
+        the threshold of significance.
         For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic
-        function. 
+        function.
     """
 
     # Reading network file
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read geneset
     with open(geneset_file, "r") as f:
         table = pd.read_csv(f, sep=",")
         table[name_column]=table[name_column].fillna(0).apply(int).apply(str)
-        
+
     if len(table.columns) < 2:
         logging.error(
             "Error: the function takes a csv file as input, the read file has less than 2 columns, check that the table is comma separated"
         )
-    
+
     # Filter table for significant genes
     table[name_column] = table[name_column].fillna(0).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
@@ -562,7 +540,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
         threshold=filter_threshold,
     )[name_column]
 
-    if normalisation:
+    if normalise:
         table[weight_column]=np.abs(table[weight_column].values)
 
     if len(geneset) < size_cut:
@@ -571,9 +549,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 
     # Read RWR matrix
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        rwr_matrix_filename, in_memory=in_memory
-    )
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
     # setting output
     output1 = out.Output(
         network_file, output_table, "diffusion", geneset_file, geneset_file
@@ -662,14 +638,12 @@ def test_association_sp(
     else:
         analysis_name_str = "comparison_sp"
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read matrix
     sp_diz = {}
-    sp_diz["nodes"], sp_diz["matrix"] = __read_distance_matrix(
-        distance_matrix_filename, in_memory=in_memory
-    )
+    sp_diz["nodes"], sp_diz["matrix"] = __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)
 
     # Managing the different genesets
     if setname_A and setname_B == None and B_geneset_file == None:
@@ -818,7 +792,7 @@ def test_association_rwr(
     else:
         analysis_name_str = "comparison_rwr"
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read datasets
@@ -826,9 +800,7 @@ def test_association_rwr(
         logging.error(" this analysis requires at least two genesets ")
 
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        rwr_matrix_filename, in_memory=in_memory
-    )
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
 
     geneset_A = ps.__load_geneset(A_geneset_file, setname_A)
 
@@ -964,7 +936,7 @@ def build_distance_matrix(
         Matrix can be saved as a lm.txt file or a .hdf5 one.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
 
@@ -1003,7 +975,7 @@ def build_rwr_diffusion(
         Build the RWR_diffusion_matrix
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     network = network.subgraph(max(nx.connected_components(network), key=len))
 
     nodes = list(network.nodes())
@@ -1032,6 +1004,7 @@ def build_rwr_diffusion(
     else:
         return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A)
 
+
 def network_graphml(
     network_file: "network file",
     geneset_file: "geneset file",
@@ -1050,7 +1023,7 @@ def network_graphml(
     connect them with a shortest path.
     """
 
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file).get_network()
     geneset = ps.__load_geneset(geneset_file, setname)
 
     if giant_component_only:
@@ -1069,7 +1042,6 @@ def network_graphml(
                             if l0 > len(path):
                                 l0 = len(path)
                                 new_network_minimal.add_path(path)
-
 
             dict_nodes = {}
             for n in new_network_minimal.nodes():

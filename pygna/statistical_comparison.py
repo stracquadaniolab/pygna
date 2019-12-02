@@ -22,7 +22,7 @@ class StatisticalComparison:
             self.__universe = set(self.__network.nodes())
         elif type(self.__network) is dict:
             self.__universe = set(self.__network.keys())
-            
+
         else:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
@@ -84,18 +84,17 @@ class StatisticalComparison:
             "n_proc = %d, each computing %d permutations "
             % (int(self.__n_proc), n_trial)
         )
-        
+
         # Don't set up the multicore architecture if only one core is given
         if self.__n_proc == 1:
-            
+
             null_distribution = StatisticalComparison.get_comparison_null_distribution(
                 self, genesetA, genesetB, max_iter, keep
             )
 
         else:
-            
-            p = multiprocessing.Pool(self.__n_proc)
 
+            p = multiprocessing.Pool(self.__n_proc)
             results = [
                 p.apply_async(
                     StatisticalComparison.get_comparison_null_distribution,
@@ -209,10 +208,10 @@ def comparison_random_walk(network, genesetA, genesetB, diz={}):
 
     probAB = [
         diz["matrix"][i, j] for i in genesetA_index for j in genesetB_index
-    ]  
+    ]
     probBA = [
         diz["matrix"][i, j] for i in genesetB_index for j in genesetA_index
-    ]  
+    ]
 
-    prob = np.sum(probAB) + np.sum(probBA)  
+    prob = np.sum(probAB) + np.sum(probBA)
     return prob

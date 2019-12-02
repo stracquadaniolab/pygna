@@ -1,15 +1,9 @@
 import logging
-import pickle
 import networkx as nx
 import os
-import sys
-from datetime import datetime
-import glob
 import numpy as np
 import statsmodels.stats.multitest as multi
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
 import scipy
 import tempfile
 import shutil
@@ -56,9 +50,9 @@ class Output:
             )
         finally:
             tmp.close()
-    
+
     def close_temporary_table(self):
-        shutil.copy(self.table_file_name, self.output_table_results)   
+        shutil.copy(self.table_file_name, self.output_table_results)
         os.remove(self.table_file_name)
 
 
@@ -157,7 +151,7 @@ class Output:
             self.GMT_dict[key] = {}
             self.GMT_dict[key]["descriptor"] = descriptor
             self.GMT_dict[key]["genes"] = gene_list
-            
+
         else:
             logging.warning("Key Already Exists: " + str(key))
 
