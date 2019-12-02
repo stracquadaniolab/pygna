@@ -3,10 +3,9 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 import logging
-import pandas as pd
-import seaborn as sns
 from pygna import output
 from pygna.utils import YamlConfig
+
 
 class BlockModel(object):
 
@@ -51,12 +50,12 @@ class BlockModel(object):
         while reject:
             graph = generate_graph_from_sm(self.n_nodes, self.bm, self.nodes_in_block, self.nodes, self.nodes_percentage)
             LCC=max(nx.connected_components(graph), key=len)
-            reject=(len(LCC)!=self.n_nodes)       
+            reject=(len(LCC)!=self.n_nodes)
             logging.info('Reject='+str(reject))
             logging.info('Nodes: %d, in LCC: %d' %(self.n_nodes,len(LCC) ))
 
         self.graph=graph
-        
+
     def plot_graph(self, output_folder):
         plot_bm_graph(self.graph, self.bm, output_folder=output_folder)
 
@@ -117,7 +116,7 @@ def generate_graph_from_sm(n_nodes, block_model, nodes_in_block=False, node_name
 
         #cluster is an array of random numbers corresponding to the cluster of each node
         cluster = np.random.randint(block_model.shape[0], size=n_nodes)
-        
+
     for i in range(n_nodes):
         G.add_node(node_names[i], cluster = cluster[i] )
 

@@ -29,6 +29,10 @@ data/**
 *.egg-info/
 .installed.cfg
 *.egg
+*.tsv
+*.csv
+*.gmt
+*.hdf5
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
