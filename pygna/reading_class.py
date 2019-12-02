@@ -199,7 +199,7 @@ class ReadDistanceMatrix(ReadingData):
     """
     This class read a distance matrix in the HDF5 format
     """
-    def __init__(self, filename):
+    def __init__(self, filename, in_memory):
         """
         :param filename: str, the path of the file to be read
         """
@@ -207,18 +207,23 @@ class ReadDistanceMatrix(ReadingData):
         self.filename = filename
         self.nodes = None
         self.data = None
+        self.memory = in_memory
 
         self.__readfile()
         if type(self.nodes[0]) == bytes:
             self._decode()
 
+    # TODO Fix this 2/12
     def __readfile(self):
         """
         This method read and stores matrix information in memory
         """
-        with tables.open_file(self.filename, mode="r", driver="H5FD_CORE") as hdf5_file:
-            self.nodes = list(hdf5_file.root.nodes[:])
-            self.data = hdf5_file.root.matrix[:]
+        if self.memory:
+            hdf5_file = tables.open_file(self.filename, mode="r", driver="H5FD_CORE")
+        else:
+            hdf5_file = tables.open_file(self.filename, mode="r")
+        self.nodes = list(hdf5_file.root.nodes[:])
+        self.data = hdf5_file.root.matrix[:]
 
     def _decode(self):
         """

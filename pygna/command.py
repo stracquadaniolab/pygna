@@ -20,12 +20,12 @@ import tables
 
 
 # TODO Check and refactor this
-def __read_distance_matrix(distance_matrix_filename):
+def __read_distance_matrix(distance_matrix_filename, in_memory=False):
     """
     Reads the large matrix .Uses a hdf5 file to work with it
     :param distance_matrix_filename: str, the file to read
     """
-    nodes, data = rc.ReadDistanceMatrix(distance_matrix_filename).get_data()
+    nodes, data = rc.ReadDistanceMatrix(distance_matrix_filename, in_memory).get_data()
     return nodes, data
 
 
@@ -263,7 +263,7 @@ def test_topology_rwr(
     geneset = ps.__load_geneset(geneset_file, setname)
 
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename)
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(
@@ -433,9 +433,7 @@ def test_topology_sp(
     geneset = ps.__load_geneset(geneset_file, setname)
 
     diz = {}
-    diz["nodes"], diz["matrix"] = __read_distance_matrix(
-        distance_matrix_filename, in_memory=in_memory
-    )
+    diz["nodes"], diz["matrix"] = __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
 
@@ -550,9 +548,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 
     # Read RWR matrix
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        rwr_matrix_filename, in_memory=in_memory
-    )
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
     # setting output
     output1 = out.Output(
         network_file, output_table, "diffusion", geneset_file, geneset_file
@@ -646,9 +642,7 @@ def test_association_sp(
 
     # Read matrix
     sp_diz = {}
-    sp_diz["nodes"], sp_diz["matrix"] = __read_distance_matrix(
-        distance_matrix_filename, in_memory=in_memory
-    )
+    sp_diz["nodes"], sp_diz["matrix"] = __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)
 
     # Managing the different genesets
     if setname_A and setname_B == None and B_geneset_file == None:
@@ -805,9 +799,7 @@ def test_association_rwr(
         logging.error(" this analysis requires at least two genesets ")
 
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        rwr_matrix_filename, in_memory=in_memory
-    )
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
 
     geneset_A = ps.__load_geneset(A_geneset_file, setname_A)
 
