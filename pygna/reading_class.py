@@ -141,13 +141,14 @@ class ReadGmt(ReadingData):
         :param setname: str, the setname to extract
         :return: pd.dataframe, the geneset data
         """
-        if setname in self.gmt_data:
-            temp = self.gmt_data[setname]
-            self.gmt_data.clear()
-            self.gmt_data[setname] = temp
-        else:
-            logging.error("Cannot find geneset: %s" % setname)
-            sys.exit(-1)
+        if setname is not None:
+            if setname in self.gmt_data:
+                temp = self.gmt_data[setname]
+                self.gmt_data.clear()
+                self.gmt_data[setname] = temp
+            else:
+                logging.error("Cannot find geneset: %s" % setname)
+                sys.exit(-1)
         return self.gmt_data
 
 

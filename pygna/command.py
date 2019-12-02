@@ -263,9 +263,7 @@ def test_topology_rwr(
     geneset = ps.__load_geneset(geneset_file, setname)
 
     RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(
-        rwr_matrix_filename, in_memory=in_memory
-    )
+    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename)
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(
