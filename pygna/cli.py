@@ -1,4 +1,6 @@
-import matplotlib.pyplot
+import matplotlib
+# TODO fix below: understand the first call of matplotlib and fix the .use
+matplotlib.use("TkAgg")
 import logging
 import argh
 import pygna.command as cmd
@@ -6,7 +8,7 @@ import pygna.painter as paint
 import pygna.utils as utils
 import pygna.block_model as bm
 import pygna.degree_model as dm
-matplotlib.pyplot.switch_backend("TkAgg")
+
 """
 autodoc
 """
