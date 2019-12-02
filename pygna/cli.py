@@ -1,3 +1,4 @@
+import matplotlib.pyplot
 import logging
 import argh
 import pygna.command as cmd
@@ -5,9 +6,7 @@ import pygna.painter as paint
 import pygna.utils as utils
 import pygna.block_model as bm
 import pygna.degree_model as dm
-import matplotlib
-
-matplotlib.use("TkAgg")
+matplotlib.pyplot.switch_backend("TkAgg")
 """
 autodoc
 """
