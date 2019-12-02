@@ -1,4 +1,3 @@
-import matplotlib
 from matplotlib.offsetbox import AnchoredText
 from abc import ABC
 import textwrap
@@ -17,17 +16,32 @@ class PygnaFigure(ABC):
 
     def __init__(self):
         super(PygnaFigure, self).__init__()
+        self.filename = None
 
-    def _save_fig(self, filename):
+    def _save_fig(self):
+        """
+        This method saves the figure using the matplotlib framework
+        :return: null
+        """
         # TODO check the extension and save accordingly with the "format=" parameter
-        plt.savefig(filename)
+        plt.savefig(self.filename)
 
     def _get_dimensions(self, fig_type, size):
+        """
+        This methods maps the ratios saved in the class with the figure type and returns the correct ration for each
+        figure
+        :param fig_type: str, the figure type to be printed
+        :param size: int, the size of the plot
+        :return: int, int, int, int the width, height, fontsize, scalar of the figure
+        """
         width = self.ratios[fig_type][0]*size
         height = self.ratios[fig_type][1]*size
         fontsize = size*5
-        scalar = size*3
-        return width, height, fontsize, scalar
+        if size <= 3:
+            scalar = size**4
+        else:
+            scalar = size**3
+        return int(width), int(height), int(fontsize), int(scalar)
 
 
 class VolcanoPlot(PygnaFigure):
@@ -40,7 +54,7 @@ class VolcanoPlot(PygnaFigure):
                  size=2):
         super().__init__()
         self.df = df
-        self.output_file = output_file
+        self.filename = output_file
         self.p_col = p_col
         self.id_col = id_col
         self.plotting_col = plotting_col
@@ -49,7 +63,7 @@ class VolcanoPlot(PygnaFigure):
         self.y_label = y_label
         self.x_label = x_label
         self.annotate = annotate
-        self.size = size
+        self.size = int(size)
 
         logging.info('Significant are considered when  %s > %f and %s > %f' % (self.p_col, self.y_thresh,
                                                                                self.plotting_col, self.x_thresh))
@@ -85,20 +99,45 @@ class VolcanoPlot(PygnaFigure):
             anchored_text = AnchoredText('\n'.join(texts), loc=2, prop={'fontsize': font_ratio})
             ax.add_artist(anchored_text)
 
-        super()._save_fig(self.output_file)
+        super()._save_fig()
 
     def _elaborate_not_sig_genes(self, df, plotting_column, pvalue_col, y_thresh, x_thresh):
+        """
+        This method elaborates the genes which are not significant
+        :param df: pd.datafrme, the dataframe to elaborate
+        :param plotting_column: str, the column to apply the x threshold
+        :param pvalue_col: str, the column to apply the y threshold
+        :param y_thresh: float, the value of the x threshold
+        :param x_thresh: float, the value of y threshold
+        :return: pd.dataframe, the dataframe with the not significant genes
+        """
         dataframe = df[(df[plotting_column] < x_thresh) | (df[pvalue_col] < y_thresh)].copy()
         return dataframe
 
     def _elaborate_sig_genes(self, df, plotting_column, pvalue_col, y_thresh, x_thresh):
+        """
+        This method elaborates the genes which are significant
+        :param df: pd.datafrme, the dataframe to elaborate
+        :param plotting_column: str, the column to apply the x threshold
+        :param pvalue_col: str, the column to apply the y threshold
+        :param y_thresh: float, the value of the x threshold
+        :param x_thresh: float, the value of y threshold
+        :return: pd.dataframe, the dataframe with the significant genes
+        """
         dataframe = df[(np.abs(df[plotting_column]) >= x_thresh) & (df[pvalue_col] >= y_thresh)].copy()
         if len(dataframe) < 1:
-            logging.info('there are no significant terms')
+            logging.warning("There are no significant terms")
         return dataframe
 
-    def _append_name(self, condition, id_col, text_list):
-        for k, row in condition:
+    def _append_name(self, dataset, id_col, text_list):
+        """
+        This method add the names to the legend of the plot
+        :param dataset: df.dataframe, the dataset where are stored the names
+        :param id_col: str, the column where the names are stored
+        :param text_list: list, list with the names already stored
+        :return: list, list with the names
+        """
+        for k, row in dataset:
             w = textwrap.wrap('-' + row[id_col].replace("_", " "), 30, break_long_words=False)
             text_list.append(w)
         return text_list

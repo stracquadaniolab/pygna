@@ -1,24 +1,28 @@
-from abc import ABC, abstractmethod
+import abc
 
 import pandas as pd
+import tables
+import networkx as nx
+import logging
+import sys
 
 
-class ReadingData(ABC):
+class ReadingData(object):
     """Abstract class used to read different types of file. Each subclass must implement the 'readfile'
     and get_data method"""
     def __init__(self):
         super(ReadingData, self).__init__()
 
-    @abstractmethod
+    @abc.abstractmethod
     def __readfile(self):
         raise NotImplementedError
 
-    @abstractmethod
+    @abc.abstractmethod
     def get_data(self):
         raise NotImplementedError
 
 
-class ReadTsv(ReadingData, ABC):
+class ReadTsv(ReadingData):
     """
     A class used to read the .tsv network file inside pygna
     """
@@ -34,18 +38,17 @@ class ReadTsv(ReadingData, ABC):
         self.filename = filename
         self.int_type = int_type
         self.pd_table = pd_table
+        self.interactions = []
 
         if not self.pd_table:
-            self.interactions = self._ReadingData__readfile(self.filename)
+            self.__readfile()
+        self.graph = self._convert_to_graph()
 
-    def _ReadingData__readfile(self, filename):
+    def __readfile(self):
         """
         This method read the file and saves the data inside a class attribute
-        :param filename: str, represents the path to the file
-        :return: interactions: list, represents the genes read in the file
         """
-        interactions = []
-        with open(filename, "r") as f:
+        with open(self.filename, "r") as f:
             for record in f:
                 if record.startswith("#"):
                     continue
@@ -54,13 +57,21 @@ class ReadTsv(ReadingData, ABC):
                 if self.int_type:
                     types = fields[3].split(";")
                     if self.int_type in types:
-                        interactions.append((fields[0], fields[1]))
+                        self.interactions.append((fields[0], fields[1]))
                     else:
                         continue
                 else:
-                    interactions.append((fields[0], fields[1]))
+                    self.interactions.append((fields[0], fields[1]))
 
-            return interactions
+    def _convert_to_graph(self):
+        """
+        Converts the interactions into a graph object
+        :return: nx.graph, from the interactions
+        """
+        graph = nx.Graph()
+        graph.add_edges_from(self.interactions)
+        graph.remove_edges_from(graph.selfloop_edges())
+        return graph
 
     def get_data(self):
         """
@@ -76,8 +87,15 @@ class ReadTsv(ReadingData, ABC):
         """
         return pd.read_table(self.filename)
 
+    def get_network(self):
+        """
+        Returns the nx.graph object of the network
+        :return: nx.graph, containing the network information
+        """
+        return self.graph
 
-class ReadGmt(ReadingData, ABC):
+
+class ReadGmt(ReadingData):
     """
     A class used to read the .gmt gene file inside pygna
     """
@@ -91,16 +109,15 @@ class ReadGmt(ReadingData, ABC):
         self.filename = filename
         self.read_descriptor = read_descriptor
 
-        self.gmt_data = self._ReadingData__readfile(self.filename)
+        self.gmt_data = self.__readfile()
 
-    def _ReadingData__readfile(self, filename):
+    def __readfile(self):
         """
         This method reads the geneset file into a variable
-        :param filename: str, represents the path to the geneset file
         :returns gene_list: dict, represents the genes list
         """
         gene_lists = dict()
-        with open(filename, "r") as f:
+        with open(self.filename, "r") as f:
             for record in f:
                 fields = record.strip().split("\t")
                 if self.read_descriptor:
@@ -118,8 +135,23 @@ class ReadGmt(ReadingData, ABC):
         """
         return self.gmt_data
 
+    def get_geneset(self, setname):
+        """
+        Returns the geneset from the gmt file
+        :param setname: str, the setname to extract
+        :return: pd.dataframe, the geneset data
+        """
+        if setname in self.gmt_data:
+            temp = self.gmt_data[setname]
+            self.gmt_data.clear()
+            self.gmt_data[setname] = temp
+        else:
+            logging.error("Cannot find geneset: %s" % setname)
+            sys.exit(-1)
+        return self.gmt_data
 
-class ReadCsv(ReadingData, ABC):
+
+class ReadCsv(ReadingData):
     """
     A class used to read the .csv data file
     """
@@ -135,9 +167,9 @@ class ReadCsv(ReadingData, ABC):
         self.sep = sep
         self.use_cols = use_cols
 
-        self.data = self._ReadingData__readfile()
+        self.data = self.__readfile()
 
-    def _ReadingData__readfile(self):
+    def __readfile(self):
         """
         This method read the file and saves the data inside a class attribute
         :return: pd.dataframe, represents teh data read inside the .csv
@@ -160,3 +192,44 @@ class ReadCsv(ReadingData, ABC):
         :return null
         """
         self.data[name_column] = self.data[name_column].fillna(0).apply(int).apply(str)
+
+
+class ReadDistanceMatrix(ReadingData):
+    """
+    This class read a distance matrix in the HDF5 format
+    """
+    def __init__(self, filename):
+        """
+        :param filename: str, the path of the file to be read
+        """
+        super().__init__()
+        self.filename = filename
+        self.nodes = None
+        self.data = None
+
+        self.__readfile()
+        if type(self.nodes[0]) == bytes:
+            self._decode()
+
+    def __readfile(self):
+        """
+        This method read and stores matrix information in memory
+        """
+        with tables.open_file(self.filename, mode="r", driver="H5FD_CORE") as hdf5_file:
+            self.nodes = list(hdf5_file.root.nodes[:])
+            self.data = hdf5_file.root.matrix[:]
+
+    def _decode(self):
+        """
+        Elaborate teh nodes from the graph
+        :return: null
+        """
+        self.nodes = [i.decode() for i in self.nodes]
+
+    def get_data(self):
+        """
+        Return the data of the HDF5 Matrix
+        :return: table data, the data of the HDF5 Matrix
+        :return: table nodes, the nodes of the HDF5 Matrix
+        """
+        return self.nodes, self.data
