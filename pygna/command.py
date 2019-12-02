@@ -152,7 +152,7 @@ def test_topology_total_degree(
 
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
+                        null_d, observed, diagnostic_null_folder+setname+'_total_degree_null_distribution.pdf', setname=setname
                     )
 
     output1.close_temporary_table()
@@ -228,7 +228,7 @@ def test_topology_internal_degree(
 
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
+                        null_d, observed, diagnostic_null_folder+setname+'_internal_degree_null_distribution.pdf', setname=setname
                     )
     output1.close_temporary_table()
     if results_figure:
@@ -295,7 +295,7 @@ def test_topology_rwr(
 
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
+                        null_d, observed, diagnostic_null_folder+setname+'_rwr_null_distribution.pdf', setname=setname
                     )
 
                 # saving output
@@ -393,9 +393,10 @@ def test_topology_module(
                     np.mean(null_d),
                     np.var(null_d),
                 )
+                
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
+                        null_d, observed, diagnostic_null_folder+setname+'_module_null_distribution.pdf', setname=setname
                     )
 
     output1.close_temporary_table()
@@ -473,7 +474,7 @@ def test_topology_sp(
 
             if diagnostic_null_folder:
                 diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
+                        null_d, observed, diagnostic_null_folder+setname+'_sp_null_distribution.pdf', setname=setname
                     )
         else:
             logging.info(
