@@ -41,7 +41,8 @@ class Converters(Utils):
 
         return geneset_symbol
 
-    def convert_s2e(self, geneset, tsv_data, entrez_col="NCBI Gene ID", symbol_col="Approved symbol"):
+    @classmethod
+    def convert_s2e(cls, geneset, tsv_data, entrez_col="NCBI Gene ID", symbol_col="Approved symbol"):
         """
         Method to convert the string 2 entrez
         :param tsv_data: pd.dataframe, the dataframe to work on
