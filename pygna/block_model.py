@@ -163,7 +163,8 @@ def generate_sbm_network(input_file: "yaml configuration file"):
 
     """ This function generates a simulated network, using the block model matrix
         given as input and saves both the network and the cluster nodes.
-        All parameters must be specified in a yaml file
+        All parameters must be specified in a yaml file.
+        This function allows to create network and geneset for any type of SBM
     """
     ym=YamlConfig()
     config=ym.load_config(input_file)
@@ -200,7 +201,7 @@ def generate_sbm2_network(  output_folder: 'folder where the simulations are    
     [theta0, 1-theta0
     1-theta0, 1-theta0]
     The simulator checks for connectedness of the generated network, if the generated net is not connected, a new simulation is generated. 
-    
+
     :param n_nodes: int, number of nodes in the network
     :param theta0: str, pass all within cluster 0 probability of connection, use a string floats separated by commas `0.9,0.7,0.3,0.1`
     :param percentage0: str, percentage of nodes in cluster 0,
