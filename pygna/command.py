@@ -40,7 +40,6 @@ def network_summary(network_file: "network file",
                     c_components_figure_file: "pdf or png file for the connected components distribution",
                     geneset_input_file: "geneset file" = None,
                     setname: "specify a single geneset" = None):
-
     """
     This function saves the principal info of a graph:
     - network properties
@@ -60,7 +59,7 @@ def network_summary(network_file: "network file",
             geneset = ps.__load_geneset(geneset_input_file, setname)
             for setname, item in geneset.items():
                 graph = nx.subgraph(network, item)
-                out.write_graph_summary(graph, text_output, setname+" on "+network_file)
+                out.write_graph_summary(graph, text_output, setname + " on " + network_file)
                 diagnostic.plot_connected_components(nx.connected_components(graph), c_components_figure_file)
                 diagnostic.plot_degree(nx.degree(graph), degree_figure_file)
 
@@ -69,6 +68,7 @@ def network_summary(network_file: "network file",
         diagnostic.plot_connected_components(nx.connected_components(network), c_components_figure_file)
         diagnostic.plot_degree(nx.degree(network), degree_figure_file)
     logging.info("Network summary completed")
+
 
 ################################################################################
 ######### SINGLE SET ANALYSES ##################################################
@@ -86,7 +86,6 @@ def test_topology_total_degree(
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None):
-
     """
         Performs the analysis of total degree of the .
 
@@ -122,11 +121,12 @@ def test_topology_total_degree(
                 logging.info("%s removed from results since nodes mapped are < %d" % (setname, size_cut))
             else:
                 logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-                logging.info("Null mean: %g null variance: %g" % (np.mean(null_d), np.var(null_d)))
+                # TODO Check line below
+                logging.info("Null mean: %g null variance: %g".format(np.mean(null_d), np.var(null_d)))
                 output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
                                                   pvalue, np.mean(null_d), np.var(null_d))
                 if diagnostic_null_folder:
-                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder+setname +
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
                                                       'null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
@@ -143,9 +143,9 @@ def test_topology_internal_degree(
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
-    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset)" = None,
-    ):
-
+    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                            "(one for each dataset)" = None,
+):
     """
         Performs the analysis of internal degree.
 
@@ -177,7 +177,7 @@ def test_topology_internal_degree(
                                                   pvalue, np.mean(null_d), np.var(null_d))
 
                 if diagnostic_null_folder:
-                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder+setname +
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
                                                       'null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
@@ -195,8 +195,9 @@ def test_topology_rwr(
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     results_figure: "barplot of results, use pdf or png extension" = None,
-    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset)" = None,
-    ):
+    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                            "(one for each dataset)" = None,
+):
     """
         Performs the analysis of random walk probabilities.
         Given the RWR matrix ,
@@ -208,62 +209,41 @@ def test_topology_rwr(
     network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
     geneset = ps.__load_geneset(geneset_file, setname)
-    RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
+    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(network_file, output_table, "topology_rwr", geneset_file, setnames)
 
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-
-    st_test = st.StatisticalTest(st.geneset_RW_statistic, network, RW_dict)
+    st_test = st.StatisticalTest(st.geneset_RW_statistic, network, rw_dict)
 
     for setname, item in geneset.items():
-
         item = set(item)
         if len(item) > size_cut:
             # test
-            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-                item, max_iter=number_of_permutations, alternative="greater"
-            )
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
+                                                                                     max_iter=number_of_permutations,
+                                                                                     alternative="greater", cores=cores)
             logging.info("Setname:" + setname)
             if n_mapped < size_cut:
-                logging.info(
-                    "%s remove from results since nodes mapped are < %d"
-                    % (setname, size_cut)
-                )
+                logging.info("%s remove from results since nodes mapped are < %d" % (setname, size_cut))
             else:
-
                 logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-
                 if diagnostic_null_folder:
-                    diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'_rwr_null_distribution.pdf', setname=setname
-                    )
-
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
+                                                      '_rwr_null_distribution.pdf', setname=setname)
                 # saving output
-                output1.update_st_table_empirical(
-                    setname,
-                    n_mapped,
-                    n_geneset,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
-
-
+                output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                                  pvalue, np.mean(null_d), np.var(null_d))
         else:
-            logging.info(
-                "%s removed from results since nodes mapped are < %d"
-                % (setname, size_cut)
-            )
+            logging.info("%s removed from results since nodes mapped are < %d" % (setname, size_cut))
 
     output1.close_temporary_table()
     if results_figure:
-        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater',)
+        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
+
 
 def test_topology_module(
     network_file: "network file",
@@ -273,10 +253,11 @@ def test_topology_module(
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
-    output_LCC: "for creating a GMT file with the LCC lists pass a gmt filename" = None,
+    output_lcc: "for creating a GMT file with the LCC lists pass a gmt filename" = None,
     results_figure: "barplot of results, use pdf or png extension" = None,
-    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset)" = None,
-    ):
+    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                            "(one for each dataset)" = None,
+):
     """
         Performs geneset network topology module analysis.
 
@@ -285,70 +266,45 @@ def test_topology_module(
         for a geneset of the same size.
     """
     network = rc.ReadTsv(network_file).get_network()
-
     geneset = ps.__load_geneset(geneset_file, setname)
 
     setnames = [key for key in geneset.keys()]
-
-    output1 = out.Output(
-        network_file, output_table, "topology_module", geneset_file, setnames
-    )
+    output1 = out.Output(network_file, output_table, "topology_module", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
 
     st_test = st.StatisticalTest(st.geneset_module_statistic, network)
-
     for setname, item in geneset.items():
-
         item = set(item)
         if len(item) > size_cut:
-            if output_LCC:
-
+            if output_lcc:
                 module = nx.subgraph(network, item)
                 if len(module.nodes) > 0:
-                    LCC = sorted(
-                        list(nx.connected_components(module)), key=len, reverse=True
-                    )[0]
+                    lcc = sorted(list(nx.connected_components(module)), key=len, reverse=True)[0]
                 else:
-                    LCC = []
+                    lcc = []
+                output1.add_GMT_entry(setname, "topology_module", lcc)
 
-                output1.add_GMT_entry(setname, "topology_module", LCC)
-
-            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-                item, max_iter=number_of_permutations, alternative="greater"
-            )
-
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
+                                                                                     max_iter=number_of_permutations,
+                                                                                     alternative="greater", cores=cores)
             logging.info("Setname:" + setname)
             if n_mapped < size_cut:
-                logging.info(
-                    "%s remove from results since nodes mapped are < %d"
-                    % (setname, size_cut)
-                )
+                logging.info("%s remove from results since nodes mapped are < %d" % (setname, size_cut))
             else:
                 logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-
-                output1.update_st_table_empirical(
-                    setname,
-                    n_mapped,
-                    n_geneset,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
-                
+                output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                                  pvalue, np.mean(null_d), np.var(null_d))
                 if diagnostic_null_folder:
-                    diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'_module_null_distribution.pdf', setname=setname
-                    )
-
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
+                                                      '_module_null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
-    if output_LCC:
-        output1.create_GMT_output(output_LCC)
+    if output_lcc:
+        output1.create_GMT_output(output_lcc)
 
     if results_figure:
-        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater',)
+        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
+
 
 def test_topology_sp(
     network_file: "network file",
@@ -361,8 +317,9 @@ def test_topology_sp(
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     results_figure: "barplot of results, use pdf or png extension" = None,
-    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset)" = None,
-    ):
+    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                            "(one for each dataset)" = None,
+):
     """
         Performs geneset network topology shortest path analysis.
 
@@ -377,21 +334,13 @@ def test_topology_sp(
 
     geneset = ps.__load_geneset(geneset_file, setname)
 
-    diz = {}
-    diz["nodes"], diz["matrix"] = __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)
-
+    diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
+           "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
     setnames = [key for key in geneset.keys()]
 
-    output1 = out.Output(
-        network_file,
-        output_table,
-        "topology_sp",
-        geneset_file,
-        setnames,
-    )
+    output1 = out.Output(network_file, output_table, "topology_sp", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-
     st_test = st.StatisticalTest(st.geneset_localisation_statistic, network, diz)
 
     for setname, item in geneset.items():
@@ -399,59 +348,44 @@ def test_topology_sp(
         item = set(item)
         if len(item) > size_cut:
             logging.info("Setname:" + setname)
-            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-                item, max_iter=number_of_permutations
-            )
-
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item, cores=cores,
+                                                                                     max_iter=number_of_permutations)
             logging.info("Observed: %g p-value: %g" % (observed, pvalue))
 
-            output1.update_st_table_empirical(
-                setname,
-                n_mapped,
-                n_geneset,
-                number_of_permutations,
-                observed,
-                pvalue,
-                np.mean(null_d),
-                np.var(null_d),
-            )
-
+            output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue,
+                                              np.mean(null_d), np.var(null_d))
             if diagnostic_null_folder:
-                diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'_sp_null_distribution.pdf', setname=setname
-                    )
+                diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
+                                                  '_sp_null_distribution.pdf', setname=setname)
         else:
-            logging.info(
-                "%s remove from results since nodes mapped are < %d"
-                % (setname, size_cut)
-            )
+            logging.info("%s remove from results since nodes mapped are < %d" % (setname, size_cut))
     output1.close_temporary_table()
     if results_figure:
-        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='less',)
+        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='less')
+
 
 ################################################################################
 ######### Diffusion test #######################################################
 ################################################################################
-
+# TODO removing the following:
+#  weight: "RW" = "RW",
+#  show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
+#  results_figure: "figure where the result figure can be saved (use pdf or png)" = None,
 def test_diffusion_hotnet(network_file: "network file, use a network with weights",
-                            geneset_file: "csv geneset file",
-                            rwr_matrix_filename:  "hdf5 RWR matrix obtained with pygna ",
-                            output_table: "output results table, use .csv extension",
-                            name_column: "Column to use as name (default is deseq2)" = "gene_name",
-                            weight_column: "Column to use as weight (default is deseq2)" = "stat",
-                            filter_column: "Column used to define the significant genes (default is deseq2)" = "padj",
-                            filter_condition: "Condition for significance" = "less",
-                            filter_threshold: "threshold for significance" = 0.01,
-                            weight: "RW" = "RW",
-                            normalise : 'pass this flag for using only positive values in the analysis' = False,
-                            size_cut: "removes all genesets with a mapped length < size_cut" = 20,
-                            number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
-                            cores: "Number of cores for the multiprocessing" = 1,
-                            in_memory: "set if you want the large matrix to be read in memory" = False,
-                            show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
-                            results_figure: "figure where the result figure can be saved (use pdf or png)" = None,
-                            ):
-
+                          geneset_file: "csv geneset file",
+                          rwr_matrix_filename: "hdf5 RWR matrix obtained with pygna ",
+                          output_table: "output results table, use .csv extension",
+                          name_column: "Column to use as name (default is deseq2)" = "gene_name",
+                          weight_column: "Column to use as weight (default is deseq2)" = "stat",
+                          filter_column: "Column used to define the significant genes (default is deseq2)" = "padj",
+                          filter_condition: "Condition for significance" = "less",
+                          filter_threshold: "threshold for significance" = 0.01,
+                          normalise: 'pass this flag for using only positive values in the analysis' = False,
+                          size_cut: "removes all genesets with a mapped length < size_cut" = 20,
+                          number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
+                          cores: "Number of cores for the multiprocessing" = 1,
+                          in_memory: "set if you want the large matrix to be read in memory" = False,
+                          ):
     """
         Performs the analysis of random walk applying the weights of an upstream analysis.
         Given a csv file the user needs to specify the columns of interest and
@@ -465,80 +399,51 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read geneset
+    # TODO fix this below with the read class
     with open(geneset_file, "r") as f:
         table = pd.read_csv(f, sep=",")
-        table[name_column]=table[name_column].fillna(0).apply(int).apply(str)
-
+        table[name_column] = table[name_column].fillna(0).apply(int).apply(str)
     if len(table.columns) < 2:
-        logging.error(
-            "Error: the function takes a csv file as input, the read file has less than 2 columns, check that the table is comma separated"
-        )
+        logging.error("Error: the function takes a csv file as input, the read file has less than 2 columns, "
+                      "check that the table is comma separated")
 
     # Filter table for significant genes
     table[name_column] = table[name_column].fillna(0).apply(str)
     table = utils.clean_table(table, stat_col=weight_column)
-    geneset = utils.filter_table(
-        table,
-        filter_column=filter_column,
-        alternative=filter_condition,
-        threshold=filter_threshold,
-    )[name_column]
+    geneset = utils.filter_table(table, filter_column=filter_column, alternative=filter_condition,
+                                 threshold=filter_threshold)[name_column]
 
     if normalise:
-        table[weight_column]=np.abs(table[weight_column].values)
+        table[weight_column] = np.abs(table[weight_column].values)
 
     if len(geneset) < size_cut:
         logging.error('The number of significant genes is lower than %d. \
-                    \n Change size_cut if necessary' %size_cut )
+                    \n Change size_cut if necessary' % size_cut)
 
     # Read RWR matrix
-    RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
+    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
     # setting output
-    output1 = out.Output(
-        network_file, output_table, "diffusion", geneset_file, geneset_file
-    )
+    output1 = out.Output(network_file, output_table, "diffusion", geneset_file, geneset_file)
     output1.create_st_table_empirical()
     logging.info("Results file = " + output1.output_table_results)
 
     # initialising test
-    st_test = sd.DiffusionTest(
-        sd.hotnet_diffusion_statistic,
-        RW_dict["nodes"],
-        RW_dict["matrix"],
-        table,
-        names_col=name_column,
-        weights_col=weight_column,
-    )
+    st_test = sd.DiffusionTest(sd.hotnet_diffusion_statistic, rw_dict["nodes"], rw_dict["matrix"], table,
+                               names_col=name_column, weights_col=weight_column)
 
-    observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-        geneset, max_iter=number_of_permutations, alternative="greater", cores=cores
-    )
+    observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(geneset, max_iter=number_of_permutations,
+                                                                             alternative="greater", cores=cores)
     if n_mapped < size_cut:
-        logging.info(
-            "Results removed, since nodes mapped are < %d"
-            % (size_cut)
-        )
+        logging.info("Results removed, since nodes mapped are < %d" % size_cut)
     else:
         logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-
-        output1.update_st_table_empirical(
-            geneset_file,
-            n_mapped,
-            n_geneset,
-            number_of_permutations,
-            observed,
-            pvalue,
-            np.mean(null_d),
-            np.var(null_d),
-        )
-
-
+        output1.update_st_table_empirical(geneset_file, n_mapped, n_geneset, number_of_permutations, observed, pvalue,
+                                          np.mean(null_d), np.var(null_d))
     output1.close_temporary_table()
 
-    #if results_figure:
+    # if results_figure:
     #    paint.paint_diffusion_matrix(output1.output_table_results, results_figure, alternative='greater',)
-
 
 
 ################################################################################
@@ -547,19 +452,20 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 
 def test_association_sp(
     network_file: "network file",
-    A_geneset_file: "GMT geneset file, if it's the only parameter passed the analysis is gonna be run on all the couples of datasets, otherwise specify the other files and setnames",
+    file_geneset_a: "GMT geneset file, if it's the only parameter passed the analysis is gonna be run on all the "
+                    "couples of datasets, otherwise specify the other files and setnames",
     distance_matrix_filename: "distance matrix file generated by pygna",
     output_table: "output results table, use .csv extension",
-    setname_A: "Geneset A to analyse" = None,
-    B_geneset_file: "GMT geneset file" = None,
-    setname_B: "Geneset B to analyse" = None,
+    setname_a: "Geneset A to analyse" = None,
+    file_geneset_b: "GMT geneset file" = None,
+    setname_b: "Geneset B to analyse" = None,
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
-    keep: "if true, keeps the geneset B unpermuted" = False,
+    keep: "if true, keeps the geneset B not permuted" = False,
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     results_figure: "barplot of results, use pdf or png extension" = None,
-    ):
+):
     """
         Performs comparison of network location analysis. If the flag
         --keep  is passed, the B geneset is kept
@@ -586,136 +492,92 @@ def test_association_sp(
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read matrix
-    sp_diz = {}
-    sp_diz["nodes"], sp_diz["matrix"] = __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)
+    sp_diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
+              "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
 
     # Managing the different genesets
-    if setname_A and setname_B == None and B_geneset_file == None:
+    if setname_a and setname_b is None and file_geneset_b is None:
         logging.error(" this analysis requires at least two genesets ")
 
-    geneset_A = ps.__load_geneset(A_geneset_file, setname_A)
-    if B_geneset_file:
-        geneset_B = ps.__load_geneset(B_geneset_file, setname_B)
+    geneset_a = ps.__load_geneset(file_geneset_a, setname_a)
+    if file_geneset_b:
+        geneset_b = ps.__load_geneset(file_geneset_b, setname_b)
     else:
-        if setname_B:
-            geneset_B = ps.__load_geneset(A_geneset_file, setname_B)
+        if setname_b:
+            geneset_b = ps.__load_geneset(file_geneset_a, setname_b)
         else:
-            geneset_B = None
+            geneset_b = None
 
-    st_comparison = sc.StatisticalComparison(
-        sc.comparison_shortest_path, network, diz=sp_diz, n_proc=cores
-    )
+    st_comparison = sc.StatisticalComparison(sc.comparison_shortest_path, network, diz=sp_diz, n_proc=cores)
 
-    if not geneset_B:  # Analysis of genesets inside a single file
-        logging.info("Analysising all the sets in " + A_geneset_file)
-        setnames = [key for key in geneset_A.keys()]
+    if not geneset_b:  # Analysis of genesets inside a single file
+        logging.info("Analysing all the sets in " + file_geneset_a)
+        setnames = [key for key in geneset_a.keys()]
 
         # Creating the output table
-        output1 = out.Output(
-            network_file, output_table, analysis_name_str, A_geneset_file, setnames
-        )
-
+        output1 = out.Output(network_file, output_table, analysis_name_str, file_geneset_a, setnames)
         logging.info("Results file = " + output1.output_table_results)
         output1.create_comparison_table_empirical()
 
-
         for pair in itertools.combinations(setnames, 2):
-            if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
+            if len(set(geneset_a[pair[0]])) > size_cut and len(set(geneset_a[pair[1]])) > size_cut:
                 logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
 
-                n_overlaps = len(
-                    set(geneset_A[pair[0]]).intersection(set(geneset_A[pair[1]]))
-                )
-                observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                    set(geneset_A[pair[0]]),
-                    set(geneset_A[pair[1]]),
-                    max_iter=number_of_permutations,
-                    keep=keep,
-                )
+                n_overlaps = len(set(geneset_a[pair[0]]).intersection(set(geneset_a[pair[1]])))
+                observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(
+                    set(geneset_a[pair[0]]), set(geneset_a[pair[1]]), max_iter=number_of_permutations, keep=keep)
                 # Save the results
-                output1.update_comparison_table_empirical(
-                    pair[0],
-                    pair[1],
-                    len(set(geneset_A[pair[0]])),
-                    A_mapped,
-                    len(set(geneset_A[pair[1]])),
-                    B_mapped,
-                    n_overlaps,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
+                output1.update_comparison_table_empirical(pair[0], pair[1], len(set(geneset_a[pair[0]])), a_mapped,
+                                                          len(set(geneset_a[pair[1]])), b_mapped, n_overlaps,
+                                                          number_of_permutations, observed, pvalue, np.mean(null_d),
+                                                          np.var(null_d))
             else:
                 logging.warning("Geneset A has %d terms and Geneset B has %d terms. \
-                \nOne of them is too short, analysis not done" %(len(set(geneset_A[pair[0]])), len(set(geneset_A[pair[1]])) ))
+                \nOne of them is too short, analysis not done" % (len(set(geneset_a[pair[0]])),
+                                                                  len(set(geneset_a[pair[1]]))))
 
     else:  # Analysis of genesets into two different gmt files
 
-        logging.info("geneset_A contains %d sets", (len(geneset_A)))
-        sets_A = [key for key in geneset_A.keys()]
-        logging.info("geneset_B contains %d sets", (len(geneset_B)))
-        sets_B = [key for key in geneset_B.keys()]
-
-        output1 = out.Output(
-            network_file,
-            output_table,
-            analysis_name_str,
-            A_geneset_file,
-            sets_A,
-            B_geneset_file,
-            sets_B,
-        )
-
+        logging.info("geneset_a contains %d sets", (len(geneset_a)))
+        sets_a = [key for key in geneset_a.keys()]
+        logging.info("geneset_b contains %d sets", (len(geneset_b)))
+        sets_b = [key for key in geneset_b.keys()]
+        output1 = out.Output(network_file, output_table, analysis_name_str, file_geneset_a, sets_a, file_geneset_b,
+                             sets_b)
         logging.info("Results file = " + output1.output_table_results)
         output1.create_comparison_table_empirical()
-
-        for set_A, item_A in geneset_A.items():
-            for set_B, item_B in geneset_B.items():
+        for set_A, item_A in geneset_a.items():
+            for set_B, item_B in geneset_b.items():
                 n_overlaps = len(set(item_A).intersection(set(item_B)))
                 if len(item_A) > size_cut and len(item_B) > size_cut:
-                    observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                        set(item_A), set(item_B), max_iter=number_of_permutations, keep=keep
-                    )
+                    observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(
+                        set(item_A), set(item_B), max_iter=number_of_permutations, keep=keep)
 
                     logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-
-                    output1.update_comparison_table_empirical(
-                        set_A,
-                        set_B,
-                        len(set(item_A)),
-                        A_mapped,
-                        len(set(item_B)),
-                        B_mapped,
-                        n_overlaps,
-                        number_of_permutations,
-                        observed,
-                        pvalue,
-                        np.mean(null_d),
-                        np.var(null_d),
-                    )
-
+                    output1.update_comparison_table_empirical(set_A, set_B, len(set(item_A)), a_mapped,
+                                                              len(set(item_B)), b_mapped, n_overlaps,
+                                                              number_of_permutations, observed, pvalue, np.mean(null_d),
+                                                              np.var(null_d))
     output1.close_temporary_table()
-
     if results_figure:
         paint.paint_comparison_matrix(output1.output_table_results, results_figure)
 
+
 def test_association_rwr(
     network_file: "network file",
-    A_geneset_file: "GMT geneset file",
+    file_geneset_a: "GMT geneset file",
     rwr_matrix_filename: ".hdf5 file with the RWR matrix obtained by pygna",
     output_table: "output results table, use .csv extension",
-    setname_A: "Geneset A to analyse" = None,
-    B_geneset_file: "GMT geneset file" = None,
-    setname_B: "Geneset B to analyse" = None,
+    setname_a: "Geneset A to analyse" = None,
+    file_geneset_b: "GMT geneset file" = None,
+    setname_b: "Geneset B to analyse" = None,
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
-    keep: "if true, keeps the geneset B unpermuted" =False,
+    keep: "if true, keeps the geneset B unpermuted" = False,
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     results_figure: "heatmap of results" = None,
-    ):
+):
     """
         Performs comparison of network location analysis.
 
@@ -740,126 +602,76 @@ def test_association_rwr(
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read datasets
-    if setname_A and setname_B == None and B_geneset_file == None:
+    if setname_a and setname_b is None and file_geneset_b is None:
         logging.error(" this analysis requires at least two genesets ")
 
-    RW_dict = {}
-    RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
+    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
 
-    geneset_A = ps.__load_geneset(A_geneset_file, setname_A)
+    geneset_a = ps.__load_geneset(file_geneset_a, setname_a)
 
-    if B_geneset_file:
-        geneset_B = ps.__load_geneset(B_geneset_file, setname_B)
+    if file_geneset_b:
+        geneset_b = ps.__load_geneset(file_geneset_b, setname_b)
     else:
-        if setname_B:
-            geneset_B = ps.__load_geneset(A_geneset_file, setname_B)
+        if setname_b:
+            geneset_b = ps.__load_geneset(file_geneset_a, setname_b)
         else:
-            geneset_B = None
+            geneset_b = None
 
-    st_comparison = sc.StatisticalComparison(
-        sc.comparison_random_walk, network, n_proc=cores, diz=RW_dict
-    )
-
-    if not geneset_B:
-
-        logging.info("Analysising all the sets in " + A_geneset_file)
-        setnames = [key for key in geneset_A.keys()]
-
-        output1 = out.Output(
-            network_file, output_table, analysis_name_str, A_geneset_file, setnames
-        )
+    st_comparison = sc.StatisticalComparison(sc.comparison_random_walk, network, n_proc=cores, diz=rw_dict)
+    if not geneset_b:
+        logging.info("Analysing all the sets in " + file_geneset_a)
+        setnames = [key for key in geneset_a.keys()]
+        output1 = out.Output(network_file, output_table, analysis_name_str, file_geneset_a, setnames)
         logging.info("Results file = " + output1.output_table_results)
         output1.create_comparison_table_empirical()
 
         for pair in itertools.combinations(setnames, 2):
-            if len(set(geneset_A[pair[0]])) > size_cut and len(set(geneset_A[pair[1]])) > size_cut:
+            if len(set(geneset_a[pair[0]])) > size_cut and len(set(geneset_a[pair[1]])) > size_cut:
                 logging.info("Analysing " + str(pair[0]) + " and " + str(pair[1]))
+                n_overlaps = len(set(geneset_a[pair[0]]).intersection(set(geneset_a[pair[1]])))
+                observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(
+                    set(geneset_a[pair[0]]), set(geneset_a[pair[1]]), max_iter=number_of_permutations,
+                    alternative="greater", keep=keep)
 
-                n_overlaps = len(
-                    set(geneset_A[pair[0]]).intersection(set(geneset_A[pair[1]]))
-                )
-
-                observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                    set(geneset_A[pair[0]]),
-                    set(geneset_A[pair[1]]),
-                    max_iter=number_of_permutations,
-                    alternative="greater",
-                    keep=keep,
-                )
-
-                output1.update_comparison_table_empirical(
-                    pair[0],
-                    pair[1],
-                    len(set(geneset_A[pair[0]])),
-                    A_mapped,
-                    len(set(geneset_A[pair[1]])),
-                    B_mapped,
-                    n_overlaps,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
+                output1.update_comparison_table_empirical(pair[0], pair[1], len(set(geneset_a[pair[0]])), a_mapped,
+                                                          len(set(geneset_a[pair[1]])), b_mapped, n_overlaps,
+                                                          number_of_permutations, observed, pvalue, np.mean(null_d),
+                                                          np.var(null_d))
             else:
                 logging.warning("Geneset A has %d terms and Geneset B has %d terms. \
-                \nOne of them is too short, analysis not done" %(len(set(geneset_A[pair[0]])), len(set(geneset_A[pair[1]])) ))
+                \nOne of them is too short, analysis not done" % (len(set(geneset_a[pair[0]])),
+                                                                  len(set(geneset_a[pair[1]]))))
 
     else:
-
-        logging.info("geneset_A contains %d sets" % ((len(geneset_A))))
-        sets_A = [key for key in geneset_A.keys()]
-        logging.info("Setnames in A: " + str(sets_A))
-        logging.info("geneset_B contains %d sets" % ((len(geneset_B))))
-        sets_B = [key for key in geneset_B.keys()]
-        logging.info("Setnames in B: " + str(sets_B))
-
-        output1 = out.Output(
-            network_file,
-            output_table,
-            analysis_name_str,
-            A_geneset_file,
-            sets_A,
-            B_geneset_file,
-            sets_B,
-        )
+        logging.info("geneset_a contains %d sets" % (len(geneset_a)))
+        sets_a = [key for key in geneset_a.keys()]
+        logging.info("Setnames in A: " + str(sets_a))
+        logging.info("geneset_b contains %d sets" % (len(geneset_b)))
+        sets_b = [key for key in geneset_b.keys()]
+        logging.info("Setnames in B: " + str(sets_b))
+        output1 = out.Output(network_file, output_table, analysis_name_str, file_geneset_a, sets_a, file_geneset_b,
+                             sets_b)
         logging.info("Results file = " + output1.output_table_results)
         output1.create_comparison_table_empirical()
 
-        for set_A, item_A in geneset_A.items():
-            for set_B, item_B in geneset_B.items():
+        for set_A, item_A in geneset_a.items():
+            for set_B, item_B in geneset_b.items():
 
                 if len(item_A) > size_cut and len(item_B) > size_cut:
                     logging.info("Analysing " + str(set_A) + " and " + str(set_B))
                     n_overlaps = len(set(item_A).intersection(set(item_B)))
-
-                    observed, pvalue, null_d, A_mapped, B_mapped = st_comparison.comparison_empirical_pvalue(
-                        set(item_A),
-                        set(item_B),
-                        max_iter=number_of_permutations,
-                        alternative="greater",
-                        keep=keep,
-                    )
-
+                    observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(
+                        set(item_A), set(item_B), max_iter=number_of_permutations, alternative="greater", keep=keep)
                     logging.info("Observed: %g p-value: %g" % (observed, pvalue))
 
-                    output1.update_comparison_table_empirical(
-                        set_A,
-                        set_B,
-                        len(set(item_A)),
-                        A_mapped,
-                        len(set(item_B)),
-                        B_mapped,
-                        n_overlaps,
-                        number_of_permutations,
-                        observed,
-                        pvalue,
-                        np.mean(null_d),
-                        np.var(null_d),
-                    )
+                    output1.update_comparison_table_empirical(set_A, set_B, len(set(item_A)), a_mapped,
+                                                              len(set(item_B)), b_mapped, n_overlaps,
+                                                              number_of_permutations, observed, pvalue, np.mean(null_d),
+                                                              np.var(null_d))
                 else:
                     logging.warning("Geneset A has %d terms and Geneset B has %d terms. \
-                    \nOne of them is too short, analysis not done" %(len(set(item_A)), len(set(item_B)) ))
+                    \nOne of them is too short, analysis not done" % (len(set(item_A)), len(set(item_B))))
 
     output1.close_temporary_table()
     if results_figure:
@@ -874,7 +686,7 @@ def build_distance_matrix(
     network_file: "network file",
     output_file: "distance matrix output file, use .hdf5",
     giant_component_only: "compute the shortest paths only for nodes in the giant component" = True,
-    ):
+):
     """
         Build a shortest path distance matrix for a given network.
         Matrix can be saved as a lm.txt file or a .hdf5 one.
@@ -894,14 +706,10 @@ def build_distance_matrix(
             # create a hdf5 file with two objects:
             # - one is the nodes array,
             hdf5_nodes = hdf5_file.create_array(hdf5_file.root, "nodes", nodes)
-            # -  the other is the shorthest path distance matrix
-            hdf5_data = hdf5_file.create_array(
-                hdf5_file.root, "matrix", np.zeros((len(nodes), len(nodes)))
-            )
-
+            # -  the other is the shortest path distance matrix
+            hdf5_data = hdf5_file.create_array(hdf5_file.root, "matrix", np.zeros((len(nodes), len(nodes))))
             for node_i, k in distance_matrix:
                 i = nodes.index(node_i)
-
                 for node_j, sp in k.items():
                     j = nodes.index(node_j)
                     if j >= i:  # saves only the upper triangular matrix
@@ -914,23 +722,22 @@ def build_rwr_diffusion(
     network_file: "network file",
     beta=0.85,
     output_file: "distance matrix output file (use .hdf5) " = None,
-    ):
+):
     """
         Build the RWR_diffusion_matrix
     """
 
     network = rc.ReadTsv(network_file).get_network()
     network = network.subgraph(max(nx.connected_components(network), key=len))
-
     nodes = list(network.nodes())
 
     logging.info("Beginning to calculate RWR matrix")
 
-    A = nx.adjacency_matrix(network)
-    K = 1 / np.array(list(dict(network.degree()).values()))
-    D = scipy.sparse.dia_matrix((K, [0]), shape=(A.shape))
-    A = A.dot(D)
-    n = np.shape(A)[1]
+    a = nx.adjacency_matrix(network)
+    k = 1 / np.array(list(dict(network.degree()).values()))
+    d = scipy.sparse.dia_matrix((k, [0]), shape=a.shape)
+    a = a.dot(d)
+    n = np.shape(a)[1]
 
     if output_file.endswith(".hdf5"):
         with tables.open_file(output_file, mode="w") as hdf5_file:
@@ -939,24 +746,21 @@ def build_rwr_diffusion(
             # - one is the nodes array,
             hdf5_nodes = hdf5_file.create_array(hdf5_file.root, "nodes", nodes)
             # -  the other is the RWR matrix
-            hdf5_data = hdf5_file.create_array(
-                hdf5_file.root,
-                "matrix",
-                beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A),
-            )
+            hdf5_data = hdf5_file.create_array(hdf5_file.root, "matrix",
+                                               beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * a))
             logging.info("Saving network")
     else:
-        return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * A)
+        return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * a)
 
 
 def network_graphml(
     network_file: "network file",
     geneset_file: "geneset file",
     output_file: "graphml file for network for visualisation",
-    setname: "setname" = None,
+    setname: "set name" = None,
     giant_component_only: "saves only the giant component of the network" = True,
     minimal: 'saves only the minimal graph' = False,
-    ):
+):
     """
     This function generates a graphml file with nodes annotation.
     Given a geneset, with k setnames, each node has k False/True
@@ -974,7 +778,6 @@ def network_graphml(
         network = network.subgraph(max(nx.connected_components(network), key=len))
 
     if minimal:
-
         for setname in geneset:
             new_network_minimal = nx.Graph()
             for s in geneset[setname]:
@@ -996,7 +799,6 @@ def network_graphml(
             nx.set_node_attributes(new_network_minimal, dict_nodes, setname)
 
     else:
-
         for setname in geneset:
             dict_nodes = {}
             for n in network.nodes():
