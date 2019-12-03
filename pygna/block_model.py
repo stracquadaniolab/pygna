@@ -159,11 +159,12 @@ def plot_bm_graph(graph, block_model, output_folder = None):
 
 
 
-def generate_simulated_network(input_file: "yaml configuration file"):
+def generate_sbm_network(input_file: "yaml configuration file"):
 
     """ This function generates a simulated network, using the block model matrix
         given as input and saves both the network and the cluster nodes.
-        All parameters must be specified in a yaml file
+        All parameters must be specified in a yaml file.
+        This function allows to create network and geneset for any type of SBM
     """
     ym=YamlConfig()
     config=ym.load_config(input_file)
@@ -178,3 +179,58 @@ def generate_simulated_network(input_file: "yaml configuration file"):
         bm.write_network(outpath+suffix+"_s_"+str(i)+"_network.tsv")
         bm.write_cluster_genelist(outpath+suffix+"_s_"+str(i)+"_genes.gmt")
         #bm.plot_graph(outpath+suffix+"_s_"+str(i))
+
+def generate_sbm2_network(  output_folder: 'folder where the simulations are                                saved',
+                            prefix:'prefix for the simulations' = 'sbm',
+                            n_nodes: 'nodes in the network' = 1000,
+                            theta0: 'probability of connection in the cluster' = '0.9,0.7,0.5,0.2',
+                            percentage: 'percentage of nodes in cluster 0, use ratio 0.1 = 10 percent' = '0.1',
+                            density: 'multiplicative parameter used to define network density' = '0.06,0.1,0.2',
+                            n_simulations: 'number of simulated networks for each configuration' = 3
+                            ):
+
+    """
+    This function generates the simualted networks and genesets
+    using the stochastic block model with 2 BLOCKS as described in
+    the paper. The output names are going to be
+    prefix_t_<theta0>_p_<percentage>_d_<density>_s_<n_simulation>
+    _network.tsv or _genes.gmt
+    One connected cluster while the rest of the network 
+    has the same probability of connection.
+    SBM = d * 
+    [theta0, 1-theta0
+    1-theta0, 1-theta0]
+    The simulator checks for connectedness of the generated network, if the generated net is not connected, a new simulation is generated. 
+
+    :param n_nodes: int, number of nodes in the network
+    :param theta0: str, pass all within cluster 0 probability of connection, use a string floats separated by commas `0.9,0.7,0.3,0.1`
+    :param percentage0: str, percentage of nodes in cluster 0,
+    use a string floats separated by commas `0.1`
+    :param density: str, multiplicative paramenter used to define network density use a string floats separated by commas `0.06,0.1,0.2`
+    :param n_simulations: int, number of simulated networks
+    :param prefix: str, prefix name of the simulation
+
+    """
+    
+    n_blocks=2
+    teta_ii= [float(i) for i in theta0.replace(' ','').split(',')]
+    percentages=[float(i) for i in percentage.replace(' ','').split(',')]
+    density=[float(i) for i in density.replace(' ','').split(',')]
+    n_simulated=int(n_simulations)
+    n_nodes=int(n_nodes)
+
+    for p in percentages:
+        for t in teta_ii:
+            for d in density:
+                
+                matrix = np.array([[d*t, d*(1-t)],[d*(1-t), d*(1-t)]])
+
+                bm=BlockModel(matrix, 
+                                n_nodes=n_nodes, 
+                                nodes_percentage= [p, 1-p] )
+
+                for i in range(n_simulated):
+                    name=output_folder+ prefix + "_t_"+str(t)+"_p_"+str(p)+"_d_"+str(d)+"_s_"+str(i)
+                    bm.create_graph()
+                    bm.write_network(name+"_network.tsv")
+                    bm.write_cluster_genelist(name+"_genes.gmt")
