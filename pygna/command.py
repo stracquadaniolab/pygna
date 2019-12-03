@@ -12,7 +12,6 @@ import pygna.diagnostic as diagnostic
 import pygna.painter as paint
 import pygna.utils as utils
 import pygna.statistical_diffusion as sd
-import pandas as pd
 import scipy
 import scipy.linalg.interpolative
 import itertools
@@ -399,10 +398,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read geneset
-    # TODO fix this below with the read class
-    with open(geneset_file, "r") as f:
-        table = pd.read_csv(f, sep=",")
-        table[name_column] = table[name_column].fillna(0).apply(int).apply(str)
+    table = rc.ReadCsv(geneset_file).fill_na_column(name_column).get_data()
     if len(table.columns) < 2:
         logging.error("Error: the function takes a csv file as input, the read file has less than 2 columns, "
                       "check that the table is comma separated")
@@ -412,7 +408,6 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
     table = utils.clean_table(table, stat_col=weight_column)
     geneset = utils.filter_table(table, filter_column=filter_column, alternative=filter_condition,
                                  threshold=filter_threshold)[name_column]
-
     if normalise:
         table[weight_column] = np.abs(table[weight_column].values)
 
@@ -741,7 +736,7 @@ def build_rwr_diffusion(
 
     if output_file.endswith(".hdf5"):
         with tables.open_file(output_file, mode="w") as hdf5_file:
-
+            # TODO fix below
             # create a hdf5 file with two objects:
             # - one is the nodes array,
             hdf5_nodes = hdf5_file.create_array(hdf5_file.root, "nodes", nodes)
@@ -777,6 +772,7 @@ def network_graphml(
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
 
+    dict_nodes = {}
     if minimal:
         for setname in geneset:
             new_network_minimal = nx.Graph()
@@ -789,8 +785,6 @@ def network_graphml(
                             if l0 > len(path):
                                 l0 = len(path)
                                 new_network_minimal.add_path(path)
-
-            dict_nodes = {}
             for n in new_network_minimal.nodes():
                 if n in geneset[setname]:
                     dict_nodes[n] = True
@@ -800,7 +794,6 @@ def network_graphml(
 
     else:
         for setname in geneset:
-            dict_nodes = {}
             for n in network.nodes():
                 if n in geneset[setname]:
                     dict_nodes[n] = True
