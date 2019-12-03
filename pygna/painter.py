@@ -7,6 +7,9 @@ import pygna.output as out
 import pygna.parser as ps
 import pygna.plots as pp
 import seaborn as sns
+import palettable
+from palettable.colorbrewer.sequential import *
+from palettable.colorbrewer.diverging import *
 
 
 # TODO Refactor and check this

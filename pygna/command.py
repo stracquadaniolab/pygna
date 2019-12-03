@@ -101,60 +101,33 @@ def test_topology_total_degree(
 
     setnames = [key for key in geneset.keys()]
 
-    #Generate output
-    output1 = out.Output(
-        network_file, output_table, "topology_total_degree", geneset_file, setnames
-    )
+    # Generate output
+    output1 = out.Output(network_file, output_table, "topology_total_degree", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
+
     # Create table
     output1.create_st_table_empirical()
-
     st_test = st.StatisticalTest(st.geneset_total_degree_statistic, network)
 
     for setname, item in geneset.items():
-
         # Geneset smaller than size cut are not taken into consideration
         if len(item) > size_cut:
-
             item = set(item)
-
-            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-                item,
-                max_iter=number_of_permutations,
-                alternative="greater",
-                cores=cores,
-            )
-
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
+                                                                                     max_iter=number_of_permutations,
+                                                                                     alternative="greater",
+                                                                                     cores=cores)
             logging.info("Setname:" + setname)
-
             if n_mapped < size_cut:
-                logging.info(
-                    "%s removed from results since nodes mapped are < %d"
-                    % (setname, size_cut)
-                )
+                logging.info("%s removed from results since nodes mapped are < %d" % (setname, size_cut))
             else:
                 logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-                logging.info(
-                    "Null mean: %g null variance: %g"
-                    % (np.mean(null_d), np.var(null_d))
-                )
-
-                output1.update_st_table_empirical(
-                    setname,
-                    n_mapped,
-                    n_geneset,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
-
+                logging.info("Null mean: %g null variance: %g" % (np.mean(null_d), np.var(null_d)))
+                output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                                  pvalue, np.mean(null_d), np.var(null_d))
                 if diagnostic_null_folder:
-                    diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
-                    )
-
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder+setname +
+                                                      'null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
@@ -182,59 +155,34 @@ def test_topology_internal_degree(
     """
 
     network = rc.ReadTsv(network_file).get_network()
-
     geneset = ps.__load_geneset(geneset_file, setname)
-
     setnames = [key for key in geneset.keys()]
-
-    output1 = out.Output(
-        network_file, output_table, "topology_internal_degree", geneset_file, setnames
-    )
+    output1 = out.Output(network_file, output_table, "topology_internal_degree", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-
     st_test = st.StatisticalTest(st.geneset_internal_degree_statistic, network)
-
     for setname, item in geneset.items():
-
         item = set(item)
         if len(item) > size_cut:
-            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(
-                item,
-                max_iter=number_of_permutations,
-                alternative="greater",
-                cores=cores,
-            )
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
+                                                                                     max_iter=number_of_permutations,
+                                                                                     alternative="greater", cores=cores)
 
             logging.info("Setname:" + setname)
-
             if n_mapped < size_cut:
-                logging.info(
-                    "%s remove from results since nodes mapped are < %d"
-                    % (setname, size_cut)
-                )
+                logging.info("%s remove from results since nodes mapped are < %d" % (setname, size_cut))
             else:
                 logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-                output1.update_st_table_empirical(
-                    setname,
-                    n_mapped,
-                    n_geneset,
-                    number_of_permutations,
-                    observed,
-                    pvalue,
-                    np.mean(null_d),
-                    np.var(null_d),
-                )
+                output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                                  pvalue, np.mean(null_d), np.var(null_d))
 
                 if diagnostic_null_folder:
-                    diagnostic.plot_null_distribution(
-                        null_d, observed, diagnostic_null_folder+setname+'null_distribution.pdf', setname=setname
-                    )
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder+setname +
+                                                      'null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
-        paint.paint_datasets_stats(
-            output1.output_table_results, results_figure, alternative='greater',
-        )
+        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
+
 
 def test_topology_rwr(
     network_file: "network file, use a network with weights",
@@ -259,16 +207,12 @@ def test_topology_rwr(
 
     network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
-
     geneset = ps.__load_geneset(geneset_file, setname)
-
     RW_dict = {}
     RW_dict["nodes"], RW_dict["matrix"] = __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)
 
     setnames = [key for key in geneset.keys()]
-    output1 = out.Output(
-        network_file, output_table, "topology_rwr", geneset_file, setnames
-    )
+    output1 = out.Output(network_file, output_table, "topology_rwr", geneset_file, setnames)
 
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()

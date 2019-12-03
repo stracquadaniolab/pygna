@@ -159,7 +159,7 @@ def plot_bm_graph(graph, block_model, output_folder = None):
 
 
 
-def generate_simulated_network(input_file: "yaml configuration file"):
+def generate_sbm_network(input_file: "yaml configuration file"):
 
     """ This function generates a simulated network, using the block model matrix
         given as input and saves both the network and the cluster nodes.

@@ -171,8 +171,8 @@ def generate_hdn_network(
     prefix,
     n_nodes: "number of nodes in the network" = 1000,
     network_prob: "probability of connection in the network" = 0.005,
-    vip_prob: "probability of the connection of VIP" = 0.3,
-    vip_percentage=0.05,
+    hdn_probability: "probability of the connection of VIP" = 0.3,
+    hdn_percentage=0.05,
     number_of_simulations=5,
     ):
 
@@ -181,9 +181,9 @@ def generate_hdn_network(
 
     dm = DegreeModel(
         network_prob=network_prob,
-        vip_prob=vip_prob,
+        vip_prob=hdn_probability,
         n_nodes=n_nodes,
-        vip_percentage=vip_percentage,
+        vip_percentage=hdn_percentage,
     )
 
     for i in range(number_of_simulations):

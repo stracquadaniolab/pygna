@@ -27,21 +27,18 @@ class ReadTsv(ReadingData):
     A class used to read the .tsv network file inside pygna
     """
 
-    def __init__(self, filename, pd_table=False, int_type=None):
+    def __init__(self, filename, int_type=None):
         # TODO Fix documentation about int_type
         """
         :param filename: str, represents the path to the network file
-        :param pd_table: bool, if the results is going to be a pd.dataframe
         :param int_type: Unknown
         """
         super().__init__()
         self.filename = filename
         self.int_type = int_type
-        self.pd_table = pd_table
         self.interactions = []
 
-        if not self.pd_table:
-            self.__readfile()
+        self.__readfile()
         self.graph = self._convert_to_graph()
 
     def __readfile(self):
@@ -141,14 +138,13 @@ class ReadGmt(ReadingData):
         :param setname: str, the setname to extract
         :return: pd.dataframe, the geneset data
         """
-        if setname is not None:
-            if setname in self.gmt_data:
-                temp = self.gmt_data[setname]
-                self.gmt_data.clear()
-                self.gmt_data[setname] = temp
-            else:
-                logging.error("Cannot find geneset: %s" % setname)
-                sys.exit(-1)
+        if setname in self.gmt_data:
+            temp = self.gmt_data[setname]
+            self.gmt_data.clear()
+            self.gmt_data[setname] = temp
+        else:
+            logging.error("Cannot find geneset: %s" % setname)
+            sys.exit(-1)
         return self.gmt_data
 
 
@@ -199,7 +195,7 @@ class ReadDistanceMatrix(ReadingData):
     """
     This class read a distance matrix in the HDF5 format
     """
-    def __init__(self, filename, in_memory):
+    def __init__(self, filename, in_memory=False):
         """
         :param filename: str, the path of the file to be read
         """
@@ -213,10 +209,9 @@ class ReadDistanceMatrix(ReadingData):
         if type(self.nodes[0]) == bytes:
             self._decode()
 
-    # TODO Fix this 2/12
     def __readfile(self):
         """
-        This method read and stores matrix information in memory
+        This method read and stores matrix information in memory or by reading it on the disk
         """
         if self.memory:
             hdf5_file = tables.open_file(self.filename, mode="r", driver="H5FD_CORE")
