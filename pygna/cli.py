@@ -49,7 +49,9 @@ def main():
         utils.generate_group_gmt,
         # simulations
         dm.generate_hdn_network,
-        bm.generate_sbm_network, ])
+        bm.generate_sbm_network,
+        bm.generate_sbm2_network,
+         ])
 
 
 if __name__ == "__main__":
