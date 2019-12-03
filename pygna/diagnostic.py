@@ -3,7 +3,7 @@ import seaborn as sns
 import logging
 import numpy as np
 import networkx as nx
-
+from matplotlib.offsetbox import AnchoredText
 
 def plot_degree(degree_object, output_file):
 
@@ -99,7 +99,7 @@ def plot_null_distribution(null_distribution, observed, output_file, setname):
     Saves the density plot of the null distribution and pinpoints the observed value
     """
 
-    fig, axes = plt.subplots(1, figsize=(10, 10))
+    fig, axes = plt.subplots(1, figsize=(8, 6))
     g1 = sns.distplot(null_distribution, hist=True, kde=True, rug=False, ax=axes)
     if len(null_distribution[null_distribution > observed]):
         g3 = sns.distplot(
@@ -107,22 +107,23 @@ def plot_null_distribution(null_distribution, observed, output_file, setname):
             hist=False,
             kde=False,
             rug=True,
+            rug_kws={'height':1/50},
             color="r",
             ax=axes,
         )
     
     ymax = axes.dataLim.y1
-    g4 = axes.stem([observed], [ymax-ymax/10], "r", "r--")
+    xmax = axes.dataLim.x1
+    print('xmax %f' %xmax)
+    g4 = axes.stem([observed], [ymax/2], "r", "r--")
 
     sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
-    axes.annotate(
-        "observed=%f" % observed,
-        xy=(observed, ymax-ymax/10),
-        xytext=(observed,ymax-ymax/20),
-        color="r",
-        fontsize=14,
-    )
+    anchored_text = AnchoredText("Observed:%1.1E" %observed, loc=1, 
+        prop={'fontsize':12, 'color': 'r'}, **{'frameon':False})
+    axes.add_artist(anchored_text)
 
+    axes.set_xlabel('Statistics', fontsize=12)
+    axes.set_ylabel('Density', fontsize=12)
     logging.info(
         "Output for diagnostic null distribution: " + output_file
     )
