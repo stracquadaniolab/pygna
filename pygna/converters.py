@@ -41,8 +41,7 @@ class Converters(Utils):
 
         return geneset_symbol
 
-    @classmethod
-    def convert_s2e(cls, geneset, tsv_data, entrez_col="NCBI Gene ID", symbol_col="Approved symbol"):
+    def convert_s2e(self, geneset, tsv_data, entrez_col="NCBI Gene ID", symbol_col="Approved symbol"):
         """
         Method to convert the string 2 entrez
         :param tsv_data: pd.dataframe, the dataframe to work on
@@ -259,15 +258,15 @@ class GmtToGmtEnriched(Converters):
         self.converter_map_filename = converter_map_filename
 
         self.gmt_data = rc.ReadGmt(self.gmt_file, True).get_data()
-        self.tsv_data = rc.ReadTsv(self.converter_map_filename).get_data()
+        self.tsv_data = rc.ReadTsv(self.converter_map_filename, pd_table=True).get_data()
 
         if self.conversion == "e2s":
             for k, d in self.gmt_data.items():
-                self.gmt_data[k]["genes"] = super().convert_e2s(d["genes"], self.converter_map_filename,
+                self.gmt_data[k]["genes"] = super().convert_e2s(d["genes"], self.tsv_data,
                                                                 self.entrez_col, self.symbol_col)
         elif self.conversion == "s2e":
             for k, d in self.gmt_data.items():
-                self.gmt_data[k]["genes"] = super().convert_s2e(d["genes"], self.converter_map_filename,
+                self.gmt_data[k]["genes"] = super().convert_s2e(d["genes"], self.tsv_data,
                                                                 self.entrez_col, self.symbol_col)
         else:
             logging.error("Conversion type not understood")
