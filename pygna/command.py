@@ -686,7 +686,7 @@ def build_distance_matrix(
         Build a shortest path distance matrix for a given network.
         Matrix can be saved as a lm.txt file or a .hdf5 one.
     """
-
+    logging.info("Converting distance matrix, please wait...")
     network = rc.ReadTsv(network_file).get_network()
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))
@@ -709,6 +709,7 @@ def build_distance_matrix(
                     j = nodes.index(node_j)
                     if j >= i:  # saves only the upper triangular matrix
                         hdf5_data[i, j] = sp
+        hdf5_file.close()
     else:
         logging.error("Pass an hd5f file")
 
@@ -736,14 +737,13 @@ def build_rwr_diffusion(
 
     if output_file.endswith(".hdf5"):
         with tables.open_file(output_file, mode="w") as hdf5_file:
-            # TODO fix below
             # create a hdf5 file with two objects:
             # - one is the nodes array,
-            hdf5_nodes = hdf5_file.create_array(hdf5_file.root, "nodes", nodes)
+            hdf5_file.create_array(hdf5_file.root, "nodes", nodes)
             # -  the other is the RWR matrix
-            hdf5_data = hdf5_file.create_array(hdf5_file.root, "matrix",
-                                               beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * a))
+            hdf5_file.create_array(hdf5_file.root, "matrix", beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * a))
             logging.info("Saving network")
+            hdf5_file.close()
     else:
         return beta * np.linalg.inv(np.eye(n) - (1.0 - beta) * a)
 

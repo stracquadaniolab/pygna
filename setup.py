@@ -9,18 +9,18 @@ with open(os.path.join(setup_path, 'README.md'), encoding='utf-8') as f:
 
 setup(
     # package information
-    name = 'pygna',
-    packages = find_packages(),
-    version = '2.2.4-dev',
-    description = 'Geneset Network Analysis',
-    long_description = readme,
-    license = 'MIT',
+    name='pygna',
+    packages=find_packages(),
+    version='2.2.4-dev',
+    description='Geneset Network Analysis',
+    long_description=readme,
+    license='MIT',
     url='https://github.com/stracquadaniolab/pygna',
     keywords='Bioinformatics Network Statistics',
 
-    # author information
-    author = 'Viola Fanfani, Giovanni Stracquadanio',
-    author_email = 'v.fanfani@sms.ed.ac.uk',
+    #  author information
+    author='Viola Fanfani, Giovanni Stracquadanio',
+    author_email='v.fanfani@sms.ed.ac.uk',
 
     # installation info and requirements
     install_requires=[
