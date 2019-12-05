@@ -172,7 +172,7 @@ def print_GMT(GMT_dictionary, output_file):
                 + "\t"
                 + str(dict_set["descriptor"])
                 + "\t"
-                + "\t".join(dict_set["genes"])
+                + "\t".join(str(dict_set["genes"]))
                 + "\n"
             )
 

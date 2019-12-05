@@ -181,7 +181,7 @@ class CsvToGmt(Converters):
         self.threshold = threshold
         self.descriptor = descriptor
 
-        self.table = rc.ReadCsv(self.input_file).fill_na_column(self.name_column).get_data()
+        self.table = rc.ReadCsv(self.input_file, column_to_fill=self.name_column).get_data()
         self.table = self._elaborate()
 
         if self.output_gmt:
