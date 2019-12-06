@@ -33,7 +33,6 @@ jobs:
             command: |
                 conda build -c conda-forge -c bioconda .conda_recipe/ \
                 --python << parameters.python-version >> \
-                --numpy << parameters.numpy-version >>
         - save_cache:
             paths:
                 - /opt/conda/pkgs
@@ -44,7 +43,6 @@ jobs:
             command: |
                 export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
                 -c conda-forge --python << parameters.python-version >> \
-                 --numpy << parameters.numpy-version >> | grep bz2`
                 mkdir ${HOME}/conda-bld/
                 conda convert --platform osx-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
                 conda convert --platform linux-32 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
@@ -54,7 +52,6 @@ jobs:
             command: |
                 export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
                 -c conda-forge --python << parameters.python-version >> \
-                 --numpy << parameters.numpy-version >> | grep bz2`
                 anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
                 -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
                 anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
