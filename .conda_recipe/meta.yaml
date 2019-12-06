@@ -17,7 +17,7 @@ requirements:
     - scipy
     - matplotlib
     - pyyaml
-    - tables=3.6.1
+    - pytables=3.6
     - seaborn=0.9
     - palettable
     - networkx=2.3
@@ -31,7 +31,7 @@ requirements:
     - scipy
     - matplotlib
     - pyyaml
-    - tables=3.6.1
+    - pytables=3.6
     - seaborn=0.9
     - palettable
     - networkx=2.3
