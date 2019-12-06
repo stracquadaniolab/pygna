@@ -32,7 +32,7 @@ setup(
         'tables>=3.4.4',
         'seaborn>=0.9',
         'palettable',
-        'networkx>=2.2',
+        'networkx=2.3',
         'statsmodels',
         'argh'
     ],

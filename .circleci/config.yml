@@ -7,9 +7,6 @@ jobs:
         python-version:
             type: string
             default: "3.7"
-        numpy-version:
-            type: string
-            default: "1.15"
         build-label:
             type: string
             default: "main"
