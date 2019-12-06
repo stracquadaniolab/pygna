@@ -13,28 +13,28 @@ requirements:
   build:
     - adjustText
     - pandas
-    - numpy>=1.16.3
+    - numpy=1.16.3
     - scipy
     - matplotlib
     - pyyaml
-    - tables>=3.4.4
-    - seaborn>=0.9
+    - tables=3.4.4
+    - seaborn=0.9
     - palettable
-    - networkx<=2.3
+    - networkx=2.3
     - statsmodels
     - argh
 
   run:
     - adjustText
     - pandas
-    - numpy>=1.16.3
+    - numpy=1.16.3
     - scipy
     - matplotlib
     - pyyaml
-    - tables>=3.4.4
-    - seaborn>=0.9
+    - tables=3.4.4
+    - seaborn=0.9
     - palettable
-    - networkx<=2.3
+    - networkx=2.3
     - statsmodels
     - argh
 
