@@ -67,7 +67,7 @@ class Output:
         mean_null,
         var_null,
     ):
-
+        setname = setname.replace(",", "_")
         with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
@@ -117,6 +117,8 @@ class Output:
         mean_null,
         var_null,
     ):
+        setname_A = setname_A.replace(",", "_")
+        setname_B = setname_B.replace(",", "_")
         with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(

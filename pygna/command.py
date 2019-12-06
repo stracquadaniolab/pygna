@@ -522,6 +522,7 @@ def test_association_sp(
                 observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(
                     set(geneset_a[pair[0]]), set(geneset_a[pair[1]]), max_iter=number_of_permutations, keep=keep)
                 # Save the results
+
                 output1.update_comparison_table_empirical(pair[0], pair[1], len(set(geneset_a[pair[0]])), a_mapped,
                                                           len(set(geneset_a[pair[1]])), b_mapped, n_overlaps,
                                                           number_of_permutations, observed, pvalue, np.mean(null_d),
