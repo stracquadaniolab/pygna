@@ -65,14 +65,12 @@ workflows:
         jobs:
             - build_conda_package:
                 python-version: "3.6"
-                numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
 
     commit-build-py37:
         jobs:
             - build_conda_package:
                 python-version: "3.7"
-                numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
 
     nightly-build:
@@ -86,6 +84,5 @@ workflows:
         jobs:
             - build_conda_package:
                 python-version: "3.7"
-                numpy-version: "1.15"
                 build-label: "nightly"
                 context: ANACONDA_CLOUD_DEPLOY
