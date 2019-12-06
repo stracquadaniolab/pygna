@@ -7,7 +7,7 @@ source:
 
 build:
   entry_points:
-      - pygna = cli:main
+      - pygna = pygna.cli:main
 
 requirements:
   build:
