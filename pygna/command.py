@@ -398,7 +398,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read geneset
-    table = rc.ReadCsv(geneset_file).fill_na_column(name_column).get_data()
+    table = rc.ReadCsv(geneset_file,column_to_fill=name_column).get_data()
     if len(table.columns) < 2:
         logging.error("Error: the function takes a csv file as input, the read file has less than 2 columns, "
                       "check that the table is comma separated")
@@ -522,6 +522,7 @@ def test_association_sp(
                 observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(
                     set(geneset_a[pair[0]]), set(geneset_a[pair[1]]), max_iter=number_of_permutations, keep=keep)
                 # Save the results
+
                 output1.update_comparison_table_empirical(pair[0], pair[1], len(set(geneset_a[pair[0]])), a_mapped,
                                                           len(set(geneset_a[pair[1]])), b_mapped, n_overlaps,
                                                           number_of_permutations, observed, pvalue, np.mean(null_d),
@@ -686,7 +687,7 @@ def build_distance_matrix(
         Build a shortest path distance matrix for a given network.
         Matrix can be saved as a lm.txt file or a .hdf5 one.
     """
-
+    logging.info("Converting distance matrix, please wait...")
     network = rc.ReadTsv(network_file).get_network()
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))

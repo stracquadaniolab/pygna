@@ -67,7 +67,7 @@ class Output:
         mean_null,
         var_null,
     ):
-
+        setname = setname.replace(",", "_")
         with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
@@ -117,6 +117,8 @@ class Output:
         mean_null,
         var_null,
     ):
+        setname_A = setname_A.replace(",", "_")
+        setname_B = setname_B.replace(",", "_")
         with open(self.table_file_name, "a") as f:
             f.write(
                 ",".join(
@@ -167,14 +169,8 @@ def print_GMT(GMT_dictionary, output_file):
 
     for key, dict_set in GMT_dictionary.items():
         with open(output_file, "a") as f:
-            f.write(
-                str(key)
-                + "\t"
-                + str(dict_set["descriptor"])
-                + "\t"
-                + "\t".join(dict_set["genes"])
-                + "\n"
-            )
+            genes = "\t".join(map(str, dict_set["genes"]))
+            f.write(str(key) + "\t" + str(dict_set["descriptor"]) + "\t" + genes + "\n")
 
 
 def apply_multiple_testing_correction(

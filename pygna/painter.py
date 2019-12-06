@@ -370,7 +370,7 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     and the results are those plotted.
 
     The defined threshold are for x: zscore and y: -log10(pvalue)
-    
+
     '''
 
     out.apply_multiple_testing_correction(
@@ -391,7 +391,7 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     if not rwr:
         df['zscore']= -df['zscore']
 
-    # When pvalue==0 the -log would be infinite, hence we replace 
+    # When pvalue==0 the -log would be infinite, hence we replace
     # pvalue with the permutation resolution - a tenth of the resolution
     # So that the plotted value is going to be 1 + max_log
     sig_th = 1/n_permutations - 1/n_permutations/10
@@ -400,10 +400,8 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     # transform in -log10(pvalue)
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
-    volcano_plot(df,output_file, p_col = '-log10(p)', id_col=id_col,
-                        plotting_col="zscore", threshold_x=threshold_x,
-                        threshold_y=threshold_y,ylabel='-log10(pvalue)',
-                        xlabel='absolute z-score', annot=annotate)
+    volcano_plot(df, output_file, p_col = '-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
+                 threshold_y=threshold_y,y_label='-log10(pvalue)', x_label='absolute z-score', annot=annotate)
 
 
 #######################################################

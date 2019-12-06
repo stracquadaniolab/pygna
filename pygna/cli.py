@@ -1,5 +1,5 @@
 import matplotlib
-# TODO fix below: understand the first call of matplotlib and fix the .use
+# TODO fix below: find the first call of matplotlib and fix the .use
 matplotlib.use("TkAgg")
 import logging
 import argh
