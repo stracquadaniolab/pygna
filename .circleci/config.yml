@@ -34,7 +34,7 @@ jobs:
         - run:
             name: Build package
             command: |
-                conda build -c conda-forge -c bioconda conda_recipe \
+                conda build -c conda-forge -c bioconda .conda_recipe/ \
                 --python << parameters.python-version >> \
                 --numpy << parameters.numpy-version >>
         - save_cache:
