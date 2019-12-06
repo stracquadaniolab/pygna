@@ -167,14 +167,7 @@ def print_GMT(GMT_dictionary, output_file):
 
     for key, dict_set in GMT_dictionary.items():
         with open(output_file, "a") as f:
-            f.write(
-                str(key)
-                + "\t"
-                + str(dict_set["descriptor"])
-                + "\t"
-                + "\t".join(dict_set["genes"])
-                + "\n"
-            )
+            f.write(str(key) + "\t" + str(dict_set["descriptor"]) + "\t" + (str(dict_set["genes"])[1:-1]) + "\n")
 
 
 def apply_multiple_testing_correction(

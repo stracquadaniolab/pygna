@@ -156,18 +156,22 @@ class ReadCsv(ReadingData):
     A class used to read the .csv data file
     """
 
-    def __init__(self, filename, sep=",", use_cols=None):
+    def __init__(self, filename, sep=",", use_cols=None, column_to_fill=None):
         """
         :param filename: str, represents the path to the data file
         :param sep: str, the separator to be used
         :param use_cols: list, columns used to be read and grouped
+        :param column_to_fill: str, column to fill the NA values
         """
         super().__init__()
         self.filename = filename
         self.sep = sep
         self.use_cols = use_cols
+        self.name_column = column_to_fill
 
         self.data = self.__readfile()
+        if self.name_column is not None:
+            self._fill_na_column()
 
     def __readfile(self):
         """
@@ -185,13 +189,13 @@ class ReadCsv(ReadingData):
         """
         return self.data
 
-    def fill_na_column(self, name_column="gene_name"):
+    def _fill_na_column(self):
         """
         Fill the N/A values with a (str) 0
-        :param name_column: name of the column to filter
         :return null
         """
-        self.data[name_column] = self.data[name_column].fillna(0).apply(int).apply(str)
+        self.data[self.name_column].fillna(0, inplace=True)
+        self.data[self.name_column] = self.data[self.name_column].astype(int)
 
 
 class ReadDistanceMatrix(ReadingData):
