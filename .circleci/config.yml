@@ -70,10 +70,9 @@ workflows:
                 python-version: "3.6"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
-                build:
-                    branches:
-                        only:
-                            - master
+                branches:
+                    only:
+                        - master
 
     commit-build-py37:
         jobs:
@@ -81,7 +80,6 @@ workflows:
                 python-version: "3.7"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
-                build:
-                    branches:
-                        only:
-                            - master
+                branches:
+                    only:
+                        - master
