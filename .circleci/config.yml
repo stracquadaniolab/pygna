@@ -4,15 +4,15 @@ jobs:
     build_conda_package:
 
         parameters:
-        python-version:
-            type: string
-            default: "3.7"
-        numpy-version:
-            type: string
-            default: "1.15"
-        build-label:
-            type: string
-            default: "main"
+            python-version:
+                type: string
+                default: "3.7"
+            numpy-version:
+                type: string
+                default: "1.15"
+            build-label:
+                type: string
+                default: "main"
 
         docker:
             - image: continuumio/miniconda3
@@ -54,6 +54,18 @@ jobs:
                     conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
 
     upload_package:
+        parameters:
+            python-version:
+                type: string
+                default: "3.7"
+            numpy-version:
+                type: string
+                default: "1.15"
+            build-label:
+                type: string
+                default: "main"
+        docker:
+            - image: continuumio/miniconda3
         steps:
             - run:
                 name: Upload package
