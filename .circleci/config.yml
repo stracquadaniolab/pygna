@@ -73,7 +73,8 @@ workflows:
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
             - upload_package:
-                  requires: build_conda_package
-                    filters:
+                requires:
+                  - build_conda_package
+                filters:
                     branches:
                         only: master
