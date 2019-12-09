@@ -70,6 +70,10 @@ workflows:
                 python-version: "3.6"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
+                build:
+                    branches:
+                        only:
+                            - master
 
     commit-build-py37:
         jobs:
@@ -77,18 +81,7 @@ workflows:
                 python-version: "3.7"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
-
-    nightly-build:
-        triggers:
-            - schedule:
-                cron: "0 0 * * *"
-                filters:
+                build:
                     branches:
                         only:
                             - master
-        jobs:
-            - build_conda_package:
-                python-version: "3.7"
-                numpy-version: "1.15"
-                build-label: "nightly"
-                context: ANACONDA_CLOUD_DEPLOY
