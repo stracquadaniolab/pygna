@@ -52,6 +52,7 @@ jobs:
                 conda convert --platform osx-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
                 conda convert --platform linux-32 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
                 conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+    upload_package:
         - run:
             name: Upload package
             command: |
@@ -64,22 +65,13 @@ jobs:
                 -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
 workflows:
 
-    commit-build-py36:
-        jobs:
-            - build_conda_package:
-                python-version: "3.6"
-                numpy-version: "1.15"
-                context: ANACONDA_CLOUD_DEPLOY
-                filters:
-                    branches:
-                        only: master
-
     commit-build-py37:
         jobs:
             - build_conda_package:
                 python-version: "3.7"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
+            - upload_package:
                 filters:
-                    branches:
-                        only: master
+                  branches:
+                      only: master
