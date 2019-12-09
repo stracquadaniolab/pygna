@@ -52,17 +52,18 @@ jobs:
                 conda convert --platform osx-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
                 conda convert --platform linux-32 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
                 conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
-upload_package:
-    - run:
-        name: Upload package
-        command: |
-            export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
-            -c conda-forge --python << parameters.python-version >> \
-             --numpy << parameters.numpy-version >> | grep bz2`
-            anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-            -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
-            anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-            -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
+
+    upload_package:
+        - run:
+            name: Upload package
+            command: |
+                export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
+                -c conda-forge --python << parameters.python-version >> \
+                 --numpy << parameters.numpy-version >> | grep bz2`
+                anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
+                -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
+                anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
+                -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
 workflows:
 
     commit-build-py37:
@@ -72,6 +73,7 @@ workflows:
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
             - upload_package:
-                filters:
-                  branches:
-                      only: master
+                  requires: build_conda_package
+                    filters:
+                    branches:
+                        only: master
