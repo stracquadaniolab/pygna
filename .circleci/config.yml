@@ -66,17 +66,20 @@ workflows:
 
     commit-build-py36:
         jobs:
-            - build_conda_package:
+            branches:
+                only:
+                    - master
+            build_conda_package:
                 python-version: "3.6"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
-                branches:
-                    only:
-                        - master
 
     commit-build-py37:
         jobs:
-            - build_conda_package:
+            branches:
+                only:
+                    - master
+            build_conda_package:
                 python-version: "3.7"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
