@@ -1,9 +1,9 @@
 version: 2.1
 
 jobs:
-  build_conda_package:
+    build_conda_package:
 
-    parameters:
+        parameters:
         python-version:
             type: string
             default: "3.7"
@@ -14,10 +14,10 @@ jobs:
             type: string
             default: "main"
 
-    docker:
+        docker:
       - image: continuumio/miniconda3
 
-    steps:
+        steps:
         - checkout
         - restore_cache:
             keys:
@@ -54,16 +54,17 @@ jobs:
                 conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
 
     upload_package:
-        - run:
-            name: Upload package
-            command: |
-                export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
-                -c conda-forge --python << parameters.python-version >> \
-                 --numpy << parameters.numpy-version >> | grep bz2`
-                anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-                -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
-                anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-                -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
+        steps:
+            - run:
+                name: Upload package
+                command: |
+                    export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
+                    -c conda-forge --python << parameters.python-version >> \
+                     --numpy << parameters.numpy-version >> | grep bz2`
+                    anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
+                    -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
+                    anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
+                    -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
 workflows:
 
     commit-build-py37:
