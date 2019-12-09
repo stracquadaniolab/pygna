@@ -3,6 +3,10 @@ Changelog
 
 Latest Version
 --------------
+v3.0.0
++++++++
+New version with conda CI.
+
 v2.0.7
 +++++++
 Updated requirements (python >=3.6)
