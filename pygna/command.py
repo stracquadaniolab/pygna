@@ -335,6 +335,8 @@ def test_topology_sp(
 
     diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
            "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    diz["matrix"] = diz["matrix"] + np.transpose(diz["matrix"])
+    np.fill_diagonal(diz["matrix"], float("inf"))
     setnames = [key for key in geneset.keys()]
 
     output1 = out.Output(network_file, output_table, "topology_sp", geneset_file, setnames)
@@ -489,6 +491,8 @@ def test_association_sp(
     # Read matrix
     sp_diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
               "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    sp_diz["matrix"] = sp_diz["matrix"] + np.transpose(sp_diz["matrix"])
+    np.fill_diagonal(sp_diz["matrix"], np.inf)
 
     # Managing the different genesets
     if setname_a and setname_b is None and file_geneset_b is None:
