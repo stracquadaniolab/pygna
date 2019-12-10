@@ -9,6 +9,7 @@ import pygna.diagnostic as diag
 import multiprocessing
 import time
 
+
 class StatisticalTest:
     def __init__(self, test_statistic, network, diz={}):
 
@@ -115,9 +116,9 @@ def geneset_localisation_statistic_median(network, geneset, diz={}, observed_fla
     return cum_sum / float(len(geneset))
 
 
-def geneset_localisation_statistic(network, n, diz, observed_flag=False):
+def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
 
-    #n = np.array([diz["nodes"].index(i) for i in geneset])
+    n = np.array([diz["nodes"].index(i) for i in geneset])
     diz = diz["matrix"]
 
     sub_matrix = diz[n[:, None], n]
