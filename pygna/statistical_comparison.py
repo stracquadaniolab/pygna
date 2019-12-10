@@ -156,8 +156,8 @@ def comparison_shortest_path(network, genesetA, genesetB, diz):
 
     d_AB = cum_sum / float(len(genesetA) + len(genesetB))
 
-    d_A = st.geneset_localisation_statistic(network, genesetA, diz)
-    d_B = st.geneset_localisation_statistic(network, genesetB, diz)
+    d_A = st.geneset_localisation_statistic(network, n, diz)
+    d_B = st.geneset_localisation_statistic(network, m, diz)
     return d_AB - (d_A + d_B) / 2
 
 
