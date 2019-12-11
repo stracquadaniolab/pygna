@@ -1,13 +1,8 @@
 import logging
-import random
 import networkx as nx
 import numpy as np
-import scipy
 import sys
-import matplotlib.pyplot as plt
-import pygna.diagnostic as diag
 import multiprocessing
-import time
 import pygna.statistical_test as st
 
 
@@ -150,46 +145,30 @@ class StatisticalComparison:
 ###  TEST STATISTICS FOR COMPARISONS  #########################################
 ###############################################################################
 
-
-def comparison_shortest_path(network, genesetA, genesetB, diz={}):
-
-    cum_sum = 0.0
-
-    genesetA_index = [diz["nodes"].index(i) for i in genesetA]
-    genesetB_index = [diz["nodes"].index(i) for i in genesetB]
-
-    if len(genesetA_index) == 0 or len(genesetB_index) == 0:
+def comparison_shortest_path(network, genesetA, genesetB, diz):
+    n = np.array([diz["nodes"].index(i) for i in genesetA])
+    m = np.array([diz["nodes"].index(i) for i in genesetB])
+    if len(n) == 0 or len(m) == 0:
+        logging.info("Geneset length is equal to 0")
         sys.exit()
-
-    for u in genesetA_index:
-        min_du = float("inf")
-        for v in genesetB_index:
-            d_uv = diz["matrix"][v][u] + diz["matrix"][u][v]
-            if u != v and d_uv < min_du:
-                min_du = d_uv
-            elif u == v:
-                min_du = 0
-
-        cum_sum += min_du
-
-    cum_sum_v = 0
-    for v in genesetB_index:
-        min_dv = float("inf")
-        for u in genesetA_index:
-            d_uv = diz["matrix"][v][u] + diz["matrix"][u][v]
-            if u != v and d_uv < min_dv:
-                min_dv = d_uv
-            elif u == v:
-                min_dv = 0
-        cum_sum_v += min_dv
-
-        cum_sum += min_dv
+    cum_sum = calculate_sum(n, m, diz)
+    cum_sum += calculate_sum(m, n, diz)
 
     d_AB = cum_sum / float(len(genesetA) + len(genesetB))
 
     d_A = st.geneset_localisation_statistic(network, genesetA, diz)
     d_B = st.geneset_localisation_statistic(network, genesetB, diz)
     return d_AB - (d_A + d_B) / 2
+
+
+def calculate_sum(n, m, diz):
+    diz = diz["matrix"]
+
+    sub_matrix = diz[n[:, None], m]
+    sub_matrix = np.where(sub_matrix != np.inf, sub_matrix, 0)
+    min_columns = np.amin(sub_matrix, axis=0)
+    sum_columns = np.sum(min_columns)
+    return sum_columns
 
 
 def comparison_random_walk(network, genesetA, genesetB, diz={}):
@@ -206,12 +185,8 @@ def comparison_random_walk(network, genesetA, genesetB, diz={}):
     if len(genesetA_index) == 0 or len(genesetB_index) == 0:
         sys.exit()
 
-    probAB = [
-        diz["matrix"][i, j] for i in genesetA_index for j in genesetB_index
-    ]
-    probBA = [
-        diz["matrix"][i, j] for i in genesetB_index for j in genesetA_index
-    ]
+    probAB = [diz["matrix"][i, j] for i in genesetA_index for j in genesetB_index]
+    probBA = [diz["matrix"][i, j] for i in genesetB_index for j in genesetA_index]
 
     prob = np.sum(probAB) + np.sum(probBA)
     return prob

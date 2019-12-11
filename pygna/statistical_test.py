@@ -9,6 +9,7 @@ import pygna.diagnostic as diag
 import multiprocessing
 import time
 
+
 class StatisticalTest:
     def __init__(self, test_statistic, network, diz={}):
 
@@ -57,7 +58,7 @@ class StatisticalTest:
 
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
 
-        
+
 
         if n_proc == 1:
             null_distribution = StatisticalTest.get_null_distribution(
@@ -101,9 +102,7 @@ class StatisticalTest:
 ###############################################################################
 
 
-def geneset_localisation_statistic_median(
-    network, geneset, diz={}, observed_flag=False
-):
+def geneset_localisation_statistic_median(network, geneset, diz={}, observed_flag=False):
     """ median shortest path for each node """
     cum_sum = 0.0
     geneset_index = [diz["nodes"].index(i) for i in geneset]
@@ -117,19 +116,15 @@ def geneset_localisation_statistic_median(
     return cum_sum / float(len(geneset))
 
 
-def geneset_localisation_statistic(network, geneset, diz={}, observed_flag=False):
-    # minumum shortest path
-    cum_sum = 0.0
-    geneset_index = [diz["nodes"].index(i) for i in geneset]
+def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
 
-    for u in geneset_index:
-        min_du = float("inf")
-        for v in geneset_index:
-            d_uv = diz["matrix"][v][u] + diz["matrix"][u][v]
-            if u != v and d_uv < min_du:
-                min_du = d_uv
-        cum_sum += min_du
-    return cum_sum / float(len(geneset))
+    n = np.array([diz["nodes"].index(i) for i in geneset])
+    diz = diz["matrix"]
+
+    sub_matrix = diz[n[:, None], n]
+    min_columns = np.amin(sub_matrix, axis=0)
+    sum_columns = np.sum(min_columns)
+    return sum_columns / len(n)
 
 
 def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
@@ -188,5 +183,5 @@ def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
 
     geneset_index = [diz["nodes"].index(i) for i in geneset]
     prob = [diz["matrix"][i, j] for i in geneset_index for j in geneset_index if i != j]
-    prob = np.sum(prob)  
+    prob = np.sum(prob)
     return prob

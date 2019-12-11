@@ -126,7 +126,7 @@ def test_topology_total_degree(
                                                   pvalue, np.mean(null_d), np.var(null_d))
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
-                                                      'null_distribution.pdf', setname=setname)
+                                                      'total_degree_null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
@@ -177,7 +177,7 @@ def test_topology_internal_degree(
 
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
-                                                      'null_distribution.pdf', setname=setname)
+                                                      'internal_degree_null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
@@ -335,6 +335,8 @@ def test_topology_sp(
 
     diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
            "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    diz["matrix"] = diz["matrix"] + np.transpose(diz["matrix"])
+    np.fill_diagonal(diz["matrix"], float("inf"))
     setnames = [key for key in geneset.keys()]
 
     output1 = out.Output(network_file, output_table, "topology_sp", geneset_file, setnames)
@@ -489,6 +491,9 @@ def test_association_sp(
     # Read matrix
     sp_diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
               "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    # TODO check why "in memory"= True results are different from "in memory"= False
+    sp_diz["matrix"] = sp_diz["matrix"] + np.transpose(sp_diz["matrix"])
+    np.fill_diagonal(sp_diz["matrix"], np.inf)
 
     # Managing the different genesets
     if setname_a and setname_b is None and file_geneset_b is None:
