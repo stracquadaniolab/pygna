@@ -126,7 +126,7 @@ def test_topology_total_degree(
                                                   pvalue, np.mean(null_d), np.var(null_d))
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
-                                                      'null_distribution.pdf', setname=setname)
+                                                      'total_degree_null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
@@ -177,7 +177,7 @@ def test_topology_internal_degree(
 
                 if diagnostic_null_folder:
                     diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
-                                                      'null_distribution.pdf', setname=setname)
+                                                      'internal_degree_null_distribution.pdf', setname=setname)
     output1.close_temporary_table()
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
