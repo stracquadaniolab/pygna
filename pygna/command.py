@@ -491,6 +491,7 @@ def test_association_sp(
     # Read matrix
     sp_diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
               "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    # TODO check why "in memory"= True results are different from "in memory"= False
     sp_diz["matrix"] = sp_diz["matrix"] + np.transpose(sp_diz["matrix"])
     np.fill_diagonal(sp_diz["matrix"], np.inf)
 
