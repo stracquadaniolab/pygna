@@ -170,7 +170,7 @@ def print_GMT(GMT_dictionary, output_file):
     for key, dict_set in GMT_dictionary.items():
         with open(output_file, "a") as f:
             genes_dict = '\t'.join(map(str, dict_set["genes"]))
-            f.write(str(key) + "\t" + str(dict_set["descriptor"]) + genes_dict + "\n")
+            f.write(str(key) + "\t" + str(dict_set["descriptor"]) + "\t" + genes_dict + "\n")
 
 
 
