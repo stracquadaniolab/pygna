@@ -4,6 +4,8 @@ import textwrap
 import logging
 import numpy as np
 import matplotlib.pyplot as plt
+from palettable.colorbrewer.diverging import *
+from palettable.colorbrewer.sequential import *
 
 
 class PygnaFigure(ABC):
@@ -49,7 +51,7 @@ class VolcanoPlot(PygnaFigure):
     This class represent a Volcano Plot
     """
 
-    def __init__(self, df, output_file, p_col="empirical_pvalue", id_col="setname_B", plotting_col="observed",
+    def __init__(self, df, output_file, loc=2, p_col="empirical_pvalue", id_col="setname_B", plotting_col="observed",
                  x_threshold=0.1, y_threshold=0.1, y_label="-log10(pvalue)", x_label="z-score", annotate=False,
                  size=2):
         super().__init__()
@@ -63,29 +65,30 @@ class VolcanoPlot(PygnaFigure):
         self.y_label = y_label
         self.x_label = x_label
         self.annotate = annotate
+        self.location = loc
         self.size = int(size)
 
         logging.info('Significant are considered when  %s > %f and %s > %f' % (self.p_col, self.y_thresh,
                                                                                self.plotting_col, self.x_thresh))
-        self.df = self.df.sort_values(by=[p_col, plotting_col], ascending=False)
+        self.df = self.df.sort_values(by=[p_col, plotting_col], ascending=True)
         not_sig = self._elaborate_not_sig_genes(self.df, self.plotting_col, self.p_col, self.y_thresh, self.x_thresh)
         sig = self._elaborate_sig_genes(self.df, self.plotting_col, self.p_col, self.y_thresh, self.x_thresh)
         text = [['Top 5 terms']]
         width, height, font_ratio, marker_scalar = super()._get_dimensions("volcano", self.size)
-
         fig, ax = plt.subplots(1, figsize=(width, height))
+
         for label in (ax.get_xticklabels() + ax.get_yticklabels()):
             label.set_fontsize(font_ratio)
-        ax.scatter(not_sig[plotting_col], not_sig[p_col], marker="o", alpha=1, edgecolors=None, color='blue',
-                   s=marker_scalar)
+        ax.scatter(not_sig[plotting_col], not_sig[p_col], marker="o", alpha=1, edgecolors=None,
+                   color=RdBu_4.mpl_colors[3], s=marker_scalar)
         if len(sig) < 1:
             logging.error("There are no significant terms, not plotting the volcano plot")
         else:
-            ax.scatter(sig[plotting_col], sig[p_col], marker="+", alpha=1, edgecolors=None, color='red',
+            ax.scatter(sig[plotting_col], sig[p_col], marker="+", alpha=1, edgecolors=None, color=RdBu_4.mpl_colors[0],
                        s=marker_scalar)
             if len(sig) > 5:
                 ax.scatter(sig.iloc[:5, :][plotting_col], sig.iloc[:5, :][p_col], marker="*", alpha=1, s=marker_scalar,
-                           edgecolors=None, color='red')
+                           edgecolors=None, color=RdBu_4.mpl_colors[0])
                 self._append_name(sig.iloc[:5, :].iterrows(), self.id_col, text)
 
         ax.axhline(y=self.y_thresh, xmin=0, xmax=1, alpha=0.5, color='k', linestyle='--', linewidth=0.5)
@@ -96,7 +99,7 @@ class VolcanoPlot(PygnaFigure):
         ax.spines['right'].set_visible(False)
         if self.annotate:
             texts = [sublist if type(sublist) == str else item for sublist in text for item in sublist]
-            anchored_text = AnchoredText('\n'.join(texts), loc=2, prop={'fontsize': font_ratio})
+            anchored_text = AnchoredText('\n'.join(texts), self.location, prop={'fontsize': font_ratio})
             ax.add_artist(anchored_text)
 
         super()._save_fig()
@@ -111,7 +114,7 @@ class VolcanoPlot(PygnaFigure):
         :param x_thresh: float, the value of y threshold
         :return: pd.dataframe, the dataframe with the not significant genes
         """
-        dataframe = df[(df[plotting_column] < x_thresh) | (df[pvalue_col] < y_thresh)].copy()
+        dataframe = df[(np.abs(df[plotting_column]) < x_thresh) | (df[pvalue_col] < y_thresh)].copy()
         return dataframe
 
     def _elaborate_sig_genes(self, df, plotting_column, pvalue_col, y_thresh, x_thresh):

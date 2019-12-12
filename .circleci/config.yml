@@ -77,7 +77,7 @@ jobs:
                     -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
                     anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
                     -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
-                    
+
 workflows:
     commit_to_conda:
         jobs:

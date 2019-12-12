@@ -12,8 +12,10 @@ from palettable.colorbrewer.sequential import *
 
 
 # TODO Refactor and check this
-def volcano_plot(df, output_file, p_col, id_col, plotting_col, threshold_x, threshold_y, y_label, x_label, annot):
-    pp.VolcanoPlot(df, output_file, p_col, id_col, plotting_col, threshold_x, threshold_y, y_label, x_label, annot)
+def volcano_plot(df, output_file, p_col, id_col, plotting_col, threshold_x, threshold_y, y_label, x_label, annot, loc):
+    pp.VolcanoPlot(df=df, output_file=output_file, p_col=p_col, id_col=id_col, plotting_col=plotting_col,
+                   x_threshold=threshold_x, y_threshold=threshold_y, y_label=y_label, x_label=x_label, annotate=annot,
+                   loc=loc)
 
 
 #######################################################
@@ -329,8 +331,9 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     df['zscore'] = (df['observed'] - df['mean(null)']) / np.sqrt(df['var(null)'].values)
 
     # If it's a shortest path, mirror the zscore
+    loc = 2
     if not rwr:
-        df['zscore'] = -df['zscore']
+        loc = 1
 
     # When pvalue==0 the -log would be infinite, hence we replace
     # pvalue with the permutation resolution - a tenth of the resolution
@@ -341,10 +344,8 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     # transform in -log10(pvalue)
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
-    volcano_plot(df, output_file, p_col='-log10(p)', id_col=id_col,
-                 plotting_col="zscore", threshold_x=threshold_x,
-                 threshold_y=threshold_y, y_label='-log10(pvalue)',
-                 x_label='absolute z-score', annot=annotate)
+    volcano_plot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
+                 threshold_y=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annot=annotate, loc=loc)
 
 
 #######################################################
@@ -388,8 +389,9 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
 
     # If it's a shortest path, mirror the zscore
+    loc = 2
     if not rwr:
-        df['zscore']= -df['zscore']
+        loc = 1
 
     # When pvalue==0 the -log would be infinite, hence we replace
     # pvalue with the permutation resolution - a tenth of the resolution
@@ -401,7 +403,7 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
     volcano_plot(df, output_file, p_col = '-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
-                 threshold_y=threshold_y,y_label='-log10(pvalue)', x_label='absolute z-score', annot=annotate)
+                 threshold_y=threshold_y,y_label='-log10(pvalue)', x_label='z-score', annot=annotate, loc=loc)
 
 
 #######################################################
