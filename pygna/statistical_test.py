@@ -121,6 +121,7 @@ def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
     n = np.array([diz["nodes"].index(i) for i in geneset])
     diz = diz["matrix"]
 
+
     sub_matrix = diz[n[:, None], n]
     min_columns = np.amin(sub_matrix, axis=0)
     sum_columns = np.sum(min_columns)
