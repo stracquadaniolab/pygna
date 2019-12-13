@@ -1,0 +1,48 @@
+kind: pipeline
+name: pygna
+
+steps:
+- name: install
+  image: stracquadaniolab/ci-build-python3.6
+  commands:
+  - pip install .
+  - pygna
+  when:
+    event:
+    - push
+
+- name: build
+  image: stracquadaniolab/ci-build-python3.6
+  commands:
+  - python setup.py sdist bdist_wheel
+  when:
+    event:
+    - tag
+
+- name: publish
+  image: stracquadaniolab/ci-build-python3.6
+  environment:
+    TWINE_USERNAME:
+      from_secret: TWINE_USERNAME
+    TWINE_PASSWORD:
+      from_secret: TWINE_PASSWORD
+  commands:
+  - pip install twine
+  - twine upload dist/*
+  when:
+    event:
+    - tag
+
+- name: conda
+  image: stracquadaniolab/ci-build-python3.6
+  environment:
+    ANACONDA_API_TOKEN:
+        from_secret: ANACONDA_TOKEN
+  commands:
+  - mkdir conda-build
+  - conda build . --no-build-id --output-folder ./conda-build
+  - conda convert -p all ./conda-build/**/pygna*.bz2
+  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress --private ./conda-build/**/pygna*.bz2
+  when:
+    event:
+    - tag

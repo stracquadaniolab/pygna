@@ -3,6 +3,10 @@ Changelog
 
 Latest Version
 --------------
+v3.1.2
++++++++
+Fixing conda CI
+
 v3.0.0
 +++++++
 New version with conda CI.
