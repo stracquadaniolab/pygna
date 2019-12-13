@@ -1,6 +1,6 @@
 package:
   name: pygna
-  version: 2.3
+  version: 3
 
 source:
   path: ..
