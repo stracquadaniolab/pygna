@@ -1,49 +1,48 @@
-kind: pipeline
-name: pygna
-​
-steps:
-- name: install
-  image: stracquadaniolab/ci-build-python3.6
-  commands:
-  - pip install .
-  - pygna
-  when:
-    event:
-    - push
-​
-- name: build
-  image: stracquadaniolab/ci-build-python3.6
-  commands:
-  - python setup.py sdist bdist_wheel
-  when:
-    event:
-    - tag
-​
-- name: publish
-  image: stracquadaniolab/ci-build-python3.6
-  environment:
-    TWINE_USERNAME:
-      from_secret: TWINE_USERNAME
-    TWINE_PASSWORD:
-      from_secret: TWINE_PASSWORD
-  commands:
-  - pip install twine
-  - twine upload --skip-existing dist/*
-  when:
-    event:
-    - tag
-​
-- name: conda
-  image: stracquadaniolab/ci-build-python3.6
-  environment:
-    ANACONDA_API_TOKEN:
-        from_secret: ANACONDA_TOKEN
-  commands:
-  - mkdir conda-build
-  - conda build . --no-build-id --output-folder ./conda-build
-  - conda convert -p all ./conda-build/**/pygna*.bz2 -o ./conda-build
-  - ls -l ./conda-build/**/**
-  - anaconda -t $${ANACONDA_API_TOKEN} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
-  when:
-    event:
-    - tag
+name: Upload Python Package
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install setuptools wheel twine
+    - name: Build and publish
+      env:
+        TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
+        TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
+      run: |
+        python setup.py sdist bdist_wheel
+        twine upload dist/*
+
+    - name: Compile for Conda
+      env:
+          CONDA_TOKEN: ${{ secrets.ANACONDA_TOKEN }}
+      run: |
+            conda config --set always_yes yes
+            conda update -q conda
+            conda config --add channels bioconda
+            conda config --add channels conda-forge
+            conda install conda-build
+            conda install -c anaconda anaconda-client
+            conda build .conda_recipe -c bioconda -c conda-forge --python 3.7 --numpy 1.15
+            export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
+                    -c conda-forge --python 3.7 --numpy 1.15 | grep bz2`
+            mkdir ${HOME}/conda-bld/
+            conda convert --platform osx-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+            conda convert --platform linux-32 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+            conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+            anaconda -t ${CONDA_TOKEN} upload --force -u stracquadaniolab -l 3.1.2 ${TMP_PACKAGE_BUILD}
+            anaconda -t ${CONDA_TOKEN} upload --force -u stracquadaniolab -l 3.1.2 ${HOME}/conda-bld/**/*.bz2
+
