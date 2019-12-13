@@ -1,93 +1,75 @@
-version: 2.1
+version: 2.x
 
 jobs:
-    build_conda_package:
+  build_conda_package:
 
-        parameters:
-            python-version:
-                type: string
-                default: "3.7"
-            numpy-version:
-                type: string
-                default: "1.15"
-            build-label:
-                type: string
-                default: "main"
+    parameters:
+        python-version:
+            type: string
+            default: "3.7"
+        numpy-version:
+            type: string
+            default: "1.15"
+        build-label:
+            type: string
+            default: "main"
 
-        docker:
-            - image: continuumio/miniconda3
+    docker:
+      - image: continuumio/miniconda3
 
-        steps:
-            - checkout
-            - restore_cache:
-                keys:
-                    - miniconda-pkg-py<< parameters.python-version >>-{{ .Branch }}-{{ checksum ".conda_recipe/meta.yaml" }}
-            - run:
-                name: Configure Miniconda
-                command: |
-                    conda config --set always_yes yes
-                    conda update -q conda
-                    conda config --add channels bioconda
-                    conda config --add channels conda-forge
-                    conda install conda-build
-                    conda install -c anaconda anaconda-client
-            - run:
-                name: Build package
-                command: |
-                    conda build .conda_recipe -c bioconda -c conda-forge \
-                    --python << parameters.python-version >> \
-                    --numpy << parameters.numpy-version >>
-            - save_cache:
-                paths:
-                    - /opt/conda/pkgs
-                key: miniconda-pkg-py<< parameters.python-version >>-{{ .Branch }}-{{ checksum ".conda_recipe/meta.yaml" }}
+    steps:
+        - checkout
+        - restore_cache:
+            keys:
+                - miniconda-pkg-py<< parameters.python-version >>-{{ .Branch }}-{{ checksum ".conda_recipe/meta.yaml" }}
+        - run:
+            name: Configure Miniconda
+            command: |
+                conda config --set always_yes yes
+                conda update -q conda
+                conda config --add channels bioconda
+                conda config --add channels conda-forge
+                conda install conda-build
+                conda install -c anaconda anaconda-client
+        - run:
+            name: Build package
+            command: |
+                conda build .conda_recipe -c bioconda -c conda-forge \
+                --python << parameters.python-version >> \
+                --numpy << parameters.numpy-version >>
+        - save_cache:
+            paths:
+                - /opt/conda/pkgs
+            key: miniconda-pkg-py<< parameters.python-version >>-{{ .Branch }}-{{ checksum ".conda_recipe/meta.yaml" }}
 
-            - run:
-                name: Convert package
-                command: |
-                    export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
-                    -c conda-forge --python << parameters.python-version >> \
-                     --numpy << parameters.numpy-version >> | grep bz2`
-                    mkdir ${HOME}/conda-bld/
-                    conda convert --platform osx-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
-                    conda convert --platform linux-32 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
-                    conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
-
-    upload_conda_package:
-        parameters:
-            python-version:
-                type: string
-                default: "3.7"
-            numpy-version:
-                type: string
-                default: "1.15"
-            build-label:
-                type: string
-                default: "main"
-        docker:
-            - image: continuumio/miniconda3
-        steps:
-            - run:
-                name: Upload conda package
-                command: |
-                    export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
-                    -c conda-forge --python << parameters.python-version >> \
-                     --numpy << parameters.numpy-version >> | grep bz2`
-                    anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-                    -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
-                    anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-                    -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
-                    
+        - run:
+            name: Convert package
+            command: |
+                export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
+                -c conda-forge --python << parameters.python-version >> \
+                 --numpy << parameters.numpy-version >> | grep bz2`
+                mkdir ${HOME}/conda-bld/
+                conda convert --platform osx-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+                conda convert --platform linux-32 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+                conda convert --platform linux-64 ${TMP_PACKAGE_BUILD} -o ${HOME}/conda-bld/
+        - run:
+            name: Upload package
+            command: |
+                export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
+                -c conda-forge --python << parameters.python-version >> \
+                 --numpy << parameters.numpy-version >> | grep bz2`
+                anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
+                -l << parameters.build-label >> ${TMP_PACKAGE_BUILD}
+                anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
+                -l << parameters.build-label >> ${HOME}/conda-bld/**/*.bz2
 workflows:
-    commit_to_conda:
+
+    commit-build-py37:
         jobs:
             - build_conda_package:
                 python-version: "3.7"
                 numpy-version: "1.15"
                 context: ANACONDA_CLOUD_DEPLOY
-            - upload_conda_package:
                 requires:
-                  - build_conda_package
-                filters:
-                    branches:
-                        only: master
+                    branch:
+                        - master
