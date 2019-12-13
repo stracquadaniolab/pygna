@@ -56,12 +56,13 @@ jobs:
             name: Upload package
             command: |
                 export TMP_PACKAGE_BUILD=`conda build .conda_recipe --output -c bioconda \
-                -c conda-forge --python 3.7 \
+                -c conda-forge --python << parameters.python-version >> \
                  --numpy 1.15 | grep bz2`
                 anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-                -l 3.7 ${TMP_PACKAGE_BUILD}
+                -l 3.1.0 ${TMP_PACKAGE_BUILD}
                 anaconda -t ${UPLOAD_TOKEN} upload --force -u stracquadaniolab \
-                -l 3.7 ${HOME}/conda-bld/**/*.bz2
+                -l 3.1.0 ${HOME}/conda-bld/**/*.bz2
+
 
 workflows:
     commit_to_conda:
