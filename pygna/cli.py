@@ -1,6 +1,6 @@
 import matplotlib
 # TODO fix below: find the first call of matplotlib and fix the .use
-matplotlib.use("TkAgg")
+# matplotlib.use("TkAgg")
 import logging
 import argh
 import pygna.command as cmd
