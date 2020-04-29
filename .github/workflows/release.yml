@@ -6,44 +6,39 @@ on:
         - '*'
 
 jobs:
-    job1:
-      release:
-        name: "Build Conda package"
-        runs-on: ubuntu-latest
-        strategy:
-          matrix:
-            python: [3.7]
-            numpy: [1.15]
-        steps:
-          - uses: actions/checkout@v1
-          - name: "Setup Conda"
-            uses: s-weigand/setup-conda@v1
-            with:
-              update-conda: true
-              python-version: ${{ matrix.python }}
-              conda-channels: anaconda, conda-forge, bioconda
-          - name: "Install Conda development packages"
-            run: |
-                conda install conda-build
-                conda install -c anaconda anaconda-client
-          - name: "Build and upload package"
-            run: |
-                mkdir conda-build
-                conda build . --no-build-id --numpy ${{ matrix.numpy }} --output-folder ./conda-build
-                conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
-                anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
-    job2:
-      release:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v1
-          - name: Setup Python
-            uses: actions/setup-python@v1
-            with:
-              python-version: 3.7
-          - name: Install required packages
-            run: pip install wheel twine
-          - name: Build package
-            run: python setup.py sdist bdist_wheel
-          - name: Publish package
-            run: twine upload -u __token__ -p {% raw %}${{ secrets.PYPI_TOKEN }}{% endraw %} dist/*
+  release:
+    name: "Build, compile and upload"
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python: [3.7]
+        numpy: [1.15]
+    steps:
+      - uses: actions/checkout@v1
+      - name: "Setup Conda"
+        uses: s-weigand/setup-conda@v1
+        with:
+          update-conda: true
+          python-version: ${{ matrix.python }}
+          conda-channels: anaconda, conda-forge, bioconda
+      - name: "Install Conda development packages"
+        run: |
+            conda install conda-build
+            conda install -c anaconda anaconda-client
+      - name: "Build and upload package"
+        run: |
+            mkdir conda-build
+            conda build . --no-build-id --numpy ${{ matrix.numpy }} --output-folder ./conda-build
+            conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
+            anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
+
+      - name: Setup Python
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install required packages
+        run: pip install wheel twine
+      - name: Build package
+        run: python setup.py sdist bdist_wheel
+      - name: Publish package
+        run: twine upload -u __token__ -p {% raw %}${{ secrets.PYPI_TOKEN }}{% endraw %} dist/*
