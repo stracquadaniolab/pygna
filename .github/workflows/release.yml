@@ -41,4 +41,4 @@ jobs:
       - name: Build package
         run: python setup.py sdist bdist_wheel
       - name: Publish package
-        run: twine upload -u __token__ -p {% raw %}${{ secrets.PYPI_TOKEN }}{% endraw %} dist/*
+        run: twine upload -u ${{ PYPI_USERNAME }} -p ${{PYPI_PASSWORD}} dist/*
