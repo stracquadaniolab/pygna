@@ -229,4 +229,4 @@ def m_geneset_RW_statistic(network, geneset, diz=None, observed_flag=False):
 
     prob = diz*(torch.mul(geneset,torch.transpose(geneset, 0, 1))-torch.diag(geneset[:,0]))
     prob = torch.sum(prob)
-    return prob
+    return prob.item()
