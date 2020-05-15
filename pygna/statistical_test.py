@@ -28,7 +28,7 @@ class StatisticalTest:
 
         if matricial:
             self.__d_nodes=diz["nodes"]
-            self.__d_matrix=torch.tensor(diz["matrix"]).to(device = device)
+            self.__d_matrix=torch.tensor(diz["matrix"]).to(device = self.__device)
         else:
             self.__diz = diz
 
