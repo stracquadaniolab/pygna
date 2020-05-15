@@ -22,9 +22,9 @@ class StatisticalTest:
 
         self.__matricial = matricial
         if use_cuda:
-            device = torch.device('cuda')
+            self.__device = torch.device('cuda')
         else:
-            device = torch.device('cpu')
+            self.__device = torch.device('cpu')
 
         if matricial:
             self.__d_nodes=diz["nodes"]
@@ -53,7 +53,7 @@ class StatisticalTest:
             # TODO : check here new implementation for gpu
             if self.__matricial:
                 mapped_index = [self.__d_nodes.index(i) for i in mapped_geneset]
-                It = torch.tensor(np.zeros((self.__d_matrix.shape[0],1))).to(device = device)
+                It = torch.tensor(np.zeros((self.__d_matrix.shape[0],1))).to(device = self.__device)
                 It[mapped_index,0] = 1
                 observed = self.__test_statistic(
                         self.__network, It, self.__d_matrix, observed_flag=True
