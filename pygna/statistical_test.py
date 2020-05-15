@@ -110,17 +110,20 @@ class StatisticalTest:
     def get_null_distribution(self, geneset, n_samples):
 
         if self.__matricial:
-            random_dist = [self.__test_statistic(self.__network, geneset[torch.randperm(geneset.nelement())], self.__d_matrix) for i in range(n_samples)]
+            random_dist = [self.__test_statistic(self.__network, geneset[torch.randperm(geneset.nelement())], self.__d_matrix) for i in range(n_samples) ]
         else:
             np.random.seed()
             random_dist = []
-            for i in range(n_samples):
-                random_sample = np.random.choice(
+            random_dist = [self.__test_statistic(self.__network, set(p.random.choice(
                     list(self.__universe), len(geneset), replace=False
-                )
-                random_dist.append(
-                    self.__test_statistic(self.__network, set(random_sample), self.__diz)
-                )
+                )), self.__diz) for i in range(n_samples)]
+            #for i in range(n_samples):
+            #    random_sample = np.random.choice(
+            #        list(self.__universe), len(geneset), replace=False
+            #    )
+            #    random_dist.append(
+            #        self.__test_statistic(self.__network, set(random_sample), self.__diz)
+            #    )
 
         return random_dist
 
