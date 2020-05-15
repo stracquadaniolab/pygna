@@ -31,6 +31,7 @@ def main():
         cmd.test_topology_sp,
         cmd.test_topology_rwr,
         cmd.test_diffusion_hotnet,
+        cmd.test_topology_rwr_cuda,
         # comparison analysis
         cmd.test_association_sp,
         cmd.test_association_rwr,

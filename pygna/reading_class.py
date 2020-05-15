@@ -27,7 +27,7 @@ class ReadTsv(ReadingData):
     A class used to read the .tsv network file inside pygna
     """
 
-    def __init__(self, filename, pd_table=False, int_type=None):
+    def __init__(self, filename, pd_table=False, int_type=None, use_mapping= False):
         # TODO Fix documentation about int_type
         """
         :param filename: str, represents the path to the network file
@@ -39,9 +39,15 @@ class ReadTsv(ReadingData):
         self.int_type = int_type
         self.pd_table = pd_table
         self.interactions = []
+        self.ids_map = None
+        self.use_mapping = use_mapping
 
         if not self.pd_table:
             self.__readfile()
+        # Here for future indices
+        if self.use_mapping:
+            self.__create_map()
+
         self.graph = self._convert_to_graph()
 
     def __readfile(self):
@@ -72,6 +78,19 @@ class ReadTsv(ReadingData):
         graph.add_edges_from(self.interactions)
         graph.remove_edges_from(graph.selfloop_edges())
         return graph
+
+    def __create_map(self):
+        '''
+        Map nodes to integers and returns the mapping
+        '''
+
+        b=[i for i in list(zip(*self.interactions))]
+        nodes = set(b[0]).union(set(b[1]))
+        # Generate map
+        self.ids2int_map = {node:i for i,node in enumerate(nodes)}
+        # Apply map to nodes.
+        self.interactions = map(lambda x: (self.ids2int_map[x[0]],self.ids2int_map[x[1]]), self.interactions)
+
 
     def get_data(self):
         """

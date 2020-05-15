@@ -1,11 +1,12 @@
 """PyGNA commands main module
+import pygna.parser as ps
 """
 import logging
 import numpy as np
 import pygna.output as out
 import networkx as nx
-import pygna.parser as ps
 import pygna.reading_class as rc
+import pygna.parser as ps
 import pygna.statistical_test as st
 import pygna.statistical_comparison as sc
 import pygna.diagnostic as diagnostic
@@ -17,6 +18,7 @@ import scipy.linalg.interpolative
 import itertools
 import tables
 
+#import pygna.data.Data as Data
 
 # TODO Check and refactor this
 def __read_distance_matrix(distance_matrix_filename, in_memory=False):
@@ -72,6 +74,72 @@ def network_summary(network_file: "network file",
 ################################################################################
 ######### SINGLE SET ANALYSES ##################################################
 ################################################################################
+
+
+def test_topology_rwr_cuda(
+    network_file: "network file, use a network with weights",
+    geneset_file: "GMT geneset file",
+    rwr_matrix_filename: "hdf5 RWR matrix obtained with pygna ",
+    output_table: "output results table, use .csv extension",
+    setname: "Geneset to analyse" = None,
+    size_cut: "removes all genesets with a mapped length < size_cut" = 20,
+    number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
+    cores: "Number of cores for the multiprocessing" = 1,
+    in_memory: "set if you want the large matrix to be read in memory" = False,
+    cuda: 'use cuda for computation' = False,
+    results_figure: "barplot of results, use pdf or png extension" = None,
+    diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                            "(one for each dataset)" = None,
+    ):
+    """
+        Performs the analysis of random walk probabilities.
+        Given the RWR matrix ,
+        it compares the probability of walking between the genes in the geneset
+        compared to those of walking between the nodes
+        of a geneset with the same size
+    """
+
+    network= rc.ReadTsv(network_file).get_network()
+    network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
+
+    geneset = ps.__load_geneset(geneset_file, setname)
+    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
+
+    setnames = [key for key in geneset.keys()]
+    output1 = out.Output(network_file, output_table, "topology_rwr", geneset_file, setnames)
+
+    logging.info("Results file = " + output1.output_table_results)
+    output1.create_st_table_empirical()
+    st_test = st.StatisticalTest(st.m_geneset_RW_statistic, network, rw_dict, matricial = True, use_cuda = cuda)
+
+    for setname, item in geneset.items():
+        item = set(item)
+        if len(item) > size_cut:
+            # test
+            observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
+                                                                                     max_iter=number_of_permutations,
+                                                                                     alternative="greater", cores=cores)
+            logging.info("Setname:" + setname)
+            if n_mapped < size_cut:
+                logging.info("%s remove from results since nodes mapped are < %d" % (setname, size_cut))
+            else:
+                logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+                if diagnostic_null_folder:
+                    diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
+                                                      '_rwr_null_distribution.pdf', setname=setname)
+                # saving output
+                output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                                  pvalue, np.mean(null_d), np.var(null_d))
+        else:
+            logging.info("%s removed from results since nodes mapped are < %d" % (setname, size_cut))
+
+    output1.close_temporary_table()
+    if results_figure:
+        paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
+
+
+
 
 
 def test_topology_total_degree(
@@ -196,7 +264,7 @@ def test_topology_rwr(
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
-):
+    ):
     """
         Performs the analysis of random walk probabilities.
         Given the RWR matrix ,
@@ -303,7 +371,6 @@ def test_topology_module(
 
     if results_figure:
         paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
-
 
 def test_topology_sp(
     network_file: "network file",

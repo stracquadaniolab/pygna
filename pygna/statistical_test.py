@@ -8,14 +8,29 @@ import matplotlib.pyplot as plt
 import pygna.diagnostic as diag
 import multiprocessing
 import time
-
+import torch
 
 class StatisticalTest:
-    def __init__(self, test_statistic, network, diz={}):
+    def __init__(self, test_statistic, network, diz=None, matricial = False, use_cuda = False):
 
         self.__test_statistic = test_statistic
         self.__network = network
-        self.__diz = diz
+
+        self.__diz = None
+        self.__d_nodes = None
+        self.__d_matrix = None
+
+        self.__matricial = matricial
+        if use_cuda:
+            device = torch.device('cuda')
+        else:
+            device = torch.device('cpu')
+
+        if matricial:
+            self.__d_nodes=diz["nodes"]
+            self.__d_matrix=torch.tensor(diz["matrix"]).to(device = device)
+        else:
+            self.__diz = diz
 
         if (type(self.__network) is nx.Graph) or (type(self.__network) is nx.DiGraph):
             self.__universe = set(self.__network.nodes())
@@ -28,19 +43,33 @@ class StatisticalTest:
     def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
         # mapping geneset
         mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
+
         if len(mapped_geneset) == 0:
             return 0, 0, np.array([0]), 0, 0
         else:
             logging.info(
                 "Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset))
             )
-            observed = self.__test_statistic(
-                self.__network, mapped_geneset, self.__diz, observed_flag=True
-            )
-            # iterations
-            null_distribution = StatisticalTest.get_null_distribution_mp(
-                self, mapped_geneset, max_iter, n_proc=cores
-            )
+            # TODO : check here new implementation for gpu
+            if self.__matricial:
+                mapped_index = [self.__d_nodes.index(i) for i in mapped_geneset]
+                It = torch.tensor(np.zeros(self.__d_matrix.shape[0],1)).to(device = device)
+                It[mapped_index,0] = 1
+                observed = self.__test_statistic(
+                        self.__network, It, self.__d_matrix, observed_flag=True
+                    )
+                # iterations
+                null_distribution = StatisticalTest.get_null_distribution_mp(
+                    self, It, max_iter, n_proc=cores
+                )
+            else:
+                observed = self.__test_statistic(
+                        self.__network, mapped_geneset, self.__diz, observed_flag=True
+                    )
+                # iterations
+                null_distribution = StatisticalTest.get_null_distribution_mp(
+                    self, mapped_geneset, max_iter, n_proc=cores
+                )
             # computing empirical pvalue
             pvalue = 1
             if alternative == "greater":
@@ -58,15 +87,11 @@ class StatisticalTest:
 
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
 
-
-
         if n_proc == 1:
             null_distribution = StatisticalTest.get_null_distribution(
                 self, geneset, iter
             )
-
         else:
-
             p = multiprocessing.Pool(n_proc)
             n_trial = int(iter / n_proc)
             results = [
@@ -84,15 +109,24 @@ class StatisticalTest:
 
     def get_null_distribution(self, geneset, n_samples):
 
-        np.random.seed()
-        random_dist = []
-        for i in range(n_samples):
-            random_sample = np.random.choice(
-                list(self.__universe), len(geneset), replace=False
-            )
-            random_dist.append(
-                self.__test_statistic(self.__network, set(random_sample), self.__diz)
-            )
+        if self.__matricial:
+            np.random.seed()
+            random_dist = []
+            for i in range(n_samples):
+                idx = torch.randperm(geneset.nelement())
+                random_dist.append(
+                    self.__test_statistic(self.__network, geneset[idx], self.__d_matrix)
+                )
+        else:
+            np.random.seed()
+            random_dist = []
+            for i in range(n_samples):
+                random_sample = np.random.choice(
+                    list(self.__universe), len(geneset), replace=False
+                )
+                random_dist.append(
+                    self.__test_statistic(self.__network, set(random_sample), self.__diz)
+                )
 
         return random_dist
 
@@ -102,7 +136,7 @@ class StatisticalTest:
 ###############################################################################
 
 
-def geneset_localisation_statistic_median(network, geneset, diz={}, observed_flag=False):
+def geneset_localisation_statistic_median(network, geneset, diz = None, observed_flag=False):
     """ median shortest path for each node """
     cum_sum = 0.0
     geneset_index = [diz["nodes"].index(i) for i in geneset]
@@ -128,7 +162,7 @@ def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
     return sum_columns / len(n)
 
 
-def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_module_statistic(network, geneset, diz = None, observed_flag=False):
 
     # Largest Connected Component for the subgraph induced by the geneset
     module = nx.subgraph(network, geneset)
@@ -143,7 +177,7 @@ def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
         return 0
 
 
-def geneset_total_degree_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_total_degree_statistic(network, geneset, diz = None, observed_flag=False):
     """
     Total degree of the geneset: average total_degree
     """
@@ -153,7 +187,7 @@ def geneset_total_degree_statistic(network, geneset, diz={}, observed_flag=False
     return np.average(total)
 
 
-def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_internal_degree_statistic(network, geneset, diz = None, observed_flag=False):
     """
     Internal degree ratio: average of the ratio internal_degree/total_degree
     """
@@ -171,7 +205,7 @@ def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=Fa
     return np.average(ratio)
 
 
-def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_RW_statistic(network, geneset, diz = None, observed_flag=False):
 
     """ Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
     """
@@ -185,4 +219,13 @@ def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
     geneset_index = [diz["nodes"].index(i) for i in geneset]
     prob = [diz["matrix"][i, j] for i in geneset_index for j in geneset_index if i != j]
     prob = np.sum(prob)
+    return prob
+
+
+def m_geneset_RW_statistic(network, geneset, diz=None, observed_flag=False):
+
+    """ Matricial computation of rwr
+    """
+    prob = diz*(torch.mul(geneset,geneset.T)-torch.diag(geneset[:,0]))
+    prob = torch.sum(prob)
     return prob
