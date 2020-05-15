@@ -113,8 +113,7 @@ class StatisticalTest:
             random_dist = [self.__test_statistic(self.__network, geneset[torch.randperm(geneset.nelement())], self.__d_matrix) for i in range(n_samples) ]
         else:
             np.random.seed()
-            random_dist = []
-            random_dist = [self.__test_statistic(self.__network, set(p.random.choice(
+            random_dist = [self.__test_statistic(self.__network, set(np.random.choice(
                     list(self.__universe), len(geneset), replace=False
                 )), self.__diz) for i in range(n_samples)]
             #for i in range(n_samples):
