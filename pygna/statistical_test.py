@@ -226,6 +226,7 @@ def m_geneset_RW_statistic(network, geneset, diz=None, observed_flag=False):
 
     """ Matricial computation of rwr
     """
-    prob = diz*(torch.mul(geneset,geneset.T)-torch.diag(geneset[:,0]))
+
+    prob = diz*(torch.mul(geneset,torch.transpose(geneset, 0, 1))-torch.diag(geneset[:,0]))
     prob = torch.sum(prob)
     return prob
