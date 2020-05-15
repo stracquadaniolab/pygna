@@ -110,13 +110,7 @@ class StatisticalTest:
     def get_null_distribution(self, geneset, n_samples):
 
         if self.__matricial:
-            np.random.seed()
-            random_dist = []
-            for i in range(n_samples):
-                idx = torch.randperm(geneset.nelement())
-                random_dist.append(
-                    self.__test_statistic(self.__network, geneset[idx], self.__d_matrix)
-                )
+            random_dist = [self.__test_statistic(self.__network, geneset[torch.randperm(geneset.nelement())], self.__d_matrix) for i in range(n_samples)]
         else:
             np.random.seed()
             random_dist = []
@@ -223,6 +217,16 @@ def geneset_RW_statistic(network, geneset, diz = None, observed_flag=False):
 
 
 def m_geneset_RW_statistic(network, geneset, diz=None, observed_flag=False):
+
+    """ Matricial computation of rwr
+    """
+
+    prob = diz*(torch.mul(geneset,torch.transpose(geneset, 0, 1))-torch.diag(geneset[:,0]))
+    prob = torch.sum(prob)
+    return prob.item()
+
+
+def m_geneset_sp_statistic(network, geneset, diz=None, observed_flag=False):
 
     """ Matricial computation of rwr
     """
