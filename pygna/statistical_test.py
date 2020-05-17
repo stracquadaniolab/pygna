@@ -56,7 +56,7 @@ class StatisticalTest:
                 It = torch.tensor(np.zeros((self.__d_matrix.shape[0],1))).to(device = self.__device)
                 It[mapped_index,0] = 1
                 observed = self.__test_statistic(
-                        self.__network, It, self.__d_matrix, observed_flag=True
+                        self.__network, It.unsqueeze_(0), self.__d_matrix, observed_flag=True
                     )
                 # iterations
                 null_distribution = StatisticalTest.get_null_distribution_mp(
@@ -110,7 +110,7 @@ class StatisticalTest:
     def get_null_distribution(self, geneset, n_samples):
 
         if self.__matricial:
-            random_dist = [self.__test_statistic(self.__network, geneset[torch.randperm(geneset.nelement())], self.__d_matrix) for i in range(n_samples) ]
+            random_dist = self.__test_statistic(self.__network, torch.stack([I[torch.randperm(I.size()[0])] for i in range(n_samples)]), self.__d_matrix)
         else:
             np.random.seed()
             random_dist = [self.__test_statistic(self.__network, set(np.random.choice(
@@ -222,10 +222,8 @@ def m_geneset_RW_statistic(network, geneset, diz=None, observed_flag=False):
 
     """ Matricial computation of rwr
     """
-
-    prob = diz*(torch.mul(geneset,torch.transpose(geneset, 0, 1))-torch.diag(geneset[:,0]))
-    prob = torch.sum(prob)
-    return prob.item()
+    prob = torch.sum(torch.mul(diz,(torch.matmul(geneset,geneset.transpose(t,1,2))-torch.diag_embed(geneset[:,:,0]))), dim = (1,2))
+    return prob.numpy
 
 
 def m_geneset_sp_statistic(network, geneset, diz=None, observed_flag=False):
@@ -233,6 +231,6 @@ def m_geneset_sp_statistic(network, geneset, diz=None, observed_flag=False):
     """ Matricial computation of rwr
     """
 
-    prob = diz*(torch.mul(geneset,torch.transpose(geneset, 0, 1))-torch.diag(geneset[:,0]))
-    prob = torch.sum(prob)
-    return prob.item()
+    prob = torch.sum(torch.mul(diz,(torch.matmul(geneset,geneset.transpose(t,1,2))-torch.diag_embed(geneset[:,:,0]))), dim = (1,2))
+    return prob.numpy
+
