@@ -19,6 +19,7 @@ class StatisticalTest:
         self.__diz = None
         self.__d_nodes = None
         self.__d_matrix = None
+        self.__sequential = True
 
         self.__matricial = matricial
         if use_cuda:
@@ -44,6 +45,10 @@ class StatisticalTest:
         # mapping geneset
         mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
 
+        if cores>1:
+            self.__sequential = False
+
+
         if len(mapped_geneset) == 0:
             return 0, 0, np.array([0]), 0, 0
         else:
@@ -52,15 +57,15 @@ class StatisticalTest:
             )
             # TODO : check here new implementation for gpu
             if self.__matricial:
+                print('Inside matricial empirical pvalue')
                 mapped_index = [self.__d_nodes.index(i) for i in mapped_geneset]
                 It = torch.tensor(np.zeros((self.__d_matrix.shape[0],1))).to(device = self.__device)
                 It[mapped_index,0] = 1
                 observed = self.__test_statistic(
                         self.__network, It.unsqueeze_(0), self.__d_matrix, observed_flag=True
                     )
-                # iterations
-                null_distribution = StatisticalTest.get_null_distribution_mp(
-                    self, It, max_iter, n_proc=cores
+                null_distribution = StatisticalTest.get_null_distribution(
+                    self, It[0,:,:], n_samples = max_iter,
                 )
             else:
                 observed = self.__test_statistic(
@@ -77,8 +82,11 @@ class StatisticalTest:
             else:
                 pvalue = np.sum(null_distribution <= observed) / float(max_iter)
 
+
+            pvalue = max(1/max_iter, pvalue)
+
             return (
-                observed,
+                float(observed),
                 pvalue,
                 null_distribution,
                 len(mapped_geneset),
@@ -110,7 +118,13 @@ class StatisticalTest:
     def get_null_distribution(self, geneset, n_samples):
 
         if self.__matricial:
-            random_dist = self.__test_statistic(self.__network, torch.stack([I[torch.randperm(I.size()[0])] for i in range(n_samples)]), self.__d_matrix)
+            if self.__sequential:
+                print('running sequential matricial null')
+                random_dist = [float(self.__test_statistic(self.__network, geneset[torch.randperm(geneset.size()[0]),:].unsqueeze_(0) , self.__d_matrix)) for i in range(n_samples)]
+
+            else:
+                print('running complete matricial null')
+                random_dist = self.__test_statistic(self.__network, torch.stack([geneset[torch.randperm(geneset.size()[0])] for i in range(n_samples)]), self.__d_matrix)
         else:
             np.random.seed()
             random_dist = [self.__test_statistic(self.__network, set(np.random.choice(
@@ -222,9 +236,9 @@ def m_geneset_RW_statistic(network, geneset, diz=None, observed_flag=False):
 
     """ Matricial computation of rwr
     """
-    prob = torch.sum(torch.mul(diz,(torch.matmul(geneset,geneset.transpose(geneset,1,2))-torch.diag_embed(geneset[:,:,0]))), dim = (1,2))
-    return prob.numpy
-
+    prob = torch.sum(torch.mul(diz,(torch.matmul(geneset,torch.transpose(geneset,1,2))-torch.diag_embed(geneset[:,:,0]) )), dim = (1,2))
+    return prob.cpu().numpy()
+    
 
 def m_geneset_sp_statistic(network, geneset, diz=None, observed_flag=False):
 

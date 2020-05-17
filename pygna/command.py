@@ -84,7 +84,7 @@ def test_topology_rwr_cuda(
     setname: "Geneset to analyse" = None,
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
-    cores: "Number of cores for the multiprocessing" = 1,
+    cores: "Number of cores for the multiprocessing, if using cuda and cores = 1 the permutations are done sequentially (recommended for large matrices)" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     cuda: 'use cuda for computation' = False,
     results_figure: "barplot of results, use pdf or png extension" = None,
