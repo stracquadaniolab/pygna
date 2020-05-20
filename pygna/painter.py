@@ -229,7 +229,6 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
             table = table.append({'setname_A': i, 'setname_B': i, 'observed': 0, 'empirical_pvalue': 1},
                                  ignore_index=True)
 
-
     pivot_table = table.pivot(values="observed", index="setname_A", columns="setname_B")
     pivot_table = pivot_table.fillna(0)
 
@@ -271,19 +270,19 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         )
     else:
         g2 = sns.heatmap(
-                matrix,
-                cmap=palette,
-                ax=axes,
-                square=True,
-                xticklabels=1,
-                yticklabels=1,
-                mask=mask,
-                annot=annot,
-                center=0,
-                cbar=True,
-                linewidths=0.1,
-                linecolor="white",
-            )
+            matrix,
+            cmap=palette,
+            ax=axes,
+            square=True,
+            xticklabels=1,
+            yticklabels=1,
+            mask=mask,
+            annot=annot,
+            center=0,
+            cbar=True,
+            linewidths=0.1,
+            linecolor="white",
+        )
 
     g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
     g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
@@ -354,13 +353,12 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
 
 
 def paint_volcano_plot(table_filename: 'pygna comparison output',
-                        output_file: 'output figure file, specify png or pdf file',
-                        rwr: 'use rwr is the table comes from a rwr analysis' = False,
-                        id_col="setname_B",
-                        threshold_x=0,
-                        threshold_y=2,
-                        annotate=False):
-
+                       output_file: 'output figure file, specify png or pdf file',
+                       rwr: 'use rwr is the table comes from a rwr analysis' = False,
+                       id_col="setname_B",
+                       threshold_x=0,
+                       threshold_y=2,
+                       annotate=False):
     '''
     This function plots the results of of a GNA test of association
     of a single geneset against multiple pathways.
@@ -375,18 +373,17 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     '''
 
     out.apply_multiple_testing_correction(
-    table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
-        )
+        table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
+    )
 
     with open(table_filename, "r") as f:
         df = pd.read_csv(f, sep=",")
 
-    stat_name= df["analysis"][0]
+    stat_name = df["analysis"][0]
     n_permutations = df["number_of_permutations"][0]
 
-
     # Normalise the plotting value
-    df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
+    df['zscore'] = (df['observed'] - df['mean(null)']) / np.sqrt(df['var(null)'].values)
 
     # If it's a shortest path, mirror the zscore
     loc = 2
@@ -396,14 +393,14 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     # When pvalue==0 the -log would be infinite, hence we replace
     # pvalue with the permutation resolution - a tenth of the resolution
     # So that the plotted value is going to be 1 + max_log
-    sig_th = 1/n_permutations - 1/n_permutations/10
-    df['bh_pvalue'] = df['bh_pvalue']+ (df['bh_pvalue']==0.0)*sig_th
+    sig_th = 1 / n_permutations - 1 / n_permutations / 10
+    df['bh_pvalue'] = df['bh_pvalue'] + (df['bh_pvalue'] == 0.0) * sig_th
 
     # transform in -log10(pvalue)
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
-    volcano_plot(df, output_file, p_col = '-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
-                 threshold_y=threshold_y,y_label='-log10(pvalue)', x_label='z-score', annot=annotate, loc=loc)
+    volcano_plot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
+                 threshold_y=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annot=annotate, loc=loc)
 
 
 #######################################################
@@ -537,3 +534,18 @@ def plot_adjacency(
     else:
         logging.warning('The null distribution figure can only be saved in pdf or png, forced to png')
         f.savefig(output_file + '.png', format="png")
+
+
+def stars(pvalue) -> str:
+    s = ""
+    if pvalue > 0.05:
+        s = "ns"
+    elif 0.01 < pvalue <= 0.05:
+        s = "*"
+    elif 0.001 < pvalue <= 0.01:
+        s = "**"
+    elif 0.0001 < pvalue <= 0.001:
+        s = "***"
+    else:
+        s = "****"
+    return s
