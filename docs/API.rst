@@ -13,7 +13,7 @@ Genesets
 
 Genesets are read in .gmt format through the following function
 
-.. autofunction:: pygna.parser.__load_geneset
+.. autofunction:: rc.ReadGmt(geneset_file)
 
 The user can specify if all sets are read or can restrict the parser to return only the geneset with a specific setname.
 

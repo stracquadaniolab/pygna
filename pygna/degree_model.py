@@ -4,10 +4,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 import logging
-import pandas as pd
-import seaborn as sns
 from pygna import output
-from pygna.utils import YamlConfig
 
 
 class DegreeModel(object):

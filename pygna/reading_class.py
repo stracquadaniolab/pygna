@@ -1,5 +1,4 @@
 import abc
-from abc import ABC
 
 import pandas as pd
 import tables
@@ -29,11 +28,9 @@ class ReadTsv(ReadingData):
     """
 
     def __init__(self, filename, pd_table=False, int_type=None):
-        # TODO Fix documentation about int_type
         """
         :param filename: str, represents the path to the network file
         :param pd_table: bool, if the results is going to be a pd.dataframe
-        :param int_type: Unknown
         """
         super().__init__()
         self.filename = filename
@@ -138,9 +135,6 @@ class ReadGmt(ReadingData):
         :param setname: str, the setname to extract
         :return: pd.dataframe, the geneset data
         """
-        # TODO The following "if" is because the parameter "setname" is defined in the calling functions above this one.
-        #  This should not be allowed to keep a good encapsulation of this method. After the refactor, this should be
-        #  check
         if setname is not None:
             if setname in self.gmt_data:
                 temp = self.gmt_data[setname]

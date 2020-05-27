@@ -4,7 +4,7 @@ import logging
 import numpy as np
 import pygna.output as out
 import networkx as nx
-import pygna.parser as ps
+import pygna.elaborators as pe
 import pygna.reading_class as rc
 import pygna.statistical_test as st
 import pygna.statistical_comparison as sc
@@ -18,11 +18,11 @@ import itertools
 import tables
 
 
-# TODO Check and refactor this
-def __read_distance_matrix(distance_matrix_filename, in_memory=False):
+def read_distance_matrix(distance_matrix_filename, in_memory=False):
     """
     Reads the large matrix .Uses a hdf5 file to work with it
     :param distance_matrix_filename: str, the file to read
+    :param in_memory: bool, if the table must be kept in memory
     """
     nodes, data = rc.ReadDistanceMatrix(distance_matrix_filename, in_memory).get_data()
     return nodes, data
@@ -55,7 +55,7 @@ def network_summary(network_file: "network file",
         if not setname:
             logging.error('Missing setname name, specify  a unique setname')
         else:
-            geneset = ps.__load_geneset(geneset_input_file, setname)
+            geneset = rc.ReadGmt(geneset_input_file).get_geneset(setname)
             for setname, item in geneset.items():
                 graph = nx.subgraph(network, item)
                 out.write_graph_summary(graph, text_output, setname + " on " + network_file)
@@ -95,7 +95,7 @@ def test_topology_total_degree(
     logging.info("Evaluating the test topology total degree, please wait")
     network = rc.ReadTsv(network_file).get_network()
 
-    geneset = ps.__load_geneset(geneset_file, setname)
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
     setnames = [key for key in geneset.keys()]
 
@@ -154,7 +154,7 @@ def test_topology_internal_degree(
     """
 
     network = rc.ReadTsv(network_file).get_network()
-    geneset = ps.__load_geneset(geneset_file, setname)
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(network_file, output_table, "topology_internal_degree", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
@@ -207,9 +207,9 @@ def test_topology_rwr(
 
     network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
-    geneset = ps.__load_geneset(geneset_file, setname)
-    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
-               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
+    rw_dict = {"nodes": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(network_file, output_table, "topology_rwr", geneset_file, setnames)
@@ -265,7 +265,7 @@ def test_topology_module(
         for a geneset of the same size.
     """
     network = rc.ReadTsv(network_file).get_network()
-    geneset = ps.__load_geneset(geneset_file, setname)
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
     setnames = [key for key in geneset.keys()]
     output1 = out.Output(network_file, output_table, "topology_module", geneset_file, setnames)
@@ -331,10 +331,10 @@ def test_topology_sp(
     network = rc.ReadTsv(network_file).get_network()
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
-    geneset = ps.__load_geneset(geneset_file, setname)
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
-    diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
-           "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    diz = {"nodes": read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
+           "matrix": read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
     diz["matrix"] = diz["matrix"] + np.transpose(diz["matrix"])
     np.fill_diagonal(diz["matrix"], float("inf"))
     setnames = [key for key in geneset.keys()]
@@ -368,7 +368,7 @@ def test_topology_sp(
 ################################################################################
 ######### Diffusion test #######################################################
 ################################################################################
-# TODO removing the following:
+# TODO removed the following:
 #  weight: "RW" = "RW",
 #  show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
 #  results_figure: "figure where the result figure can be saved (use pdf or png)" = None,
@@ -407,7 +407,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 
     # Filter table for significant genes
     table[name_column] = table[name_column].fillna(0).apply(str)
-    table = utils.clean_table(table, stat_col=weight_column)
+    table = pe.TableElaboration.clean_table(table=table, stat_col=weight_column)
     geneset = utils.filter_table(table, filter_column=filter_column, alternative=filter_condition,
                                  threshold=filter_threshold)[name_column]
     if normalise:
@@ -418,8 +418,8 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
                     \n Change size_cut if necessary' % size_cut)
 
     # Read RWR matrix
-    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
-               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
+    rw_dict = {"nodes": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
     # setting output
     output1 = out.Output(network_file, output_table, "diffusion", geneset_file, geneset_file)
     output1.create_st_table_empirical()
@@ -489,8 +489,8 @@ def test_association_sp(
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read matrix
-    sp_diz = {"nodes": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
-              "matrix": __read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+    sp_diz = {"nodes": read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
+              "matrix": read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
     # TODO check why "in memory"= True results are different from "in memory"= False
     sp_diz["matrix"] = sp_diz["matrix"] + np.transpose(sp_diz["matrix"])
     np.fill_diagonal(sp_diz["matrix"], np.inf)
@@ -499,12 +499,12 @@ def test_association_sp(
     if setname_a and setname_b is None and file_geneset_b is None:
         logging.error(" this analysis requires at least two genesets ")
 
-    geneset_a = ps.__load_geneset(file_geneset_a, setname_a)
+    geneset_a = rc.ReadGmt(file_geneset_a).get_geneset(setname_a)
     if file_geneset_b:
-        geneset_b = ps.__load_geneset(file_geneset_b, setname_b)
+        geneset_b = rc.ReadGmt(file_geneset_b).get_geneset(setname_b)
     else:
         if setname_b:
-            geneset_b = ps.__load_geneset(file_geneset_a, setname_b)
+            geneset_b = rc.ReadGmt(file_geneset_a).get_geneset(setname_b)
         else:
             geneset_b = None
 
@@ -606,16 +606,15 @@ def test_association_rwr(
     if setname_a and setname_b is None and file_geneset_b is None:
         logging.error(" this analysis requires at least two genesets ")
 
-    rw_dict = {"nodes": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
-               "matrix": __read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
+    rw_dict = {"nodes": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
+               "matrix": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
 
-    geneset_a = ps.__load_geneset(file_geneset_a, setname_a)
-
+    geneset_a = rc.ReadGmt(file_geneset_a).get_geneset(setname_a)
     if file_geneset_b:
-        geneset_b = ps.__load_geneset(file_geneset_b, setname_b)
+        geneset_b = rc.ReadGmt(file_geneset_b).get_geneset(setname_b)
     else:
         if setname_b:
-            geneset_b = ps.__load_geneset(file_geneset_a, setname_b)
+            geneset_b = rc.ReadGmt(file_geneset_a).get_geneset(setname_b)
         else:
             geneset_b = None
 
@@ -773,7 +772,7 @@ def network_graphml(
     """
 
     network = rc.ReadTsv(network_file).get_network()
-    geneset = ps.__load_geneset(geneset_file, setname)
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
     if giant_component_only:
         network = network.subgraph(max(nx.connected_components(network), key=len))

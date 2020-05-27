@@ -1,13 +1,8 @@
 import logging
-import random
 import networkx as nx
 import numpy as np
-import scipy
 import sys
-import matplotlib.pyplot as plt
-import pygna.diagnostic as diag
 import multiprocessing
-import time
 
 
 class StatisticalTest:
@@ -57,8 +52,6 @@ class StatisticalTest:
             )
 
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
-
-
 
         if n_proc == 1:
             null_distribution = StatisticalTest.get_null_distribution(
@@ -117,10 +110,8 @@ def geneset_localisation_statistic_median(network, geneset, diz={}, observed_fla
 
 
 def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
-
     n = np.array([diz["nodes"].index(i) for i in geneset])
     diz = diz["matrix"]
-
 
     sub_matrix = diz[n[:, None], n]
     min_columns = np.amin(sub_matrix, axis=0)
@@ -129,7 +120,6 @@ def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
 
 
 def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
-
     # Largest Connected Component for the subgraph induced by the geneset
     module = nx.subgraph(network, geneset)
 
@@ -164,7 +154,6 @@ def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=Fa
     degree_internal = nx.degree(subgraph)
     internal = np.array([degree_internal[g] for g in geneset])
 
-
     ratio = internal / total
     ratio[total == 0] = 0.5
 
@@ -172,7 +161,6 @@ def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=Fa
 
 
 def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
-
     """ Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
     """
 

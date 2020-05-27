@@ -1,7 +1,7 @@
 import pygna.reading_class as rc
 
 
-# TODO Check and refactor this
+# FIXME delete
 def __load_geneset(filename, setname):
     """Loads a geneset from file
     """

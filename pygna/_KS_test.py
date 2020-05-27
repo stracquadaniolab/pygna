@@ -1,10 +1,10 @@
 import logging
-import random
 import networkx as nx
 import numpy as np
 import scipy
 import sys
 import matplotlib.pyplot as plt
+import pygna.reading_class as rc
 import pygna.diagnostic as diag
 import multiprocessing
 import time
@@ -84,9 +84,9 @@ def test_degree_distribution(
         H0 is that the geneset is drawn from the same distribution of all the other nodes.
         H0 rejected if statistic is greater.
     """
-    network = ps.__load_network(network_file)
+    network = rc.ReadTsv(network_file)
 
-    geneset = ps.__load_geneset(geneset_file, setname)
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
     setnames = [key for key in geneset.keys()]
 

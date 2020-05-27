@@ -21,7 +21,6 @@ class YamlConfig:
                 return print(exc)
 
 
-# TODO Refactor and check this
 def convert_gmt(gmt_file: "gmt file to be converted",
                 output_gmt_file: "output file",
                 conversion: "e2s or s2e",
@@ -31,7 +30,6 @@ def convert_gmt(gmt_file: "gmt file to be converted",
     pc.GmtToGmtEnriched(gmt_file, output_gmt_file, conversion, entrez_col, symbol_col, converter_map_filename)
 
 
-# TODO Refactor and check this
 def geneset_from_table(input_file: "input csv file",
                        setname: "name of the set",
                        output_gmt: "output gmt name" = None,
@@ -46,7 +44,6 @@ def geneset_from_table(input_file: "input csv file",
                 descriptor)
 
 
-# TODO Refactor and check this
 def filter_table(table: "input csv file",
                  filter_column: "column with the values to be filtered" = "padj",
                  alternative: "alternative to use for the filter, with less the filter is applied <threshold, "
@@ -55,12 +52,6 @@ def filter_table(table: "input csv file",
     return pe.TableElaboration.filter_table(table, filter_column, alternative, threshold)
 
 
-# TODO Refactor and check this
-def clean_table(table, stat_col="stat"):
-    return pe.TableElaboration.clean_table(table, stat_col)
-
-
-# TODO Refactor and check this
 def generate_group_gmt(input_table: "table to get the geneset from",
                        output_gmt: "output gmt file",
                        name_col='Gene',

@@ -1,14 +1,13 @@
-from pygna.utilities import Utils
 from pygna.elaborators import TableElaboration as tE
 import pygna.reading_class as rc
 import logging
 import sys
 
-# TODO: fix the code below here when pygna.output is re-written
+
 import pygna.output as output
 
 
-class Converters(Utils):
+class Converters:
     """
     Class representing a Converter utility
     """
@@ -215,7 +214,6 @@ class CsvToGmt(Converters):
         logging.info("geneset=" + str(geneset))
         gmt_dict[self.setname]["genes"] = geneset
 
-        # TODO Maybe it's better to automatically add an extension
         if self.output_gmt.endswith(".gmt"):
             super()._gmt_output(gmt_dict, self.output_gmt)
         else:
@@ -226,15 +224,13 @@ class CsvToGmt(Converters):
         This method save the pd.dataframe on a CSV file
         :return: null
         """
-        # TODO Maybe it's better to automatically add an extension
+
         if self.output_csv.endswith(".csv"):
             self.table.to_csv(self.output_csv, sep=",", index=False)
         else:
             logging.error("specify csv output")
 
 
-# TODO GmtToGmtEnriched and CSVtoGMTEnriched classes could be merged into only one. Need re-writing the whole code and
-#  refactor accordingly
 class GmtToGmtEnriched(Converters):
     """
     This Class converts a GMT file, adding information about the Entrez ID or the symbol

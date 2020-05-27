@@ -4,18 +4,12 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pygna.output as out
-import pygna.parser as ps
 import pygna.plots as pp
 import seaborn as sns
+import pygna.reading_class as rc
 from palettable.colorbrewer.diverging import *
 from palettable.colorbrewer.sequential import *
 
-
-# TODO Refactor and check this
-def volcano_plot(df, output_file, p_col, id_col, plotting_col, threshold_x, threshold_y, y_label, x_label, annot, loc):
-    pp.VolcanoPlot(df=df, output_file=output_file, p_col=p_col, id_col=id_col, plotting_col=plotting_col,
-                   x_threshold=threshold_x, y_threshold=threshold_y, y_label=y_label, x_label=x_label, annotate=annot,
-                   loc=loc)
 
 
 #######################################################
@@ -97,15 +91,15 @@ def paint_datasets_stats(table_filename: 'pygna results table',
             data["type"] == "observed"
         ].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
             if r["pvalue"] == 0:
-                pval = "<%1.1E" % (1.0 / n_permutations)
+                pval = stars("<%1.1E" % (1.0 / n_permutations))
             else:
-                pval = "=%.4f" % r["pvalue"]
+                pval = stars("=%.4f" % r["pvalue"])
             g.facet_axis(0, 0).annotate(
                 "pval:" + pval,
                 xy=(r["value"], k),
                 xytext=(r["value"], k),
                 color=col[r["pvalue"] < (0.1 * 2 / len(data))],
-                fontsize=6,
+                fontsize=12,
             )
             k += 1
 
@@ -178,7 +172,7 @@ def paint_datasets_stats(table_filename: 'pygna results table',
                 xy=(r["value"], k),
                 xytext=(r["value"] + 0.05, k - 0.10),
                 color=col[r["pvalue"] < (0.1 * 2 / len(data))],
-                fontsize=6,
+                fontsize=12,
             )
             k += 1
 
@@ -284,8 +278,9 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
             linecolor="white",
         )
 
-    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=6)
-    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=6)
+    # Set the font size
+    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=10)
+    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=10)
     axes.set_xlabel("")
     axes.set_ylabel("")
 
@@ -313,7 +308,6 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     From the results table, a multiple testing correction is applied
     and the results are those plotted.
     The defined threshold are for x: zscore and y: -log10(pvalue)
-
     '''
 
     out.apply_multiple_testing_correction(
@@ -343,8 +337,8 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     # transform in -log10(pvalue)
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
-    volcano_plot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
-                 threshold_y=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annot=annotate, loc=loc)
+    pp.VolcanoPlot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", x_threshold=threshold_x,
+                   y_threshold=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annotate=annotate, loc=loc)
 
 
 #######################################################
@@ -399,8 +393,8 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     # transform in -log10(pvalue)
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
-    volcano_plot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", threshold_x=threshold_x,
-                 threshold_y=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annot=annotate, loc=loc)
+    pp.VolcanoPlot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", x_threshold=threshold_x,
+                y_threshold=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annotate=annotate, loc=loc)
 
 
 #######################################################
@@ -422,7 +416,7 @@ def plot_adjacency(
     Please raise an issue if you want it to be improved.
     """
 
-    graph = ps.__load_network(network)
+    graph = rc.ReadTsv(network).get_data()
     if len(graph.nodes) > 1000:
         logging.warning("Graph is larger than 1k nodes, plotting might take too long")
 
@@ -430,7 +424,7 @@ def plot_adjacency(
     s = 0
     nodelabels = []
     if clusters_file:
-        geneset = ps.__load_geneset(clusters_file)
+        geneset = rc.ReadGmt(clusters_file).get_data()
         nodelist = [k for i, v in geneset.items() for k in v]
         for i, v in geneset.items():
             s += 1
@@ -444,6 +438,8 @@ def plot_adjacency(
         matrix = matrix[0: int(size), 0: int(size)]
         nodelabels = nodelabels[:, 0: int(size)]
 
+    # Set font size
+    sns.set(font_scale=2)
     if clusters_file:
         f, axes = plt.subplots(
             2,
@@ -537,15 +533,13 @@ def plot_adjacency(
 
 
 def stars(pvalue) -> str:
-    s = ""
     if pvalue > 0.05:
-        s = "ns"
+        return "ns"
     elif 0.01 < pvalue <= 0.05:
-        s = "*"
+        return "*"
     elif 0.001 < pvalue <= 0.01:
-        s = "**"
+        return "**"
     elif 0.0001 < pvalue <= 0.001:
-        s = "***"
+        return "***"
     else:
-        s = "****"
-    return s
+        return "****"

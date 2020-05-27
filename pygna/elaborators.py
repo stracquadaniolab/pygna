@@ -1,8 +1,7 @@
-from pygna.utilities import Utils
 import logging
 
 
-class TableElaboration(Utils):
+class TableElaboration:
     """
     This class contains methods to use to elaborate a table (a pd.dataframe)
     """

@@ -25,7 +25,6 @@ class PygnaFigure(ABC):
         This method saves the figure using the matplotlib framework
         :return: null
         """
-        # TODO check the extension and save accordingly with the "format=" parameter
         plt.savefig(self.filename)
 
     def _get_dimensions(self, fig_type, size):

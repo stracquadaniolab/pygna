@@ -35,7 +35,6 @@ class Output:
         if not self.output_table_results.endswith('.csv'):
             logging.warning('The output table is saved as csv file, the name does not match the file extension')
 
-
     def set_diffusion_matrix(self, diffusion_matrix_file):
         self.diffusion_matrix_file = diffusion_matrix_file
 
@@ -55,7 +54,6 @@ class Output:
         shutil.copy(self.table_file_name, self.output_table_results)
         os.remove(self.table_file_name)
 
-
     def update_st_table_empirical(
         self,
         setname,
@@ -74,18 +72,18 @@ class Output:
                     [
                         str(x)
                         for x in [
-                            self.analysis,
-                            setname,
-                            n_mapped,
-                            n_geneset,
-                            number_of_permutations,
-                            observed,
-                            empirical_pvalue,
-                            mean_null,
-                            var_null,
-                            self.network_filename,
-                            self.geneset_filename,
-                        ]
+                        self.analysis,
+                        setname,
+                        n_mapped,
+                        n_geneset,
+                        number_of_permutations,
+                        observed,
+                        empirical_pvalue,
+                        mean_null,
+                        var_null,
+                        self.network_filename,
+                        self.geneset_filename,
+                    ]
                     ]
                 )
                 + "\n"
@@ -125,21 +123,21 @@ class Output:
                     [
                         str(x)
                         for x in [
-                            self.analysis,
-                            setname_A,
-                            setname_B,
-                            n_geneset_A,
-                            n_mapped_A,
-                            n_geneset_B,
-                            n_mapped_B,
-                            n_overlaps,
-                            number_of_permutations,
-                            observed,
-                            empirical_pvalue,
-                            mean_null,
-                            var_null,
-                            self.network_filename,
-                        ]
+                        self.analysis,
+                        setname_A,
+                        setname_B,
+                        n_geneset_A,
+                        n_mapped_A,
+                        n_geneset_B,
+                        n_mapped_B,
+                        n_overlaps,
+                        number_of_permutations,
+                        observed,
+                        empirical_pvalue,
+                        mean_null,
+                        var_null,
+                        self.network_filename,
+                    ]
                     ]
                 )
                 + "\n"
@@ -163,7 +161,6 @@ class Output:
 
 
 def print_GMT(GMT_dictionary, output_file):
-
     with open(output_file, "w") as f:
         f.write("")
 
@@ -173,11 +170,9 @@ def print_GMT(GMT_dictionary, output_file):
             f.write(str(key) + "\t" + str(dict_set["descriptor"]) + "\t" + genes_dict + "\n")
 
 
-
 def apply_multiple_testing_correction(
     table_file, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
-        ):
-
+):
     with open(table_file, "r+") as f:
         table = pd.read_csv(f)
 
@@ -195,7 +190,6 @@ def apply_multiple_testing_correction(
 
 
 def write_graph_summary(graph, output_file, net_name=None):
-
     """
     This function takes a graph as input and writes the network
     properties in a text file
@@ -228,7 +222,6 @@ def write_graph_summary(graph, output_file, net_name=None):
         file1.write("\n\t- disconnected nodes = " + str(np.sum(degree == 0)))
         file1.write("\n\t- average clustering" + str(nx.average_clustering(graph)))
 
-
     largest_cc = nx.Graph(graph.subgraph(max(nx.connected_components(graph), key=len)))
 
     D = dict(nx.degree(largest_cc))
@@ -257,4 +250,3 @@ def write_graph_summary(graph, output_file, net_name=None):
         file1.write("\n\t- degree mode = " + str(scipy.stats.mode(degree)))
         file1.write("\n\t- disconnected nodes = " + str(np.sum(degree == 0)))
         file1.write("\n\t- average clustering" + str(nx.average_clustering(largest_cc)))
-

@@ -1,13 +1,6 @@
 import logging
-import random
-import networkx as nx
 import numpy as np
-import scipy
-import sys
-import matplotlib.pyplot as plt
-import pygna.diagnostic as diag
 import multiprocessing
-import time
 
 
 def map_table2matrix(node_list, x):
@@ -159,7 +152,7 @@ def weights_diffusion_statistic(
 
     """
     Not in use.
-    This statistic reweights the original weights and 
+    This statistic reweights the original weights and
     returns the average reweighted statistic.
     """
 
@@ -194,5 +187,5 @@ def hotnet_diffusion_statistic(
         logging.warning("error in matrix multiplication")
 
     prob = [product[i,j] for i in geneset_index for j in geneset_index if i != j]
-    stat = np.sum(prob)  
+    stat = np.sum(prob)
     return stat
