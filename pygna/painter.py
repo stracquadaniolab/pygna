@@ -6,10 +6,10 @@ import matplotlib.pyplot as plt
 import pygna.output as out
 import pygna.plots as pp
 import seaborn as sns
+import math
 import pygna.reading_class as rc
 from palettable.colorbrewer.diverging import *
 from palettable.colorbrewer.sequential import *
-
 
 
 #######################################################
@@ -90,10 +90,7 @@ def paint_datasets_stats(table_filename: 'pygna results table',
         for i, r in data[
             data["type"] == "observed"
         ].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
-            if r["pvalue"] == 0:
-                pval = stars("<%1.1E" % (1.0 / n_permutations))
-            else:
-                pval = stars("=%.4f" % r["pvalue"])
+            pval = stars(r["pvalue"])
             g.facet_axis(0, 0).annotate(
                 "pval:" + pval,
                 xy=(r["value"], k),
@@ -163,10 +160,7 @@ def paint_datasets_stats(table_filename: 'pygna results table',
         for i, r in data[
             data["type"] == "observed"
         ].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
-            if r["pvalue"] == 0:
-                pval = "<%1.1E" % (1.0 / n_permutations)
-            else:
-                pval = "=%.4f" % r["pvalue"]
+            pval = stars(r["pvalue"])
             g.facet_axis(0, 0).annotate(
                 "pval:" + pval,
                 xy=(r["value"], k),
@@ -241,6 +235,8 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         )
         annot = annot.fillna(0)
         annot = (annot.T.values + annot.values) - annot.T.values * np.eye(len(annot))
+        func = np.vectorize(stars)
+        annot = func(annot)
     else:
         annot = False
 
@@ -394,7 +390,7 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     df['-log10(p)'] = -np.log10(df['bh_pvalue'].values)
 
     pp.VolcanoPlot(df, output_file, p_col='-log10(p)', id_col=id_col, plotting_col="zscore", x_threshold=threshold_x,
-                y_threshold=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annotate=annotate, loc=loc)
+                   y_threshold=threshold_y, y_label='-log10(pvalue)', x_label='z-score', annotate=annotate, loc=loc)
 
 
 #######################################################
@@ -533,13 +529,15 @@ def plot_adjacency(
 
 
 def stars(pvalue) -> str:
-    if pvalue > 0.05:
-        return "ns"
-    elif 0.01 < pvalue <= 0.05:
-        return "*"
-    elif 0.001 < pvalue <= 0.01:
-        return "**"
-    elif 0.0001 < pvalue <= 0.001:
-        return "***"
-    else:
-        return "****"
+    if not math.isnan(pvalue):
+        if pvalue > 0.05:
+            return "ns"
+        elif 0.01 < pvalue <= 0.05:
+            return "*"
+        elif 0.001 < pvalue <= 0.01:
+            return "**"
+        elif 0.0001 < pvalue <= 0.001:
+            return "***"
+        else:
+            return "****"
+    return "0"
