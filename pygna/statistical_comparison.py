@@ -7,7 +7,17 @@ import pygna.statistical_test as st
 
 
 class StatisticalComparison:
+    """
+    This class implements the statistical analysis comparison between two genesets.
+    It is possible to define a custom method and pass it to the constructor in order to obtain the most suitable results.
+    """
     def __init__(self, comparison_statistic, network, n_proc=1, diz={}):
+        """
+        :param comparison_statistic: the method do be applied to perform the statistical analysis
+        :param network: the network to be used during the analysis
+        :param n_proc: the number of CPU used to perform the elaboration
+        :param diz: the dictionary used for the genesets
+        """
         self.__comparison_statistic = comparison_statistic
         self.__network = network
         self.__diz = diz

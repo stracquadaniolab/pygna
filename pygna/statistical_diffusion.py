@@ -8,23 +8,30 @@ def map_table2matrix(node_list, x):
 
 
 class DiffusionTest:
-    def __init__(
-        self,
-        test_statistic,
-        nodes,
-        diffusion_matrix,
-        weights_table,
-        names_col="name",
-        weights_col="stat",
-        diz={},
-    ):
+    """
+    This class elaborates the diffusion statistics.
+    It is possible to define custom functions and pass them in the constructor in order to obtain the most suitable
+    results.
+
+    Each test_statistic function must return a float value of the statistic performed in order to be used by the
+    Diffusion test
+    """
+    def __init__(self, test_statistic, nodes, diffusion_matrix, weights_table, names_col="name", weights_col="stat",
+                 diz={},):
+        """
+        :param test_statistic: the function to be applied to calculate the statistics
+        :param nodes: the network nodes
+        :param diffusion_matrix: the diffusion matrix to apply the test statistic
+        :param weights_table: the table with the genes
+        :param names_col: the column name to read the elements
+        :param weights_col: the column name to read the weights
+        :param diz: the dictionary used in the observation
+        """
 
         self.test_statistic = test_statistic
         self.nodes = nodes
         self.diffusion_matrix = diffusion_matrix
-
         self.diz = diz
-
         # print(type(self.__network))
         self.universe = set(self.nodes)
 

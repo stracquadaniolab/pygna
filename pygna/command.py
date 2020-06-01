@@ -368,10 +368,6 @@ def test_topology_sp(
 ################################################################################
 ######### Diffusion test #######################################################
 ################################################################################
-# TODO removed the following:
-#  weight: "RW" = "RW",
-#  show_matrix: "plotting flag, if true the diffusion matrix for each geneset is saved " = False,
-#  results_figure: "figure where the result figure can be saved (use pdf or png)" = None,
 def test_diffusion_hotnet(network_file: "network file, use a network with weights",
                           geneset_file: "csv geneset file",
                           rwr_matrix_filename: "hdf5 RWR matrix obtained with pygna ",

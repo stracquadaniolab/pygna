@@ -257,11 +257,11 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
             cbar=True,
             linewidths=0.1,
             linecolor="white",
+            fmt=""
         )
     else:
         g2 = sns.heatmap(
             matrix,
-            cmap=palette,
             ax=axes,
             square=True,
             xticklabels=1,
@@ -272,6 +272,8 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
             cbar=True,
             linewidths=0.1,
             linecolor="white",
+            fmt="",
+            annot_kws={"size": 15}
         )
 
     # Set the font size
@@ -535,9 +537,9 @@ def stars(pvalue) -> str:
         elif 0.01 < pvalue <= 0.05:
             return "*"
         elif 0.001 < pvalue <= 0.01:
-            return "**"
+            return "* *"
         elif 0.0001 < pvalue <= 0.001:
-            return "***"
+            return "* * *"
         else:
-            return "****"
+            return "* * * *"
     return "0"
