@@ -6,8 +6,16 @@ import multiprocessing
 
 
 class StatisticalTest:
+    """
+    This class implements the statistical analysis performed by Pygna. It is possible to define custom statistical
+     functions by passing the function name to the constructor.
+    """
     def __init__(self, test_statistic, network, diz={}):
-
+        """
+        :param test_statistic: the function to be used
+        :param network: the network to be used for the analysis
+        :param diz: the dictionary containing the genes
+        """
         self.__test_statistic = test_statistic
         self.__network = network
         self.__diz = diz
@@ -96,7 +104,9 @@ class StatisticalTest:
 
 
 def geneset_localisation_statistic_median(network, geneset, diz={}, observed_flag=False):
-    """ median shortest path for each node """
+    """
+    median shortest path for each node
+    """
     cum_sum = 0.0
     geneset_index = [diz["nodes"].index(i) for i in geneset]
 
@@ -161,7 +171,8 @@ def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=Fa
 
 
 def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
-    """ Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
+    """
+    Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
     """
 
     try:

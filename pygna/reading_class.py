@@ -8,8 +8,9 @@ import sys
 
 
 class ReadingData(object):
-    """Abstract class used to read different types of file. Each subclass must implement the 'readfile'
-    and get_data method"""
+    """Abstract class used to read different types of file. Each subclass must implement the `readfile`
+    and `get_data` method
+    """
     def __init__(self):
         super(ReadingData, self).__init__()
 
