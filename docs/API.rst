@@ -30,7 +30,7 @@ Networks are read in tsv format ( node_A \tab node_B ) through the function belo
 Statistical Test
 ++++++++++++++++
 
- .. autoclass:: statistical_test.StatisticalTest
+ .. autoclass:: pygna.statistical_test.StatisticalTest
     :members:
 
 It is possible to use custom statistical function to be used into the StatisticalTest class.
@@ -71,7 +71,7 @@ Currently are implemented the following diffusion methods:
 Statistical Diffusion
 ++++++++++++++++++++++
 
-.. autoclass:: statistical_diffusion.DiffusionTest
+.. autoclass:: pygna.statistical_diffusion.DiffusionTest
     :members:
 
 It is possible to use custom statistical diffusion functions to be used into the StatisticalDiffusion class.
@@ -110,7 +110,7 @@ Currently are implemented the following diffusion methods:
 Statistical Comparison
 ++++++++++++++++++++++
 
-.. autoclass:: statistical_comparison.StatisticalComparison
+.. autoclass:: pygna.statistical_comparison.StatisticalComparison
     :members:
 
 It is possible to use custom statistical comparison functions to be used into the StatisticalComparison class.
