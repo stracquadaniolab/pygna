@@ -65,13 +65,9 @@ class StatisticalComparison:
         )
         pvalue = 1
         if alternative == "greater":
-            pvalue = np.sum(null_distribution >= observed) / float(
-                len(null_distribution)
-            )
+            pvalue = np.sum(null_distribution >= observed) + 1 / float(len(null_distribution) + 1)
         else:
-            pvalue = np.sum(null_distribution <= observed) / float(
-                len(null_distribution)
-            )
+            pvalue = np.sum(null_distribution <= observed) + 1 / float(len(null_distribution) + 1)
 
         return (
             observed,

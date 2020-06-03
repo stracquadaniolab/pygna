@@ -47,9 +47,9 @@ class StatisticalTest:
             # computing empirical pvalue
             pvalue = 1
             if alternative == "greater":
-                pvalue = np.sum(null_distribution >= observed) / float(max_iter)
+                pvalue = np.sum(null_distribution >= observed) + 1 / float(max_iter) + 1
             else:
-                pvalue = np.sum(null_distribution <= observed) / float(max_iter)
+                pvalue = np.sum(null_distribution <= observed) +1 / float(max_iter) + 1
 
             return (
                 observed,

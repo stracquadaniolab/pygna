@@ -39,7 +39,9 @@ Functions can be written anywhere but the return value of each function must be 
 For example, it is possible to define a function, such as:
 
 ```def my_custom_function_test([...]) ->float:
+
 [...]
+
 return  value
 ```
 In Pygna, it is possible to call the class constructor, passing the function as parameter:
@@ -67,7 +69,9 @@ For example, a function is defined as follows:
 
 ```
 def my_custom_function_diffusion([...]) ->float:
+
 [...]
+
 return value
 ```
 
@@ -93,7 +97,9 @@ For example, a function is defined as follows:
 
 ```
 def my_custom_function_comparison([...]) ->float:
+
 [...]
+
 return value
 ```
 
