@@ -38,7 +38,7 @@ Statistical Test
 ++++++++++++++++
 
 
- .. autoclass:: statistical_test.StatisticalTest
+ .. autoclass:: pygna.statistical_test.StatisticalTest
     :members:
 
 
@@ -89,7 +89,7 @@ Statistical Diffusion
 ++++++++++++++++++++++
 
 
-.. autoclass:: statistical_diffusion.DiffusionTest
+.. autoclass:: pygna.statistical_diffusion.DiffusionTest
     :members:
 
 
@@ -136,7 +136,7 @@ Statistical Comparison
 ++++++++++++++++++++++
 
 
-.. autoclass:: statistical_comparison.StatisticalComparison
+.. autoclass:: pygna.statistical_comparison.StatisticalComparison
     :members:
 
 
