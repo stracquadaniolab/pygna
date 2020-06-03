@@ -13,10 +13,10 @@ class StatisticalComparison:
     """
     def __init__(self, comparison_statistic, network, n_proc=1, diz={}):
         """
-        'comparison_statistic' the method do be applied to perform the statistical analysis
-        'network' the network to be used during the analysis
-        'n_proc=1' the number of CPU used to perform the elaboration
-        'diz={}' the dictionary used for the genesets
+        :param comparison_statistic: the method do be applied to perform the statistical analysis
+        :param network: the network to be used during the analysis
+        :param n_proc: the number of CPU used to perform the elaboration
+        :param diz: the dictionary used for the genesets
         """
         self.__comparison_statistic = comparison_statistic
         self.__network = network
@@ -35,12 +35,12 @@ class StatisticalComparison:
     def comparison_empirical_pvalue(self, genesetA, genesetB, alternative="less", max_iter=100, keep=False):
         """
         This method applies the comparison_statistic to two genesets
-        'genesetA' the first geneset to compare
-        'genesetB' the second geneset to compare
-        'alternative="less"' the pvalue selection of the observed genes
-        'max_iter=100' the maximum number of iterations
-        'keep=False' if the geneset B should not be kept
-        return the list with the data calculated
+        :param genesetA: the first geneset to compare
+        :param genesetB: the second geneset to compare
+        :param alternative: the pvalue selection of the observed genes
+        :param max_iter: the maximum number of iterations
+        :param keep: if the geneset B should not be kept
+        :return: the list with the data calculated
         """
 
         # mapping genesets
@@ -80,11 +80,11 @@ class StatisticalComparison:
 
     def get_comparison_null_distribution_mp(self, genesetA, genesetB, max_iter=100, keep=False):
         """
-        'genesetA' the first geneset to compare
-        'genesetB' the second geneset to compare
-        'max_iter=100 maximum number of iteration to perform
-        'keep=False if the geneset B should not be kept
-        return the array with null distribution
+        :param genesetA: the first geneset to compare
+        :param genesetB: the second geneset to compare
+        :param max_iter: maximum number of iteration to perform
+        :param keep: if the geneset B should not be kept
+        :return: the array with null distribution
         """
 
         n_trial = int(max_iter / self.__n_proc)
@@ -120,11 +120,11 @@ class StatisticalComparison:
 
     def get_comparison_null_distribution(self, genesetA, genesetB, n_samples, keep):
         """
-        'genesetA' the first geneset to compare
-        'genesetB' the second geneset to compare
-        'n_samples' the number of samples to be taken
-        'keep' if the geneset B should not be kept
-        return the random distribution calculated
+        :param genesetA: the first geneset to compare
+        :param genesetB: the second geneset to compare
+        :param n_samples: the number of samples to be taken
+        :param keep: if the geneset B should not be kept
+        :return: the random distribution calculated
         """
         np.random.seed()
         random_dist = []
