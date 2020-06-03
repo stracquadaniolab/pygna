@@ -14,10 +14,10 @@ class StatisticalTest:
     """
     def __init__(self, test_statistic, network, diz={}):
         """
-        :param test_statistic: the statistical function to be used for the calculation of the empirical p-value and the
+        'test_statistic' the statistical function to be used for the calculation of the empirical p-value and the
         null distribution
-        :param network: the network to be used for the analysis
-        :param diz: the dictionary containing the genes
+        'network' the network to be used for the analysis
+        'diz' the dictionary containing the genes
         """
         self.__test_statistic = test_statistic
         self.__network = network
@@ -34,11 +34,12 @@ class StatisticalTest:
     def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
         """
         Calculate the empirical pvalue of a given geneset
-        :param geneset: the geneset to elaborate
-        :param alternative: the pvalue selection of the observed genes
-        :param max_iter: the number of iterations to be performed
-        :param cores: the number of cores to be used
-        :return: the list with the data calculated
+        'geneset' the geneset to elaborate
+        'alternative="less"' the pvalue selection of the observed genes
+        'max_iter=100' the number of iterations to be performed
+        'cores=1' the number of cores to be used
+
+        return the list with the data calculated
         """
         # mapping geneset
         mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
@@ -73,10 +74,10 @@ class StatisticalTest:
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
         """
         Calculate the null distribution using a multicore architecture
-        :param geneset: the geneset to be used
-        :param iter: the number of iterations to perform
-        :param n_proc: the number of cpu to use for the elaboration
-        :return: the array with null distribution
+        'geneset' the geneset to be used
+        'iter=100' the number of iterations to perform
+        'n_proc=1' the number of cpu to use for the elaboration
+        return the array with null distribution
         """
         if n_proc == 1:
             null_distribution = StatisticalTest.get_null_distribution(
@@ -103,9 +104,9 @@ class StatisticalTest:
     def get_null_distribution(self, geneset, n_samples):
         """
         Calculate the null distribution
-        :param geneset: the geneset to be used
-        :param n_samples: the number of samples to be taken
-        :return: the random distribution calculated
+        'geneset' the geneset to be used
+        'n_samples' the number of samples to be taken
+        return the random distribution calculated
         """
         np.random.seed()
         random_dist = []
