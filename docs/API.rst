@@ -30,22 +30,32 @@ Networks are read in tsv format ( node_A \tab node_B ) through the function belo
 Statistical Test
 ++++++++++++++++
 
-It is possible to implement custom functions that Pygna uses for the calculation of statistics.
+ .. autoclass:: statistical_test.StatisticalTest class.
 
-.. autofunction:: statistical_test.StatisticalTest
-
-Functions can be written anywhere but the return value of each function must be a `float`.
+It is possible to use custom statistical function to be used into the StatisticalTest class.
+Statistical functions can be written anywhere but the return value of each function must be a
+.. code-block:: python
+    float
 
 For example, it is possible to define a function, such as:
 
-```def my_custom_function_test([...]) ->float:
+.. code-block:: python
+    def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
+        try:
+            diz["matrix"]
+        except KeyError:
+            print("The dictionary doesnt have a matrix key")
+            raise
 
-[...]
+        geneset_index = [diz["nodes"].index(i) for i in geneset]
+        prob = [diz["matrix"][i, j] for i in geneset_index for j in geneset_index if i != j]
+        prob = np.sum(prob)
+        return prob
 
-return  value
-```
 In Pygna, it is possible to call the class constructor, passing the function as parameter:
-`st_test = StatisticalTest(my_custom_function_test, **kwargs)`
+
+.. code-block:: python
+    st_test = StatisticalTest(st.geneset_RW_statistic, network, rw_dict)
 
 Currently are implemented the following diffusion methods:
 
@@ -56,27 +66,35 @@ Currently are implemented the following diffusion methods:
 * geneset_internal_degree_statistic
 * geneset_RW_statistic
 
-Stastistical Diffusion
+Statistical Diffusion
 ++++++++++++++++++++++
 
-As in the Statistical Test, also for the statistical diffusion class it is possible to define custom functions and use them in Pygna
+.. autoclass:: statistical_diffusion.DiffusionTest
 
-.. autofunction:: statistical_diffusion.DiffusionTest
-
-Functions can be written anywhere but the return value of each function must be a `float`.
+It is possible to use custom statistical diffusion functions to be used into the StatisticalDiffusion class.
+Statistical functions can be written anywhere but the return value of each function must be a
+.. code-block:: python
+    float
 
 For example, a function is defined as follows:
 
-```
-def my_custom_function_diffusion([...]) ->float:
+.. code-block:: python
+    def hotnet_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed_flag=False):
+        weights = np.diagflat(weights.T)
+        if matrix.shape[1] != weights.shape[0]:
+            logging.warning("pass the right shape for the weights")
+        try:
+            product = np.matmul(matrix, weights)
+        except:
+            logging.warning("error in matrix multiplication")
 
-[...]
+        prob = [product[i, j] for i in geneset_index for j in geneset_index if i != j]
+        stat = np.sum(prob)
+        return stat
 
-return value
-```
-
-In Pygna, it is possible to call the class constructor, passing the function as parameter:
-`t_test = DiffusionTest(my_custom_function_diffusion, **kwargs)`
+It is possible to call the class constructor as:
+.. code-block:: python
+    t_test = DiffusionTest(sd.hotnet_diffusion_statistic, rw_dict["nodes"], rw_dict["matrix"], table, names_col=name_column, weights_col=weight_column)
 
 Currently are implemented the following diffusion methods:
 
@@ -87,24 +105,36 @@ Currently are implemented the following diffusion methods:
 Statistical Comparison
 ++++++++++++++++++++++
 
-The Statistical Comparison is another class where it is possible to use custom functions during the elaboration of Pygna.
+.. autoclass:: statistical_comparison.StatisticalComparison
 
-.. autofunction:: statistical_comparison.StatisticalComparison
-
-Functions can be written anywhere but the return value of each function must be a `float`.
+It is possible to use custom statistical comparison functions to be used into the StatisticalComparison class.
+Functions can be written anywhere but the return value of each function must be a
+.. code-block:: python
+    float
 
 For example, a function is defined as follows:
 
-```
-def my_custom_function_comparison([...]) ->float:
+.. code-block:: python
+    def comparison_shortest_path(network, genesetA, genesetB, diz):
+        n = np.array([diz["nodes"].index(i) for i in genesetA])
+        m = np.array([diz["nodes"].index(i) for i in genesetB])
+        if len(n) == 0 or len(m) == 0:
+            logging.info("Geneset length is equal to 0")
+            sys.exit()
+        cum_sum = calculate_sum(n, m, diz)
+        cum_sum += calculate_sum(m, n, diz)
 
-[...]
+        d_AB = cum_sum / float(len(genesetA) + len(genesetB))
 
-return value
-```
+        d_A = st.geneset_localisation_statistic(network, genesetA, diz)
+        d_B = st.geneset_localisation_statistic(network, genesetB, diz)
+        return d_AB - (d_A + d_B) / 2
 
-In Pygna, it is possible to call the class constructor, passing the function as parameter:
-`comp_test = StatisticalComparison(my_custom_function_comparison, **kwargs)`
+
+It is possible to call the class constructor as:
+
+.. code-block:: python
+    comp_test = StatisticalComparison(sc.comparison_shortest_path, network, diz=sp_diz, n_proc=cores)
 
 Currently are implemented the following comparison methods:
 

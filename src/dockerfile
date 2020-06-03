@@ -1,0 +1,15 @@
+FROM python:3.8-slim
+
+# author of file
+LABEL maintainer="Fabio Cassano <fabio.cassano@ed.ac.uk>"
+
+# Packages that we need
+COPY requirements.txt /app/
+WORKDIR /app
+
+# instruction to be run during image build
+RUN pip install -r requirements.txt
+
+COPY . /app
+
+ENTRYPOINT ["python"]

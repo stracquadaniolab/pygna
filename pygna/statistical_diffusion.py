@@ -10,14 +10,12 @@ def map_table2matrix(node_list, x):
 class DiffusionTest:
     """
     This class elaborates the diffusion statistics.
-    It is possible to define custom functions and pass them in the constructor in order to obtain the most suitable
-    results.
-
-    Each test_statistic function must return a float value of the statistic performed in order to be used by the
-    Diffusion test
+    It elaborates the diffusion tests over the given network.
+    Please refer to the single method documentation for the returning values
     """
+
     def __init__(self, test_statistic, nodes, diffusion_matrix, weights_table, names_col="name", weights_col="stat",
-                 diz={},):
+                 diz={}, ):
         """
         :param test_statistic: the function to be applied to calculate the statistics
         :param nodes: the network nodes
@@ -58,6 +56,14 @@ class DiffusionTest:
             ].values.tolist()[k]
 
     def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
+        """
+        Calculate the empirical pvalue of a given geneset
+        :param geneset: the geneset to elaborate
+        :param alternative: the pvalue selection of the observed genes
+        :param max_iter: the number of iterations to be performed
+        :param cores: the number of cores to be used
+        :return: the list with the data calculated
+        """
         # mapping geneset
 
         geneset = geneset
@@ -87,9 +93,9 @@ class DiffusionTest:
             # computing empirical pvalue
             pvalue = 1
             if alternative == "greater":
-                pvalue = np.sum(null_distribution >= observed) + 1 / float(max_iter) + 1
+                pvalue = (np.sum(null_distribution >= observed) + 1) / (float(max_iter) + 1)
             else:
-                pvalue = np.sum(null_distribution <= observed) + 1 / float(max_iter) + 1
+                pvalue = (np.sum(null_distribution <= observed) + 1) / (float(max_iter) + 1)
 
             return (
                 observed,
@@ -100,7 +106,13 @@ class DiffusionTest:
             )
 
     def get_null_distribution_mp(self, geneset_index, iter=100, n_proc=1):
-
+        """
+        Calculate the null distribution using a multicore architecture
+        :param geneset_index: the geneset id that point to the geneset to be used
+        :param iter: the number of iterations to perform
+        :param n_proc: the number of cpu to use for the elaboration
+        :return: the array with null distribution
+        """
         print("n_proc=" + str(n_proc))
 
         if n_proc == 1:
@@ -129,6 +141,12 @@ class DiffusionTest:
         return np.asarray(null_distribution)
 
     def get_null_distribution(self, geneset_index, n_samples, randomize="index"):
+        """
+        Calculate the null distribution
+        :param geneset_index: the geneset id that points to the geneset to be used
+        :param n_samples: the number of samples to be taken
+        :return: the random distribution calculated
+        """
         np.random.seed()
         random_dist = []
         for i in range(n_samples):
@@ -143,7 +161,7 @@ class DiffusionTest:
                 geneset_index,
                 self.diz,
                 observed_flag=True,
-                )
+            )
             )
         return random_dist
 
@@ -156,7 +174,6 @@ class DiffusionTest:
 def weights_diffusion_statistic(
     matrix, weights, geneset_index, diz={}, observed_flag=False
 ):
-
     """
     Not in use.
     This statistic reweights the original weights and
@@ -175,17 +192,13 @@ def weights_diffusion_statistic(
     return stat
 
 
-def hotnet_diffusion_statistic(
-    matrix, weights, geneset_index, diz={}, observed_flag=False
-    ):
-
+def hotnet_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed_flag=False):
     """
     HOTNET2 like diffusion.
     Applies the diagonal matrix of weights and gets all rows and
     columns according to the genelist
     """
-
-    weights =np.diagflat(weights.T)
+    weights = np.diagflat(weights.T)
     if matrix.shape[1] != weights.shape[0]:
         logging.warning("pass the right shape for the weights")
     try:
@@ -193,6 +206,6 @@ def hotnet_diffusion_statistic(
     except:
         logging.warning("error in matrix multiplication")
 
-    prob = [product[i,j] for i in geneset_index for j in geneset_index if i != j]
+    prob = [product[i, j] for i in geneset_index for j in geneset_index if i != j]
     stat = np.sum(prob)
     return stat

@@ -9,8 +9,7 @@ import pygna.statistical_test as st
 class StatisticalComparison:
     """
     This class implements the statistical analysis comparison between two genesets.
-    It is possible to define a custom method and pass it to the constructor in order to obtain the most suitable
-    results.
+    Please refer to the single method documentation for the returning values
     """
     def __init__(self, comparison_statistic, network, n_proc=1, diz={}):
         """
@@ -33,13 +32,15 @@ class StatisticalComparison:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
 
-    def comparison_empirical_pvalue(
-        self, genesetA, genesetB, alternative="less", max_iter=100, keep=False
-    ):
-
+    def comparison_empirical_pvalue(self, genesetA, genesetB, alternative="less", max_iter=100, keep=False):
         """
-        This method applies the __comparison_statistic to two genesets and
-        returns a p-value
+        This method applies the comparison_statistic to two genesets
+        :param genesetA: the first geneset to compare
+        :param genesetB: the second geneset to compare
+        :param alternative: the pvalue selection of the observed genes
+        :param max_iter: the maximum number of iterations
+        :param keep: if the geneset B should not be kept
+        :return: the list with the data calculated
         """
 
         # mapping genesets
@@ -65,9 +66,9 @@ class StatisticalComparison:
         )
         pvalue = 1
         if alternative == "greater":
-            pvalue = np.sum(null_distribution >= observed) + 1 / float(len(null_distribution) + 1)
+            pvalue = (np.sum(null_distribution >= observed) + 1) / (float(len(null_distribution) + 1))
         else:
-            pvalue = np.sum(null_distribution <= observed) + 1 / float(len(null_distribution) + 1)
+            pvalue = (np.sum(null_distribution <= observed) + 1) / (float(len(null_distribution) + 1))
 
         return (
             observed,
@@ -77,9 +78,14 @@ class StatisticalComparison:
             len(mapped_genesetB),
         )
 
-    def get_comparison_null_distribution_mp(
-        self, genesetA, genesetB, max_iter=100, keep=False
-    ):
+    def get_comparison_null_distribution_mp(self, genesetA, genesetB, max_iter=100, keep=False):
+        """
+        :param genesetA: the first geneset to compare
+        :param genesetB: the second geneset to compare
+        :param max_iter: maximum number of iteration to perform
+        :param keep: if the geneset B should not be kept
+        :return: the array with null distribution
+        """
 
         n_trial = int(max_iter / self.__n_proc)
         logging.info(
@@ -113,38 +119,29 @@ class StatisticalComparison:
         return np.asarray(null_distribution)
 
     def get_comparison_null_distribution(self, genesetA, genesetB, n_samples, keep):
-
+        """
+        :param genesetA: the first geneset to compare
+        :param genesetB: the second geneset to compare
+        :param n_samples: the number of samples to be taken
+        :param keep: if the geneset B should not be kept
+        :return: the random distribution calculated
+        """
         np.random.seed()
         random_dist = []
 
         # association statistic, B kept, A bootstrapped
         if keep:
             for i in range(n_samples):
-                random_sample_A = np.random.choice(
-                    list(self.__universe), len(genesetA), replace=False
-                )
-                random_dist.append(
-                    self.__comparison_statistic(
-                        self.__network, set(random_sample_A), set(genesetB), self.__diz
-                    )
-                )
+                random_sample_A = np.random.choice(list(self.__universe), len(genesetA), replace=False)
+                random_dist.append(self.__comparison_statistic(self.__network, set(random_sample_A), set(genesetB),
+                                                               self.__diz))
         # association statistic, B kept, A bootstrapped
         else:
             for i in range(n_samples):
-                random_sample_A = np.random.choice(
-                    list(self.__universe), len(genesetA), replace=False
-                )
-                random_sample_B = np.random.choice(
-                    list(self.__universe), len(genesetB), replace=False
-                )
-                random_dist.append(
-                    self.__comparison_statistic(
-                        self.__network,
-                        set(random_sample_A),
-                        set(random_sample_B),
-                        self.__diz,
-                    )
-                )
+                random_sample_A = np.random.choice(list(self.__universe), len(genesetA), replace=False)
+                random_sample_B = np.random.choice(list(self.__universe), len(genesetB), replace=False)
+                random_dist.append(self.__comparison_statistic(self.__network,set(random_sample_A),set(random_sample_B),
+                                                               self.__diz,))
         return random_dist
 
 

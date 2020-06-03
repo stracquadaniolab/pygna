@@ -7,12 +7,15 @@ import multiprocessing
 
 class StatisticalTest:
     """
-    This class implements the statistical analysis performed by Pygna. It is possible to define custom statistical
-     functions by passing the function name to the constructor.
+    This class implements the statistical analysis performed by Pygna.
+    It performs the statistical tests on the given network, elaborates the number of observed genes, the pvalue etc.
+    Please refer to the single method documentation for the returning values
+
     """
     def __init__(self, test_statistic, network, diz={}):
         """
-        :param test_statistic: the function to be used
+        :param test_statistic: the statistical function to be used for the calculation of the empirical p-value and the
+        null distribution
         :param network: the network to be used for the analysis
         :param diz: the dictionary containing the genes
         """
@@ -29,6 +32,14 @@ class StatisticalTest:
             sys.exit(-1)
 
     def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
+        """
+        Calculate the empirical pvalue of a given geneset
+        :param geneset: the geneset to elaborate
+        :param alternative: the pvalue selection of the observed genes
+        :param max_iter: the number of iterations to be performed
+        :param cores: the number of cores to be used
+        :return: the list with the data calculated
+        """
         # mapping geneset
         mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
         if len(mapped_geneset) == 0:
@@ -47,9 +58,9 @@ class StatisticalTest:
             # computing empirical pvalue
             pvalue = 1
             if alternative == "greater":
-                pvalue = np.sum(null_distribution >= observed) + 1 / float(max_iter) + 1
+                pvalue = (np.sum(null_distribution >= observed) + 1) / (float(max_iter) + 1)
             else:
-                pvalue = np.sum(null_distribution <= observed) +1 / float(max_iter) + 1
+                pvalue = (np.sum(null_distribution <= observed) + 1) / (float(max_iter) + 1)
 
             return (
                 observed,
@@ -60,7 +71,13 @@ class StatisticalTest:
             )
 
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
-
+        """
+        Calculate the null distribution using a multicore architecture
+        :param geneset: the geneset to be used
+        :param iter: the number of iterations to perform
+        :param n_proc: the number of cpu to use for the elaboration
+        :return: the array with null distribution
+        """
         if n_proc == 1:
             null_distribution = StatisticalTest.get_null_distribution(
                 self, geneset, iter
@@ -84,7 +101,12 @@ class StatisticalTest:
         return np.asarray(null_distribution)
 
     def get_null_distribution(self, geneset, n_samples):
-
+        """
+        Calculate the null distribution
+        :param geneset: the geneset to be used
+        :param n_samples: the number of samples to be taken
+        :return: the random distribution calculated
+        """
         np.random.seed()
         random_dist = []
         for i in range(n_samples):
@@ -174,7 +196,6 @@ def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
     """
     Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
     """
-
     try:
         diz["matrix"]
     except KeyError:
