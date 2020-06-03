@@ -34,7 +34,6 @@ class StatisticalComparison:
 
     def comparison_empirical_pvalue(self, genesetA, genesetB, alternative="less", max_iter=100, keep=False):
         """
-        This method applies the comparison_statistic to two genesets
         :param genesetA: the first geneset to compare
         :param genesetB: the second geneset to compare
         :param alternative: the pvalue selection of the observed genes

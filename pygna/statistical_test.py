@@ -33,7 +33,6 @@ class StatisticalTest:
 
     def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
         """
-        Calculate the empirical pvalue of a given geneset
         :param geneset: the geneset to elaborate
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
@@ -72,7 +71,6 @@ class StatisticalTest:
 
     def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
         """
-        Calculate the null distribution using a multicore architecture
         :param geneset: the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
@@ -102,7 +100,6 @@ class StatisticalTest:
 
     def get_null_distribution(self, geneset, n_samples):
         """
-        Calculate the null distribution
         :param geneset: the geneset to be used
         :param n_samples: the number of samples to be taken
         :return: the random distribution calculated
