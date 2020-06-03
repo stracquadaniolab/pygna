@@ -30,10 +30,12 @@ Networks are read in tsv format ( node_A \tab node_B ) through the function belo
 Statistical Test
 ++++++++++++++++
 
- .. autoclass:: statistical_test.StatisticalTest class.
+ .. autoclass:: statistical_test.StatisticalTest
+    :members:
 
 It is possible to use custom statistical function to be used into the StatisticalTest class.
 Statistical functions can be written anywhere but the return value of each function must be a
+
 .. code-block:: python
     float
 
@@ -70,9 +72,11 @@ Statistical Diffusion
 ++++++++++++++++++++++
 
 .. autoclass:: statistical_diffusion.DiffusionTest
+    :members:
 
 It is possible to use custom statistical diffusion functions to be used into the StatisticalDiffusion class.
 Statistical functions can be written anywhere but the return value of each function must be a
+
 .. code-block:: python
     float
 
@@ -93,6 +97,7 @@ For example, a function is defined as follows:
         return stat
 
 It is possible to call the class constructor as:
+
 .. code-block:: python
     t_test = DiffusionTest(sd.hotnet_diffusion_statistic, rw_dict["nodes"], rw_dict["matrix"], table, names_col=name_column, weights_col=weight_column)
 
@@ -106,9 +111,11 @@ Statistical Comparison
 ++++++++++++++++++++++
 
 .. autoclass:: statistical_comparison.StatisticalComparison
+    :members:
 
 It is possible to use custom statistical comparison functions to be used into the StatisticalComparison class.
 Functions can be written anywhere but the return value of each function must be a
+
 .. code-block:: python
     float
 
