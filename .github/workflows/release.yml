@@ -23,15 +23,6 @@ jobs:
           update-conda: true
           python-version: ${{ matrix.python }}
           conda-channels: anaconda, conda-forge, bioconda
-      - name: "Build the Docker image"
-        uses: docker/build-push-action@v1
-        with:
-          dockerfile: ./docker/dockerfile
-          repository: ${{ github.repository }}/pygna
-          tags: latest
-          username: ${{ github.ref }}
-          password: ${{ secrets.GH_TOKEN }}
-          registry: docker.pkg.github.com
 
       - name: "Install Conda development packages"
         run: |
@@ -62,3 +53,13 @@ jobs:
       - name: "Publish package on PyPi"
         if: contains(github.refs, 'master')
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
+
+      - name: "Build the Docker image"
+        uses: docker/build-push-action@v1
+        with:
+          dockerfile: ./docker/dockerfile
+          repository: ${{ github.repository }}/pygna
+          tags: latest
+          username: ${{ github.ref }}
+          password: ${{ secrets.GH_TOKEN }}
+          registry: docker.pkg.github.com
