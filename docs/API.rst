@@ -47,6 +47,7 @@ Statistical functions can be written anywhere but the return value of each funct
 
 
 .. highlight:: python
+
     float
 
 
@@ -54,6 +55,7 @@ For example, it is possible to define a function, such as:
 
 
 .. highlight:: python
+
     def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
         try:
             diz["matrix"]
@@ -71,6 +73,7 @@ In Pygna, it is possible to call the class constructor, passing the function as 
 
 
 .. highlight:: python
+
     st_test = StatisticalTest(st.geneset_RW_statistic, network, rw_dict)
 
 
@@ -96,14 +99,16 @@ Statistical Diffusion
 It is possible to use custom statistical diffusion functions to be used into the StatisticalDiffusion class.
 Statistical functions can be written anywhere but the return value of each function must be a
 
-.. highlight:: python
+.. code-block:: python
+
     float
 
 
 For example, a function is defined as follows:
 
 
-.. highlight:: python
+.. code-block:: python
+
     def hotnet_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed_flag=False):
         weights = np.diagflat(weights.T)
         if matrix.shape[1] != weights.shape[0]:
@@ -121,7 +126,8 @@ For example, a function is defined as follows:
 It is possible to call the class constructor as:
 
 
-.. highlight:: python
+.. code-block:: python
+
     t_test = DiffusionTest(sd.hotnet_diffusion_statistic, rw_dict["nodes"], rw_dict["matrix"], table, names_col=name_column, weights_col=weight_column)
 
 
@@ -144,14 +150,16 @@ It is possible to use custom statistical comparison functions to be used into th
 Functions can be written anywhere but the return value of each function must be a
 
 
-.. highlight:: python
+.. code-block:: python
+
     float
 
 
 For example, a function is defined as follows:
 
 
-.. highlight:: python
+.. code-block:: python
+
     def comparison_shortest_path(network, genesetA, genesetB, diz):
         n = np.array([diz["nodes"].index(i) for i in genesetA])
         m = np.array([diz["nodes"].index(i) for i in genesetB])
@@ -171,7 +179,8 @@ For example, a function is defined as follows:
 It is possible to call the class constructor as:
 
 
-.. highlight:: python
+.. code-block:: python
+
     comp_test = StatisticalComparison(sc.comparison_shortest_path, network, diz=sp_diz, n_proc=cores)
 
 
