@@ -28,7 +28,7 @@ jobs:
           [ "$VERSION" == "master" ] && VERSION=latest
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
-          docker tag $IMAGE_NAME $IMAGE_ID:$VERSION
+          docker tag pygna $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
       - uses: actions/checkout@v1
