@@ -23,7 +23,12 @@ jobs:
           update-conda: true
           python-version: ${{ matrix.python }}
           conda-channels: anaconda, conda-forge, bioconda
-
+      - name: "Build the Docker image"
+        uses: docker/build-push-action@v1
+        with:
+          dockerfile: ./docker/dockerfile
+          repository: docker.pkg.github.com/stracquadaniolab/pygna/pygna
+          tags: latest
       - name: "Install Conda development packages"
         run: |
             conda install conda-build
@@ -53,11 +58,3 @@ jobs:
       - name: "Publish package on PyPi"
         if: contains(github.refs, 'master')
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
-
-      - name: "Build the Docker image"
-        uses: docker/build-push-action@v1
-        with:
-          dockerfile: /docker/dockerfile
-          repository: docker.pkg.github.com/stracquadaniolab/pygna/pygna
-          tags: latest
-
