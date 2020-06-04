@@ -43,9 +43,10 @@ jobs:
       - name: Publish package
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
+      - uses: actions/checkout@master
       - name: Build docker
-          uses: elgohr/Publish-Docker-Github-Action@master
-          with:
+            uses: elgohr/Publish-Docker-Github-Action@master
+            with:
               name: stracquadaniolab/pygna
               username: ${{ secrets.DOCKER_USERNAME }}
               password: ${{ secrets.DOCKER_PASSWORD }}
