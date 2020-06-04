@@ -57,6 +57,7 @@ jobs:
       - name: "Build the Docker image"
         uses: docker/build-push-action@v1
         with:
+          dockerfile: /docker/dockerfile
           repository: docker.pkg.github.com/stracquadaniolab/pygna/pygna
           tags: latest
 
