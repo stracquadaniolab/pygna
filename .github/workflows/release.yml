@@ -14,8 +14,8 @@ jobs:
         python: [3.7]
         numpy: [1.15]
     steps:
-    -   uses: actions/checkout@master
-    -   name: Build docker
+      - uses: actions/checkout@master
+      - name: Build docker
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
             name: stracquadaniolab/pygna
@@ -51,3 +51,13 @@ jobs:
         run: python setup.py sdist bdist_wheel
       - name: Publish package
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
+
+      - uses: actions/checkout@master
+      - name: Build docker
+        uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+          name: stracquadaniolab/pygna
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: "testing"
+          workdir: docker/pygna
