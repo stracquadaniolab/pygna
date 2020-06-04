@@ -43,11 +43,11 @@ jobs:
       - name: Publish package
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
-      - name: 'Build vanilla'
+      - name: Build docker
           uses: elgohr/Publish-Docker-Github-Action@master
           with:
-              name: stracquadaniolab/vanilla
+              name: stracquadaniolab/pygna
               username: ${{ secrets.DOCKER_USERNAME }}
               password: ${{ secrets.DOCKER_PASSWORD }}
               tags: "testing"
-              workdir: docker/vanilla
+              workdir: docker/pygna
