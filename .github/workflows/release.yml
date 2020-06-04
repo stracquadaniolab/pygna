@@ -36,7 +36,7 @@ jobs:
             conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
 
       - name: "Upload Conda package"
-        if: contains(github.refs, "master")
+        if: contains(github.refs, 'master')
         run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 
       - name: "Setup Python for PIP"
