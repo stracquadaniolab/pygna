@@ -23,35 +23,45 @@ jobs:
           update-conda: true
           python-version: ${{ matrix.python }}
           conda-channels: anaconda, conda-forge, bioconda
+
       - name: "Install Conda development packages"
         run: |
             conda install conda-build
             conda install -c anaconda anaconda-client
-      - name: "Build and upload package"
+
+      - name: "Build Conda package"
         run: |
             mkdir conda-build
             conda build . --no-build-id --numpy ${{ matrix.numpy }} --output-folder ./conda-build
             conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
-            anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 
-      - name: Setup Python
+      - name: "Upload Conda package"
+        if: ${{ github.ref }} == 'refs/heads/master'
+        run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
+
+      - name: "Setup Python for PIP"
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Install required packages
+
+      - name: "Install PIP required packages"
         run: pip install wheel twine
-      - name: Build package
+
+      - name: "Build PIP package"
         run: python setup.py sdist bdist_wheel
-      - name: Publish package
-        if: github.ref == 'refs/heads/master'
+
+      - name: "Publish package on PyPi"
+        if: ${{ github.ref }} == 'refs/heads/master'
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
       - uses: actions/checkout@v2
-      - name: Build the Docker image
+      - name: "Build the Docker image"
         run: docker build . --file docker/dockerfile --tag pygna:latest
-      - name: Log into registry
+
+      - name: "Log into registry"
         run: echo "${{ secrets.GH_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-      - name: Push image
+
+      - name: "Push image"
         run: |
           IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/$IMAGE_NAME
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
