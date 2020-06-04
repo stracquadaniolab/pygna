@@ -29,6 +29,9 @@ jobs:
           dockerfile: ./docker/dockerfile
           repository: docker.pkg.github.com/stracquadaniolab/pygna/pygna
           tags: latest
+          username: ${{ github.ref }}
+          password: ${{ secrets.GH_TOKEN }}
+
       - name: "Install Conda development packages"
         run: |
             conda install conda-build
