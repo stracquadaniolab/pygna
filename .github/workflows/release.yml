@@ -55,6 +55,7 @@ jobs:
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
       - name: "Build the Docker image"
+        uses: docker/build-push-action@v1
         with:
           repository: docker.pkg.github.com/stracquadaniolab/pygna/pygna
           tags: latest
