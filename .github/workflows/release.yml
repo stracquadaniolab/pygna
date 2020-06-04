@@ -14,13 +14,9 @@ jobs:
         python: [3.7]
         numpy: [1.15]
     steps:
-      - uses: actions/checkout@master
-      - name: Build docker
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-            name: stracquadaniolab/pygna
-            tags: "latest"
-            dockerfile: ../docker/pygna
+      - uses: actions/checkout@v2
+      - name: Build the Docker image
+          run: docker build . --file docker/dockerfile --tag pygna:latest
       - uses: actions/checkout@v1
       - name: "Setup Conda"
         uses: s-weigand/setup-conda@v1
