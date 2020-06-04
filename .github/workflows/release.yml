@@ -42,3 +42,12 @@ jobs:
         run: python setup.py sdist bdist_wheel
       - name: Publish package
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
+
+      - name: 'Build vanilla'
+          uses: elgohr/Publish-Docker-Github-Action@master
+          with:
+              name: stracquadaniolab/vanilla
+              username: ${{ secrets.DOCKER_USERNAME }}
+              password: ${{ secrets.DOCKER_PASSWORD }}
+              tags: "testing"
+              workdir: docker/vanilla
