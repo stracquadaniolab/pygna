@@ -17,6 +17,10 @@ jobs:
       - uses: actions/checkout@master
       - name: Build docker
         uses: elgohr/Publish-Docker-Github-Action@master
+        with:
+            name: stracquadaniolab/pygna
+            tags: "latest"
+            dockerfile: ../docker/pygna
       - uses: actions/checkout@v1
       - name: "Setup Conda"
         uses: s-weigand/setup-conda@v1
