@@ -29,8 +29,8 @@ jobs:
           dockerfile: ./docker/dockerfile
           repository: ${{ github.repository }}/pygna
           tags: latest
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ github.ref }}
+          password: ${{ secrets.GH_TOKEN }}
           registry: docker.pkg.github.com
 
       - name: "Install Conda development packages"
