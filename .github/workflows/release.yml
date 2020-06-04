@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build the Docker image
-          run: docker build . --file docker/dockerfile --tag pygna:latest
+        run: docker build . --file docker/dockerfile --tag pygna:latest
       - uses: actions/checkout@v1
       - name: "Setup Conda"
         uses: s-weigand/setup-conda@v1
