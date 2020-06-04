@@ -36,7 +36,7 @@ jobs:
             conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
 
       - name: "Upload Conda package"
-        if: ${{ github.ref }} == 'refs/heads/master'
+        if: contains(github.refs, "master")
         run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 
       - name: "Setup Python for PIP"
@@ -51,7 +51,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: "Publish package on PyPi"
-        if: ${{ github.ref }} == 'refs/heads/master'
+        if: contains(github.refs, "master")
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
       - uses: actions/checkout@v2
