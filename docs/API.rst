@@ -54,7 +54,7 @@ Statistical functions can be written anywhere but the return value of each funct
 For example, it is possible to define a function, such as:
 
 
-.. highlight:: python
+.. code-block:: python
 
     def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
         try:
@@ -72,7 +72,7 @@ For example, it is possible to define a function, such as:
 In Pygna, it is possible to call the class constructor, passing the function as parameter:
 
 
-.. highlight:: python
+.. code-block:: python
 
     st_test = StatisticalTest(st.geneset_RW_statistic, network, rw_dict)
 
