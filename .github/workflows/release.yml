@@ -51,7 +51,7 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: "Publish package on PyPi"
-        if: contains(github.refs, "master")
+        if: contains(github.refs, 'master')
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
       - uses: actions/checkout@v2
