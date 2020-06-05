@@ -126,6 +126,7 @@ class CsvToCsvEnriched(Converters):
     def get_data(self):
         """
         Return the conversion result
+
         :return: pd.dataframe object with the e2s or s2e added as column
         """
         return self.file_data

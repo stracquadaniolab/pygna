@@ -48,7 +48,7 @@ class PygnaFigure(ABC):
 
 class VolcanoPlot(PygnaFigure):
     """
-    This class represent a Volcano Plot
+    This class represent a Volcano Plot. It saves the value in the dataframe on a file.
     """
 
     def __init__(self, df, output_file, loc=2, p_col="empirical_pvalue", id_col="setname_B", plotting_col="observed",

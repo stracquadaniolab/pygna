@@ -1,5 +1,3 @@
-.. _CLI:
-
 Command Line Tool
 ======================
 
