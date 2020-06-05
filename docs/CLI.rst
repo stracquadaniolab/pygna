@@ -68,7 +68,7 @@ Weights Diffusion Analysis
 
 **Please be aware that this function is still a beta version.**
 
-.. autofunction:: pygna.command.test_diffusion_weights
+.. autofunction:: pygna.command.test_diffusion_hotnet
 
 Large Matrices creation
 -----------------------
@@ -105,4 +105,4 @@ Utilities
 
 .. autofunction:: pygna.utils.convert_gmt
 .. autofunction:: pygna.utils.geneset_from_table
-.. autofunction:: pygna.utils.convert_csv_names
+.. autofunction:: pygna.utils.convert_csv

@@ -65,6 +65,7 @@ class ReadTsv(ReadingData):
     def _convert_to_graph(self):
         """
         Converts the interactions into a graph object
+
         :return: nx.graph, from the interactions
         """
         graph = nx.Graph()
@@ -75,6 +76,7 @@ class ReadTsv(ReadingData):
     def get_data(self):
         """
         Returns the data of the tsv file
+
         :return: list, represents the genes read in the file
         """
         if self.pd_table:
@@ -85,6 +87,7 @@ class ReadTsv(ReadingData):
     def get_network(self):
         """
         Returns the nx.graph object of the network
+
         :return: nx.graph, containing the network information
         """
         return self.graph
@@ -109,7 +112,8 @@ class ReadGmt(ReadingData):
     def __readfile(self):
         """
         This method reads the geneset file into a variable
-        :returns gene_list: dict, represents the genes list
+
+        :return: gene_list dict, represents the genes list
         """
         gene_lists = dict()
         with open(self.filename, "r") as f:
@@ -126,6 +130,7 @@ class ReadGmt(ReadingData):
     def get_data(self):
         """
         Returns the data of the gmt file
+
         :return: dict, represents the genes list
         """
         return self.gmt_data
@@ -134,6 +139,7 @@ class ReadGmt(ReadingData):
         """
         Returns the geneset from the gmt file
         :param setname: str, the setname to extract
+
         :return: pd.dataframe, the geneset data
         """
         if setname is not None:
@@ -172,6 +178,7 @@ class ReadCsv(ReadingData):
     def __readfile(self):
         """
         This method read the file and saves the data inside a class attribute
+
         :return: pd.dataframe, represents teh data read inside the .csv
         """
         with open(self.filename, "r") as f:
@@ -181,6 +188,7 @@ class ReadCsv(ReadingData):
     def get_data(self):
         """
         Returns the data of the csv file
+
         :return: pd.dataframe, represents teh data read inside the .csv
         """
         return self.data
@@ -188,7 +196,6 @@ class ReadCsv(ReadingData):
     def _fill_na_column(self):
         """
         Fill the N/A values with a (str) 0
-        :return null
         """
         self.data[self.name_column].fillna(0, inplace=True)
         self.data[self.name_column] = self.data[self.name_column].astype(int)
@@ -252,15 +259,13 @@ class ReadDistanceMatrix(ReadingData):
     def _decode(self):
         """
         Elaborate teh nodes from the graph
-        :return: null
         """
         self.nodes = [i.decode() for i in self.nodes]
 
     def get_data(self):
-        """
-        Return the data of the HDF5 Matrix
-        :return: table data, the data of the HDF5 Matrix
-        :return: table nodes, the nodes of the HDF5 Matrix
+        """Return the data of the HDF5 Matrix
+
+        :return: table data, the data of the HDF5 Matrix and table nodes, the nodes of the HDF5 Matrix
         """
         return self.nodes, self.data
 

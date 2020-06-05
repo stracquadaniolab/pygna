@@ -38,22 +38,15 @@ class DiffusionTest:
         logging.info("mapped table: %d mapped rows" % len(self.table))
 
         if len(self.table) < 10:
-            logging.warning(
-                "there are less than 10 elements in the table that are mapped to the universe"
-            )
+            logging.warning("there are less than 10 elements in the table that are mapped to the universe")
 
-        self.table_index = [
-            map_table2matrix(self.nodes, i)
-            for i in self.table[names_col].values.tolist()
-        ]
+        self.table_index = [map_table2matrix(self.nodes, i) for i in self.table[names_col].values.tolist()]
 
         self.weights = np.zeros((self.diffusion_matrix.shape[1], 1))
 
         print(self.weights.shape)
         for k in range(len(self.table_index)):
-            self.weights[self.table_index[k], 0] = self.table[
-                weights_col
-            ].values.tolist()[k]
+            self.weights[self.table_index[k], 0] = self.table[weights_col].values.tolist()[k]
 
     def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
         """
@@ -61,6 +54,7 @@ class DiffusionTest:
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
         :param cores: the number of cores to be used
+
         :return: the list with the data calculated
         """
         # mapping geneset
@@ -72,17 +66,9 @@ class DiffusionTest:
             return 0, 0, np.array([0]), 0, 0
         else:
             geneset_index = [map_table2matrix(self.nodes, i) for i in mapped_geneset]
-            logging.info(
-                "Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset))
-            )
+            logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
 
-            observed = self.test_statistic(
-                self.diffusion_matrix,
-                self.weights,
-                geneset_index,
-                self.diz,
-                observed_flag=True,
-            )
+            observed = self.test_statistic(self.diffusion_matrix,self.weights,geneset_index,self.diz,observed_flag=True)
             logging.info("Observed %f." % observed)
 
             # iterations
@@ -109,27 +95,19 @@ class DiffusionTest:
         :param geneset_index: the geneset id that point to the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
+
         :return: the array with null distribution
         """
         print("n_proc=" + str(n_proc))
 
         if n_proc == 1:
-            null_distribution = DiffusionTest.get_null_distribution(
-                self, geneset_index, iter
-            )
-
+            null_distribution = DiffusionTest.get_null_distribution(self, geneset_index, iter)
         else:
-
             p = multiprocessing.Pool(n_proc)
             n_trial = int(iter / n_proc)
             print("n_trial=" + str(n_trial))
-            results = [
-                p.apply_async(
-                    DiffusionTest.get_null_distribution,
-                    args=(self, geneset_index, n_trial),
-                )
-                for w in list(range(1, n_proc + 1))
-            ]
+            results = [p.apply_async(DiffusionTest.get_null_distribution,
+                                     args=(self, geneset_index, n_trial),)for w in list(range(1, n_proc + 1))]
             null_distribution = np.array([])
             for r in results:
                 null_distribution = np.hstack((null_distribution, np.array(r.get())))
@@ -142,6 +120,7 @@ class DiffusionTest:
         """
         :param geneset_index: the geneset id that points to the geneset to be used
         :param n_samples: the number of samples to be taken
+
         :return: the random distribution calculated
         """
         np.random.seed()
@@ -152,14 +131,8 @@ class DiffusionTest:
                 np.random.shuffle(random_weights)
             else:
                 np.random.shuffle(geneset_index)
-            random_dist.append(self.test_statistic(
-                self.diffusion_matrix,
-                random_weights,
-                geneset_index,
-                self.diz,
-                observed_flag=True,
-            )
-            )
+            random_dist.append(self.test_statistic(self.diffusion_matrix,random_weights,geneset_index,self.diz,
+                                                   observed_flag=True))
         return random_dist
 
 

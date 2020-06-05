@@ -37,6 +37,7 @@ class StatisticalTest:
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
         :param cores: the number of cores to be used
+
         :return: the list with the data calculated
         """
         # mapping geneset
@@ -44,16 +45,10 @@ class StatisticalTest:
         if len(mapped_geneset) == 0:
             return 0, 0, np.array([0]), 0, 0
         else:
-            logging.info(
-                "Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset))
-            )
-            observed = self.__test_statistic(
-                self.__network, mapped_geneset, self.__diz, observed_flag=True
-            )
+            logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
+            observed = self.__test_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
             # iterations
-            null_distribution = StatisticalTest.get_null_distribution_mp(
-                self, mapped_geneset, max_iter, n_proc=cores
-            )
+            null_distribution = StatisticalTest.get_null_distribution_mp(self, mapped_geneset, max_iter, n_proc=cores)
             # computing empirical pvalue
             pvalue = 1
             if alternative == "greater":
@@ -74,23 +69,18 @@ class StatisticalTest:
         :param geneset: the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
+
         :return: the array with null distribution
         """
         if n_proc == 1:
-            null_distribution = StatisticalTest.get_null_distribution(
-                self, geneset, iter
-            )
+            null_distribution = StatisticalTest.get_null_distribution(self, geneset, iter)
 
         else:
 
             p = multiprocessing.Pool(n_proc)
             n_trial = int(iter / n_proc)
-            results = [
-                p.apply_async(
-                    StatisticalTest.get_null_distribution, args=(self, geneset, n_trial)
-                )
-                for w in list(range(1, n_proc + 1))
-            ]
+            results = [p.apply_async(StatisticalTest.get_null_distribution,
+                                     args=(self, geneset, n_trial)) for w in list(range(1, n_proc + 1))]
             null_distribution = np.array([])
             for r in results:
                 null_distribution = np.hstack((null_distribution, np.array(r.get())))
@@ -102,17 +92,14 @@ class StatisticalTest:
         """
         :param geneset: the geneset to be used
         :param n_samples: the number of samples to be taken
+
         :return: the random distribution calculated
         """
         np.random.seed()
         random_dist = []
         for i in range(n_samples):
-            random_sample = np.random.choice(
-                list(self.__universe), len(geneset), replace=False
-            )
-            random_dist.append(
-                self.__test_statistic(self.__network, set(random_sample), self.__diz)
-            )
+            random_sample = np.random.choice(list(self.__universe), len(geneset), replace=False)
+            random_dist.append(self.__test_statistic(self.__network, set(random_sample), self.__diz))
 
         return random_dist
 

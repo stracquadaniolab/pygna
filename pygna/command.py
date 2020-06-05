@@ -396,7 +396,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
     network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
 
     # Read geneset
-    table = rc.ReadCsv(geneset_file,column_to_fill=name_column).get_data()
+    table = rc.ReadCsv(geneset_file, column_to_fill=name_column).get_data()
     if len(table.columns) < 2:
         logging.error("Error: the function takes a csv file as input, the read file has less than 2 columns, "
                       "check that the table is comma separated")
