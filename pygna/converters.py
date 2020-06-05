@@ -23,6 +23,7 @@ class Converters:
         :param symbol_col: str, the column containing the symbols
         :param entrez_col: str, the column containing the entrez ID
         :param geneset: pd.dataframe, column containing the entrez to convert
+
         :return: list, containing the string names
         """
         logging.info("Converting Entrez ID -> Symbols")
@@ -48,6 +49,7 @@ class Converters:
         :param symbol_col: str, the column containing the symbols
         :param entrez_col: str, the column containing the entrez ID
         :param geneset: pd.dataframe, column containing the strings to convert
+
         :return: list, containing the entrez names
         """
         logging.info("Converting Symbols -> Entrez ID")
@@ -131,7 +133,6 @@ class CsvToCsvEnriched(Converters):
     def _csv_output(self):
         """
         Method to print the output to file
-        :return: null
         """
         output_file = self.output
         self.filename.to_csv(output_file, index=False)
@@ -139,7 +140,6 @@ class CsvToCsvEnriched(Converters):
     def _clean_table(self):
         """
         Method to make all upper and clean the table from null values
-        :return: null
         """
         self.map_table = self.map_table.fillna("0")
         self.map_table["Approved symbol"] = self.map_table["Approved symbol"].str.upper()
@@ -192,6 +192,7 @@ class CsvToGmt(Converters):
     def _elaborate(self):
         """
         This method performs the cleaning and the filtering of the table
+
         :return: pd.dataframe, representing the cleaned and filter table
         """
         table = tE.clean_table(self.table, self.filter_column)
@@ -201,8 +202,7 @@ class CsvToGmt(Converters):
 
     def _process_gmt(self):
         """
-        This method parse the results and save them on a GMT file
-        :return: null
+        This method parse the results and save them in a GMT file
         """
         if self.descriptor is None:
             self.descriptor = self.input_file.split("/")[-1]
@@ -221,8 +221,7 @@ class CsvToGmt(Converters):
 
     def _csv_output(self):
         """
-        This method save the pd.dataframe on a CSV file
-        :return: null
+        This method save the pd.dataframe in a CSV file
         """
 
         if self.output_csv.endswith(".csv"):

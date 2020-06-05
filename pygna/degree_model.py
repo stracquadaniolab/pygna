@@ -9,7 +9,6 @@ from pygna import output
 
 class DegreeModel(object):
     def __init__(self, network_prob=0.5, vip_prob=1, n_nodes=10, vip_percentage=0.1):
-
         self.n_nodes = n_nodes
         self.graph = nx.Graph()
         self.network_prob = network_prob
@@ -23,7 +22,6 @@ class DegreeModel(object):
         self.n_nodes = len(nodes_names)
 
     def create_graph(self):
-
         reject = True
         logging.info("Reject=" + str(reject))
         while reject:

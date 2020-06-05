@@ -23,7 +23,7 @@ class PygnaFigure(ABC):
     def _save_fig(self):
         """
         This method saves the figure using the matplotlib framework
-        :return: null
+
         """
         plt.savefig(self.filename)
 
@@ -31,6 +31,7 @@ class PygnaFigure(ABC):
         """
         This methods maps the ratios saved in the class with the figure type and returns the correct ration for each
         figure
+
         :param fig_type: str, the figure type to be printed
         :param size: int, the size of the plot
         :return: int, int, int, int the width, height, fontsize, scalar of the figure
@@ -106,6 +107,7 @@ class VolcanoPlot(PygnaFigure):
     def _elaborate_not_sig_genes(self, df, plotting_column, pvalue_col, y_thresh, x_thresh):
         """
         This method elaborates the genes which are not significant
+
         :param df: pd.datafrme, the dataframe to elaborate
         :param plotting_column: str, the column to apply the x threshold
         :param pvalue_col: str, the column to apply the y threshold
@@ -119,6 +121,7 @@ class VolcanoPlot(PygnaFigure):
     def _elaborate_sig_genes(self, df, plotting_column, pvalue_col, y_thresh, x_thresh):
         """
         This method elaborates the genes which are significant
+
         :param df: pd.datafrme, the dataframe to elaborate
         :param plotting_column: str, the column to apply the x threshold
         :param pvalue_col: str, the column to apply the y threshold
@@ -134,6 +137,7 @@ class VolcanoPlot(PygnaFigure):
     def _append_name(self, dataset, id_col, text_list):
         """
         This method add the names to the legend of the plot
+
         :param dataset: df.dataframe, the dataset where are stored the names
         :param id_col: str, the column where the names are stored
         :param text_list: list, list with the names already stored
