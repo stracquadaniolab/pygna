@@ -37,6 +37,7 @@ class StatisticalTest:
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
         :param cores: the number of cores to be used
+
         :return: the list with the data calculated
         """
         # mapping geneset
@@ -68,6 +69,7 @@ class StatisticalTest:
         :param geneset: the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
+
         :return: the array with null distribution
         """
         if n_proc == 1:
@@ -90,6 +92,7 @@ class StatisticalTest:
         """
         :param geneset: the geneset to be used
         :param n_samples: the number of samples to be taken
+
         :return: the random distribution calculated
         """
         np.random.seed()

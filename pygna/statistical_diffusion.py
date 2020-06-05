@@ -54,6 +54,7 @@ class DiffusionTest:
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
         :param cores: the number of cores to be used
+
         :return: the list with the data calculated
         """
         # mapping geneset
@@ -94,6 +95,7 @@ class DiffusionTest:
         :param geneset_index: the geneset id that point to the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
+
         :return: the array with null distribution
         """
         print("n_proc=" + str(n_proc))
@@ -118,6 +120,7 @@ class DiffusionTest:
         """
         :param geneset_index: the geneset id that points to the geneset to be used
         :param n_samples: the number of samples to be taken
+
         :return: the random distribution calculated
         """
         np.random.seed()

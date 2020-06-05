@@ -304,6 +304,7 @@ class GroupGmt(Converters):
     def _elaborate(self):
         """
         This method elaborates the table and returns a dictionary with the grouped columns
+
         :return: dict, with the genes and the descriptor
         """
         diz = {}

@@ -2,6 +2,7 @@ Block Model
 ===========
 
 .. autoclass:: pygna.block_model.BlockModel(object)
+    :members:
 
 
 .. autofunction:: pygna.block_model.generate_graph_from_sm

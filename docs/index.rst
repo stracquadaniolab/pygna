@@ -16,19 +16,7 @@ PyGNA is a Geneset Network Analysis python package: it performs various analyses
     CLI
     simulations
     changelog
-    block_model
-    converters
-    degree_model
-    diagnostic
-    elaborators
-    output
-    painter
-    plots
-    reading_class
-    statistical_comparison
-    statistical_diffusion
-    statistical_test
-    utils
+    documentation
 
 Indices and tables
 ==================

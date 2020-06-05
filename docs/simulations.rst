@@ -10,7 +10,7 @@ The function to generate a simulated dataset is:
 
 .. autofunction:: pygna.degree_model.generate_hdn_network
 
-.. autofunction:: pygna.block_model.generate_simulated_network
+.. autofunction:: pygna.block_model.generate_sbm_network
 
 .. autofunction:: pygna.painter.plot_adjacency
 

@@ -40,6 +40,7 @@ class StatisticalComparison:
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the maximum number of iterations
         :param keep: if the geneset B should not be kept
+
         :return: the list with the data calculated
         """
 
@@ -75,6 +76,7 @@ class StatisticalComparison:
         :param genesetB: the second geneset to compare
         :param max_iter: maximum number of iteration to perform
         :param keep: if the geneset B should not be kept
+
         :return: the array with null distribution
         """
 
@@ -104,6 +106,7 @@ class StatisticalComparison:
         :param genesetB: the second geneset to compare
         :param n_samples: the number of samples to be taken
         :param keep: if the geneset B should not be kept
+
         :return: the random distribution calculated
         """
         np.random.seed()

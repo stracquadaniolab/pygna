@@ -530,7 +530,15 @@ def plot_adjacency(
         f.savefig(output_file + '.png', format="png")
 
 
-def stars(pvalue) -> str:
+def stars(pvalue: float) -> str:
+    """
+    Converts a pvalue with the corresponding stars
+
+    :param pvalue: The P-Value to be converted
+    :type: float
+    :rtype: str
+    :return: A string corresponding to the significance of the P-Value
+    """
     if not math.isnan(pvalue):
         if pvalue > 0.05:
             return "ns"
@@ -542,4 +550,3 @@ def stars(pvalue) -> str:
             return "* * *"
         else:
             return "* * * *"
-    return "0"
