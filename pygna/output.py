@@ -100,7 +100,8 @@ class Output:
         self.table_file_name = tmp.name
         try:
             tmp.write(
-                "analysis,setname_A,setname_B,n_geneset_A,n_mapped_A,n_geneset_B,n_mapped_B,n_overlaps,number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network\n"
+                "analysis,setname_A,setname_B,n_geneset_A,n_mapped_A,n_geneset_B,n_mapped_B,n_overlaps,"
+                "number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network\n "
             )
         finally:
             tmp.close()
@@ -173,14 +174,17 @@ class Output:
         print_GMT(self.GMT_dict, self.output_gmt)
 
 
-def print_GMT(GMT_dictionary, output_file):
+def print_GMT(gmt_dictionary: dict, output_file: str) -> None:
     """
     Save the dictionary on a GMT file
+
+    :param gmt_dictionary: the dictionary containing the data
+    :param output_file: the file to save the data
     """
     with open(output_file, "w") as f:
         f.write("")
 
-    for key, dict_set in GMT_dictionary.items():
+    for key, dict_set in gmt_dictionary.items():
         with open(output_file, "a") as f:
             genes_dict = '\t'.join(map(str, dict_set["genes"]))
             f.write(str(key) + "\t" + str(dict_set["descriptor"]) + "\t" + genes_dict + "\n")

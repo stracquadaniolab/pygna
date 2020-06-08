@@ -5,12 +5,20 @@ import numpy as np
 import logging
 from pygna import output
 from pygna.utils import YamlConfig
+import pandas as pd
+import networkx as nx
 
 
 class BlockModel(object):
 
-    def __init__(self, block_model_matrix, n_nodes=10, nodes_percentage=None):
+    def __init__(self, block_model_matrix: pd.DataFrame(), n_nodes: int = 10, nodes_percentage: list = None):
+        """
+        This class implements block model reading and elaboration
 
+        :param block_model_matrix: the matrix to be used as block model
+        :param n_nodes: the number of nodes
+        :param nodes_percentage: the percentage of nodes to use for the calculations, passed through a list for example [0.5, 0.5]
+        """
         self.n_nodes = n_nodes
         self.nodes = ["N" + str(i) for i in range(n_nodes)]
         self.n_clusters = block_model_matrix.shape[0]
@@ -20,31 +28,47 @@ class BlockModel(object):
         self.nodes_percentage = nodes_percentage
         self.cluster_dict = {}
 
-    def set_nodes(self, nodes_names):
+    def set_nodes(self, nodes_names: list) -> None:
+        """
+        Set the nodes name of the block model
+
+        :param nodes_names: the names list
+        """
         self.nodes = nodes_names
         self.n_nodes = len(nodes_names)
 
-    def set_bm(self, block_model_matrix):
-        """ Change block model matrix"""
+    def set_bm(self, block_model_matrix: pd.DataFrame()) -> None:
+        """
+        Change block model matrix
+
+        :param block_model_matrix: the block model matrix
+        """
 
         if block_model_matrix.shape[0] == self.n_clusters:
             self.bm = block_model_matrix
         else:
             logging.error("the block model is supposed to have %d clusters" % (self.n_clusters))
 
-    def set_nodes_in_block_percentage(self, nodes_percentage):
-        # pass
+    def set_nodes_in_block_percentage(self, nodes_percentage: list) -> None:
         """
-        Pass the percentage of nodes in each block as a list, for Example
-        [0.5, 0.5]
+        Pass the percentage of nodes in each block as a list, for example [0.5, 0.5]
+
+        :param nodes_percentage: percentage of the nodes
         """
         self.nodes_percentage = nodes_percentage
 
-    def set_nodes_in_block(self, nodes_in_block):
+    def set_nodes_in_block(self, nodes_in_block: int) -> None:
+        """
+        Set the nodes in the block model
+
+        :param nodes_in_block: the number of nodes in the block list
+        """
         self.nodes_in_block = nodes_in_block
 
-    def create_graph(self):
-
+    def create_graph(self) -> None:
+        """
+        Create a graph from the parameters passed in the constructor of the class
+        """
         reject = True
         logging.info('Reject=' + str(reject))
         while reject:
@@ -57,11 +81,20 @@ class BlockModel(object):
 
         self.graph = graph
 
-    def plot_graph(self, output_folder):
+    def plot_graph(self, output_folder: str) -> None:
+        """
+        Plot the block model graph
+
+        :param output_folder: the folder where to save the result
+        """
         plot_bm_graph(self.graph, self.bm, output_folder=output_folder)
 
-    def write_network(self, output_file):
+    def write_network(self, output_file: str) -> None:
+        """
+        Save the network on a given file
 
+        :param output_file: the output path where to save the results
+        """
         self.network_file = output_file
 
         logging.info("Network written on %s" % (output_file))
@@ -71,8 +104,12 @@ class BlockModel(object):
         else:
             logging.error("output file format unknown")
 
-    def write_cluster_genelist(self, output_file):
+    def write_cluster_genelist(self, output_file: str) -> None:
+        """
+        Save the gene list to a GMT file
 
+        :param output_file: the output path where to save the results
+        """
         self.genelist_file = output_file
 
         clusters = nx.get_node_attributes(self.graph, "cluster")
@@ -89,11 +126,17 @@ class BlockModel(object):
             logging.error("output file format unknown")
 
 
-def generate_graph_from_sm(n_nodes, block_model, nodes_in_block=False, node_names=None, nodes_percentage=None):
+def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame(), nodes_in_block: list = False,
+                           node_names: list = None, nodes_percentage: list = None) -> nx.Graph:
     """
-    This function creates a graph with n_nodes number of vertices and a matrix
-    block_model that describes the intra e inter- block connectivity.
+    This function creates a graph with n_nodes number of vertices and a matrix block_model that describes the intra e inter-block connectivity.
     The nodes_in_block is parameter, list, to control the number of nodes in each cluster
+
+    :param n_nodes: the number of nodes in the block model
+    :param block_model: the block model to elaborate
+    :param nodes_in_block: the list of nodes in the block model
+    :param node_names: the list of names in the block model
+    :param nodes_percentage: the percentage of nodes to use for the calculations, passed through a list for example [0.5, 0.5]
     """
 
     if not node_names:
@@ -130,7 +173,14 @@ def generate_graph_from_sm(n_nodes, block_model, nodes_in_block=False, node_name
     return G
 
 
-def plot_bm_graph(graph, block_model, output_folder=None):
+def plot_bm_graph(graph: nx.Graph, block_model: pd.DataFrame, output_folder: str = None) -> None:
+    """
+    Save the graph on a file
+
+    :param graph: the graph with name of the nodes
+    :param block_model: the block model
+    :param output_folder: the folder where to save the file
+    """
     nodes = graph.nodes()
     colors = ['#b15928', '#1f78b4', '#6a3d9a', '#33a02c', '#ff7f00']
     cluster = nx.get_node_attributes(graph, 'cluster')
@@ -158,11 +208,13 @@ def plot_bm_graph(graph, block_model, output_folder=None):
     plt.savefig(output_folder + 'block_model.pdf', bbox_inches='tight')
 
 
-def generate_sbm_network(input_file: "yaml configuration file"):
-    """ This function generates a simulated network, using the block model matrix
-        given as input and saves both the network and the cluster nodes.
-        All parameters must be specified in a yaml file.
-        This function allows to create network and geneset for any type of SBM
+def generate_sbm_network(input_file: "yaml configuration file") -> None:
+    """
+    This function generates a simulated network, using the block model matrix given as input and saves both the network and the cluster nodes.
+    All parameters must be specified in a yaml file.
+    This function allows to create network and geneset for any type of SBM
+
+    :param input_file: the file with the saved configuration
     """
     ym = YamlConfig()
     config = ym.load_config(input_file)
@@ -189,23 +241,15 @@ def generate_sbm2_network(output_folder: 'folder where the simulations are saved
                           n_simulations: 'number of simulated networks for each configuration' = 3
                           ):
     """
-    This function generates the simualted networks and genesets
-    using the stochastic block model with 2 BLOCKS as described in
-    the paper. The output names are going to be
-    prefix_t_<theta0>_p_<percentage>_d_<density>_s_<n_simulation>
-    _network.tsv or _genes.gmt
-    One connected cluster while the rest of the network
-    has the same probability of connection.
-    SBM = d *
-    [theta0, 1-theta0
-    1-theta0, 1-theta0]
+    This function generates the simualted networks and genesets using the stochastic block model with 2 BLOCKS as described in the paper. The output names are going to be prefix_t_<theta0>_p_<percentage>_d_<density>_s_<n_simulation>_network.tsv or _genes.gmt
+    One connected cluster while the rest of the networkhas the same probability of connection.
+    SBM = d *[theta0, 1-theta0 1-theta0, 1-theta0]
     The simulator checks for connectedness of the generated network, if the generated net is not connected, a new simulation is generated.
 
     :param n_nodes: int, number of nodes in the network
-    :param theta0: str, pass all within cluster 0 probability of connection, use a string floats separated by commas `0.9,0.7,0.3,0.1`
-    :param percentage: str, percentage of nodes in cluster 0,
-    use a string floats separated by commas `0.1`
-    :param density: str, multiplicative paramenter used to define network density use a string floats separated by commas `0.06,0.1,0.2`
+    :param theta0: str, pass all within cluster 0 probability of connection, use a string floats separated by commas '0.9,0.7,0.3,0.1'
+    :param percentage: str, percentage of nodes in cluster 0, use a string floats separated by commas '0.1'
+    :param density: str, multiplicative parameter used to define network density use a string floats separated by commas '0.06,0.1,0.2'
     :param n_simulations: int, number of simulated networks
     :param prefix: str, prefix name of the simulation
     """
@@ -220,12 +264,8 @@ def generate_sbm2_network(output_folder: 'folder where the simulations are saved
     for p in percentages:
         for t in teta_ii:
             for d in density:
-
                 matrix = np.array([[d * t, d * (1 - t)], [d * (1 - t), d * (1 - t)]])
-
-                bm = BlockModel(matrix,
-                                n_nodes=n_nodes,
-                                nodes_percentage=[p, 1 - p])
+                bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
 
                 for i in range(n_simulated):
                     name = output_folder + prefix + "_t_" + str(t) + "_p_" + str(p) + "_d_" + str(d) + "_s_" + str(i)

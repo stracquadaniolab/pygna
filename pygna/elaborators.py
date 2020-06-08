@@ -1,20 +1,21 @@
 import logging
+import pandas as pd
 
 
 class TableElaboration:
     """
-    This class contains methods to use to elaborate a table (a pd.dataframe)
+    This class contains methods to use to elaborate a table
     """
 
     @staticmethod
-    def clean_table(table, stat_col="stat"):
+    def clean_table(table: pd.DataFrame(), stat_col: str = "stat") -> pd.DataFrame():
         """
-        This method clean the table from the N/A values
+        This function clean the table from the N/A values
 
-        :param table: pd.dataframe, representing the table to be cleaned
-        :param stat_col: str, the column to be cleaned
+        :param table: dataframerepresenting the table to be cleaned
+        :param stat_col: the column to be cleaned
 
-        :return: pd.dataframe, the table cleaned
+        :return: the table cleaned from the N/A values
         """
         logging.info("original table has %d rows" % len(table))
         table = table.dropna(subset=[stat_col])
@@ -22,16 +23,17 @@ class TableElaboration:
         return table
 
     @staticmethod
-    def filter_table(table, filter_column="padj", alternative="less", threshold=0.01):
+    def filter_table(table: pd.DataFrame(), filter_column: str = "padj", alternative: str = "less",
+                     threshold: float = 0.01) -> pd.DataFrame():
         """
         This method filters a table according to a filter rule
 
-        :param table: pd.dataframe, the table to be filtered
-        :param filter_column: str, column with the values to be filtered
-        :param alternative: str, alternative to use for the filterK with "less" the filter is applied <threshold; otherwise >= threshold
-        :param threshold: float, threshold for the filter
+        :param table: The table to be filtered
+        :param filter_column: Column with the values to be filtered
+        :param alternative: Alternative to use for the filterK with "less" the filter is applied <threshold; otherwise >= threshold
+        :param threshold: Threshold for the filter
 
-        :return: pd.dataframe, the table filtered
+        :return: The table filtered
         """
         threshold = float(threshold)
         try:

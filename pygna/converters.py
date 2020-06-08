@@ -2,29 +2,30 @@ from pygna.elaborators import TableElaboration as tE
 import pygna.reading_class as rc
 import logging
 import sys
-
+import pandas as pd
 
 import pygna.output as output
 
 
 class Converters:
     """
-    Class representing a Converter utility
+    This class is has utilities that can be used to convert the data
     """
 
     def __init__(self):
         super(Converters, self).__init__()
 
     @classmethod
-    def convert_e2s(cls, geneset, tsv_data, entrez_col="NCBI Gene ID", symbol_col="Approved symbol"):
+    def convert_e2s(cls, geneset: pd.DataFrame, tsv_data: pd.DataFrame, entrez_col: str = "NCBI Gene ID",
+                    symbol_col: str = "Approved symbol") -> list:
         """
         Method to convert the entrez 2 string
-        :param tsv_data: pd.dataframe, the dataframe to work on
-        :param symbol_col: str, the column containing the symbols
-        :param entrez_col: str, the column containing the entrez ID
-        :param geneset: pd.dataframe, column containing the entrez to convert
 
-        :return: list, containing the string names
+        :param tsv_data: the dataframe to work on
+        :param symbol_col: the column containing the symbols
+        :param entrez_col: the column containing the entrez ID
+        :param geneset: column containing the entrez to convert
+        :return: list containing the string names
         """
         logging.info("Converting Entrez ID -> Symbols")
         unknown_counter = 0
@@ -42,15 +43,16 @@ class Converters:
         return geneset_symbol
 
     @classmethod
-    def convert_s2e(cls, geneset, tsv_data, entrez_col="NCBI Gene ID", symbol_col="Approved symbol"):
+    def convert_s2e(cls, geneset: pd.DataFrame, tsv_data: pd.DataFrame, entrez_col: str = "NCBI Gene ID",
+                    symbol_col: str = "Approved symbol") -> list:
         """
         Method to convert the string 2 entrez
-        :param tsv_data: pd.dataframe, the dataframe to work on
-        :param symbol_col: str, the column containing the symbols
-        :param entrez_col: str, the column containing the entrez ID
-        :param geneset: pd.dataframe, column containing the strings to convert
 
-        :return: list, containing the entrez names
+        :param tsv_data: the dataframe to work on
+        :param symbol_col: the column containing the symbols
+        :param entrez_col: the column containing the entrez ID
+        :param geneset: column containing the strings to convert
+        :return: list containing the entrez names
         """
         logging.info("Converting Symbols -> Entrez ID")
         geneset_entrez = []
@@ -71,7 +73,13 @@ class Converters:
         return geneset_entrez
 
     @staticmethod
-    def _gmt_output(gmt_data, gmt_output_file):
+    def _gmt_output(gmt_data: dict, gmt_output_file: str) -> None:
+        """
+        Save the dictionary on a GMT file
+
+        :param gmt_data: the dictionary containing the data
+        :param gmt_output_file: the file to save the data
+        """
         output.print_GMT(gmt_data, gmt_output_file)
 
 
@@ -80,18 +88,19 @@ class CsvToCsvEnriched(Converters):
     Class that is used to add a column with the entrezID or Symbols to a CSV file
     """
 
-    def __init__(self, csv_file, conversion, original_name_col, new_name_col, geneset, entrez_col,
-                 symbol_col, converter_map_filename="entrez_name.tsv", output_file=None):
+    def __init__(self, csv_file: pd.DataFrame, conversion: str, original_name_col: str, new_name_col: str, geneset: str,
+                 entrez_col: str, symbol_col: str, converter_map_filename: str = "entrez_name.tsv",
+                 output_file: str = None):
         """
-        :param csv_file: str, representing the path of the file
-        :param conversion: str, could be "e2s"-> Entrez2Symbols or "s2e" -> Symbol2Entrez
-        :param original_name_col: str, the column where to find the information to convert
-        :param new_name_col: str, the name of the column that is going to contain the information
-        :param geneset: str, the geneset to convert
-        :param converter_map_filename: str, the path to the .tsv used to convert the genes name
-        :param output_file: [optional] str, the path of the output file
-        :param entrez_col: str, the name of the entrez column
-        :param symbol_col: str, the name of the symbol column
+        :param csv_file: dataframe with the data
+        :param conversion: could be "e2s"-> Entrez2Symbols or "s2e" -> Symbol2Entrez
+        :param original_name_col:  the column where to find the information to convert
+        :param new_name_col: the name of the column that is going to contain the information
+        :param geneset: the geneset to convert
+        :param converter_map_filename:  the path to the .tsv used to convert the genes name
+        :param output_file: [optional] the path of the output file
+        :param entrez_col: the name of the entrez column
+        :param symbol_col:  the name of the symbol column
         """
         super().__init__()
         logging.info("Adding values to the CSV file")
@@ -123,22 +132,22 @@ class CsvToCsvEnriched(Converters):
         if self.output:
             self._csv_output()
 
-    def get_data(self):
+    def get_data(self) -> pd.DataFrame:
         """
         Return the conversion result
 
-        :return: pd.dataframe object with the e2s or s2e added as column
+        :return: dataframe with the e2s or s2e added as column
         """
         return self.file_data
 
-    def _csv_output(self):
+    def _csv_output(self) -> None:
         """
-        Method to print the output to file
+        Print the output to a csv
         """
         output_file = self.output
         self.filename.to_csv(output_file, index=False)
 
-    def _clean_table(self):
+    def _clean_table(self) -> None:
         """
         Method to make all upper and clean the table from null values
         """
@@ -156,8 +165,9 @@ class CsvToGmt(Converters):
     otherwise both can be created.
     """
 
-    def __init__(self, input_file, setname, filter_column, alternative, threshold, output_gmt=None, output_csv=None,
-                 name_column="Unnamed: 0", descriptor=None):
+    def __init__(self, input_file: str, setname: str, filter_column: str, alternative: str, threshold: float,
+                 output_gmt: str = None, output_csv: str = None, name_column: str = "Unnamed: 0",
+                 descriptor: str = None):
         """
         :param input_file: str, the csv file
         :param setname: str, the name of the set
@@ -165,8 +175,7 @@ class CsvToGmt(Converters):
         :param output_csv: str, output csv name
         :param name_column: str, column with the names
         :param filter_column: str, column with the values to be filtered
-        :param alternative: str, alternative to use for the filterK with "less" the filter is applied <threshold;
-        otherwise >= threshold
+        :param alternative: str, alternative to use for the filterK with "less" the filter is applied <threshold; otherwise >= threshold
         :param threshold: float, threshold for the filter
         :param descriptor: str, descriptor for the gmt file
         """
@@ -190,18 +199,18 @@ class CsvToGmt(Converters):
         if self.output_csv:
             self._csv_output()
 
-    def _elaborate(self):
+    def _elaborate(self) -> pd.DataFrame:
         """
         This method performs the cleaning and the filtering of the table
 
-        :return: pd.dataframe, representing the cleaned and filter table
+        :return: dataframe representing the cleaned and filter table
         """
         table = tE.clean_table(self.table, self.filter_column)
         table = tE.filter_table(table, filter_column=self.filter_column, alternative=self.alternative,
                                 threshold=self.threshold)
         return table
 
-    def _process_gmt(self):
+    def _process_gmt(self) -> None:
         """
         This method parse the results and save them in a GMT file
         """
@@ -220,7 +229,7 @@ class CsvToGmt(Converters):
         else:
             logging.error("specify gmt output")
 
-    def _csv_output(self):
+    def _csv_output(self) -> None:
         """
         This method save the pd.dataframe in a CSV file
         """
@@ -236,15 +245,15 @@ class GmtToGmtEnriched(Converters):
     This Class converts a GMT file, adding information about the Entrez ID or the symbol
     """
 
-    def __init__(self, gmt_file, output_gmt_file, conversion, entrez_col, symbol_col,
-                 converter_map_filename="entrez_name.tsv"):
+    def __init__(self, gmt_file: str, output_gmt_file: str, conversion: str, entrez_col: str, symbol_col: str,
+                 converter_map_filename: str = "entrez_name.tsv"):
         """
-        :param gmt_file: str, the input GMT file path
-        :param output_gmt_file: str, the output GMT file path
-        :param conversion: str, could be "e2s"-> Entrez2Symbols or "s2e" -> Symbol2Entrez
-        :param entrez_col: str, the name of the entrez column
-        :param symbol_col: str, the name of the symbol column
-        :param converter_map_filename: str, the path to the .tsv used to convert the genes name
+        :param gmt_file: the input GMT file path
+        :param output_gmt_file: the output GMT file path
+        :param conversion: could be "e2s"-> Entrez2Symbols or "s2e" -> Symbol2Entrez
+        :param entrez_col: the name of the entrez column
+        :param symbol_col: the name of the symbol column
+        :param converter_map_filename: the path to the .tsv used to convert the genes name
         """
         super().__init__()
         self.gmt_file = gmt_file
@@ -277,13 +286,14 @@ class GroupGmt(Converters):
     according to your needs
     """
 
-    def __init__(self, input_table, output_gmt, name_col="Gene", group_col="Cancer", descriptor="cancer_genes"):
+    def __init__(self, input_table: str, output_gmt: str, name_col: str = "Gene", group_col: str = "Cancer",
+                 descriptor: str = "cancer_genes"):
         """
-        :param input_table: str, the filename path
-        :param output_gmt: str, the output gmt file path
-        :param name_col: str, the name of the column to write the genes
-        :param group_col: str, the name of the column to group
-        :param descriptor: str, the descriptor to use
+        :param input_table: the filename path
+        :param output_gmt: the output gmt file path
+        :param name_col: the name of the column to write the genes
+        :param group_col:the name of the column to group
+        :param descriptor: the descriptor to use
         """
         super().__init__()
         self.input_table = input_table
@@ -301,11 +311,11 @@ class GroupGmt(Converters):
         self.gmt_data = self._elaborate()
         super()._gmt_output(self.gmt_data, self.output_gmt)
 
-    def _elaborate(self):
+    def _elaborate(self) -> dict:
         """
         This method elaborates the table and returns a dictionary with the grouped columns
 
-        :return: dict, with the genes and the descriptor
+        :return: with the genes and the descriptor
         """
         diz = {}
         for g, group in self.table.groupby([self.group_col]):

@@ -8,8 +8,7 @@ import sys
 
 
 class ReadingData(object):
-    """Abstract class used to read different types of file. Each subclass must implement the `readfile`
-    and `get_data` method
+    """Abstract class used to read different types of file. You can implement your own reading method, but remember that each subclass must implement the 'readfile' and 'get_data' methods
     """
     def __init__(self):
         super(ReadingData, self).__init__()
@@ -66,7 +65,8 @@ class ReadTsv(ReadingData):
         """
         Converts the interactions into a graph object
 
-        :return: nx.graph, from the interactions
+        :rtype: networkx.Graph()
+        :return: graph from the interactions
         """
         graph = nx.Graph()
         graph.add_edges_from(self.interactions)
@@ -77,7 +77,8 @@ class ReadTsv(ReadingData):
         """
         Returns the data of the tsv file
 
-        :return: list, represents the genes read in the file
+        :rtype: list
+        :return: list representing the genes read in the file
         """
         if self.pd_table:
             return pd.read_table(self.filename)
@@ -88,7 +89,8 @@ class ReadTsv(ReadingData):
         """
         Returns the nx.graph object of the network
 
-        :return: nx.graph, containing the network information
+        :rtype: networkx.Graph()
+        :return: graph containing the network information
         """
         return self.graph
 
@@ -113,7 +115,8 @@ class ReadGmt(ReadingData):
         """
         This method reads the geneset file into a variable
 
-        :return: gene_list dict, represents the genes list
+        :rtype: dict
+        :return: gene_list representing the list of genes
         """
         gene_lists = dict()
         with open(self.filename, "r") as f:
@@ -131,7 +134,8 @@ class ReadGmt(ReadingData):
         """
         Returns the data of the gmt file
 
-        :return: dict, represents the genes list
+        :rtype: dict
+        :return: dict representing the genes list
         """
         return self.gmt_data
 
@@ -140,7 +144,8 @@ class ReadGmt(ReadingData):
         Returns the geneset from the gmt file
         :param setname: str, the setname to extract
 
-        :return: pd.dataframe, the geneset data
+        :rtype: pandas.dataframe
+        :return: the geneset data
         """
         if setname is not None:
             if setname in self.gmt_data:
@@ -179,7 +184,8 @@ class ReadCsv(ReadingData):
         """
         This method read the file and saves the data inside a class attribute
 
-        :return: pd.dataframe, represents teh data read inside the .csv
+        :rtype: pandas.dataframe
+        :return: dataframe representing teh data read inside the .csv
         """
         with open(self.filename, "r") as f:
             table = pd.read_csv(f, sep=self.sep, usecols=self.use_cols)
@@ -189,7 +195,8 @@ class ReadCsv(ReadingData):
         """
         Returns the data of the csv file
 
-        :return: pd.dataframe, represents teh data read inside the .csv
+        :rtype: pandas.dataframe
+        :return: dataframe representing the data read inside the .csv
         """
         return self.data
 
@@ -222,7 +229,8 @@ class ReadTxt(ReadingData):
 
     def get_data(self):
         """
-        Returns a pd.Dataframe object from the file read
+        :rtype: pandas.dataframe
+        :return: dataframe object from the file read
         """
         return pd.DataFrame(self.data)
 

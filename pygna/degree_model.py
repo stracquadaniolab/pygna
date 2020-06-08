@@ -8,7 +8,8 @@ from pygna import output
 
 
 class DegreeModel(object):
-    def __init__(self, network_prob=0.5, vip_prob=1, n_nodes=10, vip_percentage=0.1):
+    def __init__(self, network_prob: float = 0.5, vip_prob: float = 1, n_nodes: int = 10,
+                 vip_percentage: float = 0.1):
         self.n_nodes = n_nodes
         self.graph = nx.Graph()
         self.network_prob = network_prob
@@ -17,14 +18,16 @@ class DegreeModel(object):
         self.nodes = ["N" + str(i) for i in range(n_nodes)]
         self.cluster_dict = {}
 
-    def set_nodes(self, nodes_names):
+    def set_nodes(self, nodes_names: list) -> None:
         """
         Set the name of the nodes
+
+        :param nodes_names: the list with the nodes name
         """
         self.nodes = nodes_names
         self.n_nodes = len(nodes_names)
 
-    def create_graph(self):
+    def create_graph(self) -> None:
         """
         Create a graph from the nodes
         """
@@ -46,14 +49,14 @@ class DegreeModel(object):
         self.graph = graph
 
     def plot_graph(self):
-        """
-        TBD
-        """
+        # Todo
         pass
 
-    def write_network(self, output_file):
+    def write_network(self, output_file: str) -> None:
         """
         Write on file the network as an edge list
+
+        :param output_file: the file path where to save the network
         """
         self.network_file = output_file
 
@@ -64,9 +67,11 @@ class DegreeModel(object):
         else:
             logging.error("output file format unknown")
 
-    def write_genelist(self, output_file):
+    def write_genelist(self, output_file: str) -> None:
         """
         Write the GMT gene list on file
+
+        :param output_file: the file path where to save the gene list
         """
         self.genelist_file = output_file
 
@@ -86,11 +91,17 @@ class DegreeModel(object):
             logging.error("output file format unknown")
 
 
-def generate_graph_vip(n_nodes, n_vip, network_prob=0.5, vip_prob=1, node_names=None):
+def generate_graph_vip(n_nodes: int, n_vip: int, network_prob: float = 0.5, vip_prob: int = 1,
+                       node_names: int = None) -> nx.Graph:
     """
-    This function creates a graph with n_nodes number of vertices and a matrix
-    block_model that describes the intra e inter- block connectivity.
+    This function creates a graph with n_nodes number of vertices and a matrix block_model that describes the intra e inter-block connectivity.
     The nodes_in_block is parameter, list, to control the number of nodes in each cluster
+
+    :param n_nodes: number of nodes in the network
+    :param n_vip: number of VIP to create
+    :param network_prob: probability of connection in the network
+    :param vip_prob: probability of connection of the vip
+    :param node_names: list of nodes for the network
     """
 
     if not node_names:
@@ -120,9 +131,12 @@ def generate_graph_vip(n_nodes, n_vip, network_prob=0.5, vip_prob=1, node_names=
     return G
 
 
-def plot_vip_graph(graph, output_folder=None):
+def plot_vip_graph(graph: nx.Graph, output_folder: str = None) -> None:
     """
     Plot the VIP graph on the specific folder
+
+    :param graph: the graph to plot
+    :param output_folder: the folder path where to save the file
     """
     nodes = graph.nodes()
     colors = ["#b15928", "#1f78b4"]
@@ -165,9 +179,13 @@ def plot_vip_graph(graph, output_folder=None):
     plt.savefig(output_folder + "VIP.pdf", bbox_inches="tight")
 
 
-def plot_adjacency(graph, output_folder, prefix):
+def plot_adjacency(graph: nx.Graph, output_folder: str, prefix: str) -> None:
     """
     Plot the adjacency matrix on file
+
+    :param graph: the graph to plot
+    :param output_folder: the folder where to save the file
+    :param prefix: the prefix to give to the file
     """
     plt.figure(figsize=(13.5, 5))
 
@@ -178,17 +196,18 @@ def plot_adjacency(graph, output_folder, prefix):
     plt.savefig(output_folder + prefix + "VIP.png")
 
 
-def generate_hdn_network(
-    output_folder,
-    prefix,
-    n_nodes: "number of nodes in the network" = 1000,
-    network_prob: "probability of connection in the network" = 0.005,
-    hdn_probability: "probability of the connection of VIP" = 0.3,
-    hdn_percentage=0.05,
-    number_of_simulations=5,
-    ):
+def generate_hdn_network(output_folder: str, prefix: str, n_nodes: int = 1000, network_prob: float = 0.005,
+                         hdn_probability: float = 0.3, hdn_percentage: float = 0.05, number_of_simulations: int = 5):
     """
     This function generates a simulated network using the VIP model
+
+    :param output_folder: the output folder path
+    :param prefix: the prefix of the file to be saved
+    :param n_nodes: the number of nodes in the network
+    :param network_prob: probability of connection in the network
+    :param hdn_probability: probability of connection of the VIP
+    :param hdn_percentage: percentage of connection
+    :param number_of_simulations: number of simulation to be performed
     """
 
     dm = DegreeModel(

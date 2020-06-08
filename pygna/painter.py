@@ -526,7 +526,7 @@ def plot_adjacency(
 
 def stars(pvalue: float) -> str:
     """
-    Converts a pvalue with the corresponding stars
+    Converts a pvalue into the corresponding stars
 
     :param pvalue: The P-Value to be converted
     :type: float
