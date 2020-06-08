@@ -126,6 +126,9 @@ def geneset_localisation_statistic_median(network, geneset, diz={}, observed_fla
 
 
 def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
+    """
+    Identify the genes in a geneset
+    """
     n = np.array([diz["nodes"].index(i) for i in geneset])
     diz = diz["matrix"]
 
@@ -136,6 +139,9 @@ def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
 
 
 def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
+    """
+    Evaluate the length of a observed network
+    """
     # Largest Connected Component for the subgraph induced by the geneset
     module = nx.subgraph(network, geneset)
 

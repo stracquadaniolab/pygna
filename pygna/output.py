@@ -36,11 +36,16 @@ class Output:
             logging.warning('The output table is saved as csv file, the name does not match the file extension')
 
     def set_diffusion_matrix(self, diffusion_matrix_file):
+        """
+        Set the diffusion matrix file
+        """
         self.diffusion_matrix_file = diffusion_matrix_file
 
     ## Tables for stats
     def create_st_table_empirical(self):
-
+        """
+        Create the hadings of the table in csv format
+        """
         tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         self.table_file_name = tmp.name
         try:
@@ -51,20 +56,17 @@ class Output:
             tmp.close()
 
     def close_temporary_table(self):
+        """
+        Remove the temporary file
+        """
         shutil.copy(self.table_file_name, self.output_table_results)
         os.remove(self.table_file_name)
 
-    def update_st_table_empirical(
-        self,
-        setname,
-        n_mapped,
-        n_geneset,
-        number_of_permutations,
-        observed,
-        empirical_pvalue,
-        mean_null,
-        var_null,
-    ):
+    def update_st_table_empirical(self, setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                  empirical_pvalue, mean_null, var_null):
+        """
+        Update the table content
+        """
         setname = setname.replace(",", "_")
         with open(self.table_file_name, "a") as f:
             f.write(
@@ -91,6 +93,9 @@ class Output:
 
     ## Tables for comparisons
     def create_comparison_table_empirical(self):
+        """
+        Write the hadings for the comparison table
+        """
         tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         self.table_file_name = tmp.name
         try:
@@ -115,6 +120,9 @@ class Output:
         mean_null,
         var_null,
     ):
+        """
+        Update the content of the comparison table
+        """
         setname_A = setname_A.replace(",", "_")
         setname_B = setname_B.replace(",", "_")
         with open(self.table_file_name, "a") as f:
@@ -144,7 +152,9 @@ class Output:
             )
 
     def add_GMT_entry(self, key, descriptor, gene_list):
-
+        """
+        Add a gmt entry in the GMT file
+        """
         try:
             self.GMT_dict[key]
         except KeyError:
@@ -156,11 +166,17 @@ class Output:
             logging.warning("Key Already Exists: " + str(key))
 
     def create_GMT_output(self, output_gmt):
+        """
+        Write the GMT line on the GMT file
+        """
         self.output_gmt = output_gmt
         print_GMT(self.GMT_dict, self.output_gmt)
 
 
 def print_GMT(GMT_dictionary, output_file):
+    """
+    Save the dictionary on a GMT file
+    """
     with open(output_file, "w") as f:
         f.write("")
 
@@ -170,15 +186,14 @@ def print_GMT(GMT_dictionary, output_file):
             f.write(str(key) + "\t" + str(dict_set["descriptor"]) + "\t" + genes_dict + "\n")
 
 
-def apply_multiple_testing_correction(
-    table_file, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
-):
+def apply_multiple_testing_correction(table_file, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1):
+    """
+    Apply the multiple testing correction and save the file on csv
+    """
     with open(table_file, "r+") as f:
         table = pd.read_csv(f)
 
-    rejects, pval, k, bonf = multi.multipletests(
-        table[pval_col].values, alpha=float(threshold), method=method
-    )
+    rejects, pval, k, bonf = multi.multipletests(table[pval_col].values, alpha=float(threshold), method=method)
     table["rejects"] = rejects
     table["bh_pvalue"] = pval
     table["k"] = k

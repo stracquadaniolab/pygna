@@ -134,6 +134,9 @@ class StatisticalComparison:
 ###############################################################################
 
 def comparison_shortest_path(network, genesetA, genesetB, diz):
+    """
+    Evaluate the shortest path between two genesets
+    """
     n = np.array([diz["nodes"].index(i) for i in genesetA])
     m = np.array([diz["nodes"].index(i) for i in genesetB])
     if len(n) == 0 or len(m) == 0:
@@ -148,6 +151,9 @@ def comparison_shortest_path(network, genesetA, genesetB, diz):
 
 
 def calculate_sum(n, m, diz):
+    """
+    Evaluate the sum of the columns of two matrices
+    """
     diz = diz["matrix"]
     sub_matrix = diz[n[:, None], m]
     sub_matrix = np.where(sub_matrix != np.inf, sub_matrix, 0)
@@ -157,6 +163,9 @@ def calculate_sum(n, m, diz):
 
 
 def comparison_random_walk(network, genesetA, genesetB, diz={}):
+    """
+    Evaluate the random walk on two genesets
+    """
     try:
         diz["matrix"]
     except KeyError:

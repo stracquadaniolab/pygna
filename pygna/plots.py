@@ -23,7 +23,6 @@ class PygnaFigure(ABC):
     def _save_fig(self):
         """
         This method saves the figure using the matplotlib framework
-
         """
         plt.savefig(self.filename)
 

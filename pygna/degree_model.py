@@ -18,10 +18,16 @@ class DegreeModel(object):
         self.cluster_dict = {}
 
     def set_nodes(self, nodes_names):
+        """
+        Set the name of the nodes
+        """
         self.nodes = nodes_names
         self.n_nodes = len(nodes_names)
 
     def create_graph(self):
+        """
+        Create a graph from the nodes
+        """
         reject = True
         logging.info("Reject=" + str(reject))
         while reject:
@@ -40,10 +46,15 @@ class DegreeModel(object):
         self.graph = graph
 
     def plot_graph(self):
+        """
+        TBD
+        """
         pass
 
     def write_network(self, output_file):
-
+        """
+        Write on file the network as an edge list
+        """
         self.network_file = output_file
 
         logging.info("Network written on %s" % (output_file))
@@ -54,7 +65,9 @@ class DegreeModel(object):
             logging.error("output file format unknown")
 
     def write_genelist(self, output_file):
-
+        """
+        Write the GMT gene list on file
+        """
         self.genelist_file = output_file
 
         clusters = nx.get_node_attributes(self.graph, "cluster")
@@ -108,7 +121,9 @@ def generate_graph_vip(n_nodes, n_vip, network_prob=0.5, vip_prob=1, node_names=
 
 
 def plot_vip_graph(graph, output_folder=None):
-
+    """
+    Plot the VIP graph on the specific folder
+    """
     nodes = graph.nodes()
     colors = ["#b15928", "#1f78b4"]
     cluster = nx.get_node_attributes(graph, "cluster")
@@ -151,7 +166,9 @@ def plot_vip_graph(graph, output_folder=None):
 
 
 def plot_adjacency(graph, output_folder, prefix):
-
+    """
+    Plot the adjacency matrix on file
+    """
     plt.figure(figsize=(13.5, 5))
 
     plt.subplot(1, 1, 1)
@@ -170,8 +187,8 @@ def generate_hdn_network(
     hdn_percentage=0.05,
     number_of_simulations=5,
     ):
-
-    """ This function generates a simulated network using the VIP model
+    """
+    This function generates a simulated network using the VIP model
     """
 
     dm = DegreeModel(
