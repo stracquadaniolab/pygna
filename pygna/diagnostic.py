@@ -46,7 +46,6 @@ def plot_degree(degree_object, output_file):
 def plot_connected_components(c_components, output_file):
     """
     Diagnosis tool for the connected components object.
-
     Creates the histogram of the components length, to analyse the relationship between the lcc
     and the other c_components, and prints some overall stats about the connected components
     """
@@ -79,7 +78,6 @@ def plot_connected_components(c_components, output_file):
 def plot_diffusion_matrix(nodes, matrix, filename, show_labels=False):
     """
     Diagnosis tool for a diffusion matrix.
-
     Shows the weighted adjacency matrix that is the output of a build process
     """
 

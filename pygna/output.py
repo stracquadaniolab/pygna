@@ -206,8 +206,7 @@ def apply_multiple_testing_correction(table_file, pval_col="empirical_pvalue", m
 
 def write_graph_summary(graph, output_file, net_name=None):
     """
-    This function takes a graph as input and writes the network
-    properties in a text file
+    This function takes a graph as input and writes the network properties in a text file
     """
 
     if not net_name:

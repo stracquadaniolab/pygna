@@ -10,6 +10,7 @@ class TableElaboration:
     def clean_table(table, stat_col="stat"):
         """
         This method clean the table from the N/A values
+
         :param table: pd.dataframe, representing the table to be cleaned
         :param stat_col: str, the column to be cleaned
 
@@ -24,10 +25,10 @@ class TableElaboration:
     def filter_table(table, filter_column="padj", alternative="less", threshold=0.01):
         """
         This method filters a table according to a filter rule
+
         :param table: pd.dataframe, the table to be filtered
         :param filter_column: str, column with the values to be filtered
-        :param alternative: str, alternative to use for the filterK with "less" the filter is applied <threshold;
-        otherwise >= threshold
+        :param alternative: str, alternative to use for the filterK with "less" the filter is applied <threshold; otherwise >= threshold
         :param threshold: float, threshold for the filter
 
         :return: pd.dataframe, the table filtered
