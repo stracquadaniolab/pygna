@@ -58,8 +58,8 @@ jobs:
         uses: docker/build-push-action@v1
         with:
           dockerfile: ./docker/dockerfile
+          registry: docker.pkg.github.com
           repository: ${{ github.repository }}/pygna
           tags: latest
           username: ${{ github.ref }}
           password: ${{ secrets.GH_TOKEN }}
-          registry: docker.pkg.github.com
