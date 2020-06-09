@@ -19,11 +19,13 @@ Follow the example below.
 Step 1
 ______
 Import Pygna and its libraries
+
     >>> from pygna import *
 
 Step 2
 ______
 Load the dictionary and the network you want to use
+
     >>> rw_dict = {"nodes": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[0],
     ...            "matrix": read_distance_matrix(rwr_matrix_filename, in_memory=in_memory)[1]}
     >>> network = pygna.reading_class.ReadTsv("mynetwork.tsv").get_network()
@@ -50,4 +52,5 @@ For example here it is reported the calculation of comparison shortest path betw
 Step 4
 ______
 Pass your custom function to Pygna statistical class like:
+
     >>> st_comparison = pygna.statistical_comparison.StatisticalComparison(comparison_shortest_path, network, n_proc=cores, diz=rw_dict)

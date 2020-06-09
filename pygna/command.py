@@ -20,7 +20,8 @@ import tables
 
 def read_distance_matrix(distance_matrix_filename, in_memory=False):
     """
-    Reads the large matrix .Uses a hdf5 file to work with it
+    Reads the large matrix. Uses a hdf5 file to work with it
+
     :param distance_matrix_filename: str, the file to read
     :param in_memory: bool, if the table must be kept in memory
     """
@@ -147,7 +148,6 @@ def test_topology_internal_degree(
 ):
     """
         Performs the analysis of internal degree.
-
         It computes a p-value for the ratio of internal degree
         of the geneset being bigger than the one expected by chance
         for a geneset of the same size.

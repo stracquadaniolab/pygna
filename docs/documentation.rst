@@ -1,4 +1,4 @@
-Pygna Documentation
+Pygna API
 ===================
 
 The following sections describe the different Pygna classes and functions available.

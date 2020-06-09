@@ -3,12 +3,17 @@ from abc import ABC
 import textwrap
 import logging
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from palettable.colorbrewer.diverging import *
 from palettable.colorbrewer.sequential import *
 
 
 class PygnaFigure(ABC):
+    """
+    Abstract class that implements a general figure in Pygna. It has a class attribute representing the default ratios
+    for the figures
+    """
     ratios = {
         "volcano": [3, 4],
         "heatmap": [4, 3],
@@ -20,29 +25,28 @@ class PygnaFigure(ABC):
         super(PygnaFigure, self).__init__()
         self.filename = None
 
-    def _save_fig(self):
+    def _save_fig(self) -> None:
         """
         This method saves the figure using the matplotlib framework
-
         """
         plt.savefig(self.filename)
 
-    def _get_dimensions(self, fig_type, size):
+    def _get_dimensions(self, fig_type: str, size: int) -> [int, int, int, int]:
         """
         This methods maps the ratios saved in the class with the figure type and returns the correct ration for each
         figure
 
-        :param fig_type: str, the figure type to be printed
-        :param size: int, the size of the plot
-        :return: int, int, int, int the width, height, fontsize, scalar of the figure
+        :param fig_type:  the figure type to be printed
+        :param size:  the size of the plot
+        :return: the width, height, fontsize, scalar of the figure
         """
-        width = self.ratios[fig_type][0]*size
-        height = self.ratios[fig_type][1]*size
-        fontsize = size*5
+        width = self.ratios[fig_type][0] * size
+        height = self.ratios[fig_type][1] * size
+        fontsize = size * 5
         if size <= 3:
-            scalar = size**4
+            scalar = size ** 4
         else:
-            scalar = size**3
+            scalar = size ** 3
         return int(width), int(height), int(fontsize), int(scalar)
 
 
@@ -51,9 +55,24 @@ class VolcanoPlot(PygnaFigure):
     This class represent a Volcano Plot. It saves the value in the dataframe on a file.
     """
 
-    def __init__(self, df, output_file, loc=2, p_col="empirical_pvalue", id_col="setname_B", plotting_col="observed",
-                 x_threshold=0.1, y_threshold=0.1, y_label="-log10(pvalue)", x_label="z-score", annotate=False,
-                 size=2):
+    def __init__(self, df: pd.DataFrame, output_file: str, loc: int = 2, p_col: str = "empirical_pvalue",
+                 id_col: str = "setname_B", plotting_col: str = "observed", x_threshold: float = 0.1,
+                 y_threshold: float = 0.1, y_label: str = "-log10(pvalue)", x_label: str = "z-score",
+                 annotate: bool = False, size: int = 2):
+        """
+        :param df: the dataframe containing the data
+        :param output_file: the output file
+        :param loc: the location where to print the legend
+        :param p_col: the column containing the empirical p-value values
+        :param id_col: the column containing the setname
+        :param plotting_col: the column to plot
+        :param x_threshold: value of the threshold for the x axis
+        :param y_threshold: value of the threshold for the y axis
+        :param y_label: label for the y axis
+        :param x_label: label for the x axis
+        :param annotate: whether should be printed the annotaion table
+        :param size: the size of the plots
+        """
         super().__init__()
         self.df = df
         self.filename = output_file

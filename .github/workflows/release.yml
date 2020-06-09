@@ -36,7 +36,7 @@ jobs:
             conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
 
       - name: "Upload Conda package"
-        if: contains(github.refs, 'master')
+        if: startsWith(github.ref, 'refs/tags/v')
         run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 
       - name: "Setup Python for PIP"
@@ -51,15 +51,15 @@ jobs:
         run: python setup.py sdist bdist_wheel
 
       - name: "Publish package on PyPi"
-        if: contains(github.refs, 'master')
+        if: startsWith(github.ref, 'refs/tags/v')
         run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
 
       - name: "Build the Docker image"
         uses: docker/build-push-action@v1
         with:
           dockerfile: ./docker/dockerfile
+          registry: docker.pkg.github.com
           repository: ${{ github.repository }}/pygna
           tags: latest
           username: ${{ github.ref }}
           password: ${{ secrets.GH_TOKEN }}
-          registry: docker.pkg.github.com

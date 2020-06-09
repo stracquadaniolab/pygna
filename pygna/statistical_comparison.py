@@ -12,7 +12,7 @@ class StatisticalComparison:
     Please refer to the single method documentation for the returning values
     """
 
-    def __init__(self, comparison_statistic, network, n_proc=1, diz={}):
+    def __init__(self, comparison_statistic, network: nx.Graph, n_proc: int = 1, diz: dict = {}):
         """
         :param comparison_statistic: the method do be applied to perform the statistical analysis
         :param network: the network to be used during the analysis
@@ -33,15 +33,17 @@ class StatisticalComparison:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
 
-    def comparison_empirical_pvalue(self, genesetA, genesetB, alternative="less", max_iter=100, keep=False):
+    def comparison_empirical_pvalue(self, genesetA: set, genesetB: set, alternative: str = "less", max_iter: int = 100,
+                                    keep: bool = False) -> [int, float, float, int, int]:
         """
+        Calculate the empirical value between two genesets
+
         :param genesetA: the first geneset to compare
         :param genesetB: the second geneset to compare
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the maximum number of iterations
         :param keep: if the geneset B should not be kept
-
-        :return: the list with the data calculated
+        :return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB): the list with the data calculated
         """
 
         # mapping genesets
@@ -62,21 +64,17 @@ class StatisticalComparison:
         else:
             pvalue = (np.sum(null_distribution <= observed) + 1) / (float(len(null_distribution) + 1))
 
-        return (
-            observed,
-            pvalue,
-            null_distribution,
-            len(mapped_genesetA),
-            len(mapped_genesetB),
-        )
+        return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB)
 
-    def get_comparison_null_distribution_mp(self, genesetA, genesetB, max_iter=100, keep=False):
+    def get_comparison_null_distribution_mp(self, genesetA: list, genesetB: list, max_iter: int = 100,
+                                            keep: bool = False) -> np.ndarray:
         """
+        Calculate the null distribution between two genesets with multiple CPUs
+
         :param genesetA: the first geneset to compare
         :param genesetB: the second geneset to compare
         :param max_iter: maximum number of iteration to perform
         :param keep: if the geneset B should not be kept
-
         :return: the array with null distribution
         """
 
@@ -100,13 +98,14 @@ class StatisticalComparison:
 
         return np.asarray(null_distribution)
 
-    def get_comparison_null_distribution(self, genesetA, genesetB, n_samples, keep):
+    def get_comparison_null_distribution(self, genesetA: list, genesetB: list, n_samples: int, keep: bool) -> list:
         """
+        Calculate the null distribution between two genesets with single CPU
+
         :param genesetA: the first geneset to compare
         :param genesetB: the second geneset to compare
         :param n_samples: the number of samples to be taken
         :param keep: if the geneset B should not be kept
-
         :return: the random distribution calculated
         """
         np.random.seed()
@@ -123,9 +122,8 @@ class StatisticalComparison:
             for i in range(n_samples):
                 random_sample_A = np.random.choice(list(self.__universe), len(genesetA), replace=False)
                 random_sample_B = np.random.choice(list(self.__universe), len(genesetB), replace=False)
-                random_dist.append(
-                    self.__comparison_statistic(self.__network, set(random_sample_A), set(random_sample_B),
-                                                self.__diz, ))
+                random_dist.append(self.__comparison_statistic(self.__network, set(random_sample_A),
+                                                               set(random_sample_B), self.__diz))
         return random_dist
 
 
@@ -133,7 +131,15 @@ class StatisticalComparison:
 ###  TEST STATISTICS FOR COMPARISONS  #########################################
 ###############################################################################
 
-def comparison_shortest_path(network, genesetA, genesetB, diz):
+def comparison_shortest_path(network: nx.Graph, genesetA: list, genesetB: list, diz: dict) -> float:
+    """
+    Evaluate the shortest path between two genesets
+
+    :param network: the graph representing the network
+    :param genesetA: the first geneset list
+    :param genesetB: the second geneset list
+    :param diz: the dictionary containing the nodes name and index
+    """
     n = np.array([diz["nodes"].index(i) for i in genesetA])
     m = np.array([diz["nodes"].index(i) for i in genesetB])
     if len(n) == 0 or len(m) == 0:
@@ -147,7 +153,14 @@ def comparison_shortest_path(network, genesetA, genesetB, diz):
     return d_AB - (d_A + d_B) / 2
 
 
-def calculate_sum(n, m, diz):
+def calculate_sum(n: np.ndarray, m: np.ndarray, diz: dict) -> np.ndarray:
+    """
+    Evaluate the sum of the columns of two matrices
+
+    :param n: the first column
+    :param m: the second column
+    :param diz: the dictionary containing the data
+    """
     diz = diz["matrix"]
     sub_matrix = diz[n[:, None], m]
     sub_matrix = np.where(sub_matrix != np.inf, sub_matrix, 0)
@@ -156,7 +169,15 @@ def calculate_sum(n, m, diz):
     return sum_columns
 
 
-def comparison_random_walk(network, genesetA, genesetB, diz={}):
+def comparison_random_walk(network: nx.Graph, genesetA: list, genesetB: list, diz: dict = {}) -> float:
+    """
+    Evaluate the random walk on two genesets
+
+    :param network: the graph representing the network
+    :param genesetA: the first geneset list
+    :param genesetB: the second geneset list
+    :param diz: the dictionary containing the nodes name and index
+    """
     try:
         diz["matrix"]
     except KeyError:
