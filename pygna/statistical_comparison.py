@@ -33,7 +33,7 @@ class StatisticalComparison:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
 
-    def comparison_empirical_pvalue(self, genesetA: str, genesetB: str, alternative: str = "less", max_iter: int = 100,
+    def comparison_empirical_pvalue(self, genesetA: set, genesetB: set, alternative: str = "less", max_iter: int = 100,
                                     keep: bool = False) -> [int, float, float, int, int]:
         """
         Calculate the empirical value between two genesets

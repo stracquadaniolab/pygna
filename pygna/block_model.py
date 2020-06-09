@@ -6,12 +6,11 @@ import logging
 from pygna import output
 from pygna.utils import YamlConfig
 import pandas as pd
-import networkx as nx
 
 
 class BlockModel(object):
 
-    def __init__(self, block_model_matrix: pd.DataFrame(), n_nodes: int = 10, nodes_percentage: list = None):
+    def __init__(self, block_model_matrix, n_nodes: int = 10, nodes_percentage: list = None):
         """
         This class implements block model reading and elaboration
 
@@ -37,7 +36,7 @@ class BlockModel(object):
         self.nodes = nodes_names
         self.n_nodes = len(nodes_names)
 
-    def set_bm(self, block_model_matrix: pd.DataFrame()) -> None:
+    def set_bm(self, block_model_matrix: pd.DataFrame) -> None:
         """
         Change block model matrix
 
@@ -111,7 +110,6 @@ class BlockModel(object):
         :param output_file: the output path where to save the results
         """
         self.genelist_file = output_file
-
         clusters = nx.get_node_attributes(self.graph, "cluster")
 
         for i in set(clusters.values()):
@@ -126,7 +124,7 @@ class BlockModel(object):
             logging.error("output file format unknown")
 
 
-def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame(), nodes_in_block: list = False,
+def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame, nodes_in_block: bool = False,
                            node_names: list = None, nodes_percentage: list = None) -> nx.Graph:
     """
     This function creates a graph with n_nodes number of vertices and a matrix block_model that describes the intra e inter-block connectivity.
@@ -146,21 +144,15 @@ def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame(), nodes_in_b
     G = nx.Graph()
 
     if nodes_percentage:
-
         cluster = np.random.choice(block_model.shape[0], size=n_nodes, p=nodes_percentage)
         np.random.shuffle(cluster)
-
     elif nodes_in_block:
-
         list_temp = [nodes_in_block[i] * [i] for i in range(len(nodes_in_block))]
         cluster = np.array([val for sublist in list_temp for val in sublist])
         np.random.shuffle(cluster)
-
     else:
-
         # cluster is an array of random numbers corresponding to the cluster of each node
         cluster = np.random.randint(block_model.shape[0], size=n_nodes)
-
     for i in range(n_nodes):
         G.add_node(node_names[i], cluster=cluster[i])
 
@@ -241,9 +233,8 @@ def generate_sbm2_network(output_folder: 'folder where the simulations are saved
                           n_simulations: 'number of simulated networks for each configuration' = 3
                           ):
     """
-    This function generates the simualted networks and genesets using the stochastic block model with 2 BLOCKS as described in the paper. The output names are going to be prefix_t_<theta0>_p_<percentage>_d_<density>_s_<n_simulation>_network.tsv or _genes.gmt
-    One connected cluster while the rest of the networkhas the same probability of connection.
-    SBM = d *[theta0, 1-theta0 1-theta0, 1-theta0]
+    This function generates the simulated networks and genesets using the stochastic block model with 2 BLOCKS as described in the paper. The output names are going to be prefix_t_<theta0>_p_<percentage>_d_<density>_s_<n_simulation>_network.tsv or _genes.gmt
+    One connected cluster while the rest of the network has the same probability of connection. SBM = d *[theta0, 1-theta0 1-theta0, 1-theta0]
     The simulator checks for connectedness of the generated network, if the generated net is not connected, a new simulation is generated.
 
     :param n_nodes: int, number of nodes in the network

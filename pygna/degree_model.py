@@ -34,13 +34,8 @@ class DegreeModel(object):
         reject = True
         logging.info("Reject=" + str(reject))
         while reject:
-            graph = generate_graph_vip(
-                self.n_nodes,
-                self.n_vip,
-                network_prob=self.network_prob,
-                vip_prob=self.vip_prob,
-                node_names=self.nodes,
-            )
+            graph = generate_graph_vip(self.n_nodes, self.n_vip, network_prob=self.network_prob, vip_prob=self.vip_prob,
+                                       node_names=self.nodes)
             LCC = max(nx.connected_components(graph), key=len)
             reject = len(LCC) != self.n_nodes
             logging.info("Reject=" + str(reject))
@@ -60,7 +55,7 @@ class DegreeModel(object):
         """
         self.network_file = output_file
 
-        logging.info("Network written on %s" % (output_file))
+        logging.info("Network written on %s" % output_file)
 
         if output_file.endswith(".tsv"):
             nx.write_edgelist(self.graph, output_file, data=False, delimiter="\t")
@@ -91,8 +86,8 @@ class DegreeModel(object):
             logging.error("output file format unknown")
 
 
-def generate_graph_vip(n_nodes: int, n_vip: int, network_prob: float = 0.5, vip_prob: int = 1,
-                       node_names: int = None) -> nx.Graph:
+def generate_graph_vip(n_nodes: int, n_vip: int, network_prob: float = 0.5, vip_prob: float = 1,
+                       node_names: list = None) -> nx.Graph:
     """
     This function creates a graph with n_nodes number of vertices and a matrix block_model that describes the intra e inter-block connectivity.
     The nodes_in_block is parameter, list, to control the number of nodes in each cluster

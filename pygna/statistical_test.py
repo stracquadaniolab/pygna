@@ -10,9 +10,8 @@ class StatisticalTest:
     This class implements the statistical analysis performed by Pygna.
     It performs the statistical tests on the given network, elaborates the number of observed genes, the pvalue etc.
     Please refer to the single method documentation for the returning values
-
     """
-    def __init__(self, test_statistic, network, diz={}):
+    def __init__(self, test_statistic, network: nx.Graph, diz: dict = {}):
         """
         :param test_statistic: the statistical function to be used for the calculation of the empirical p-value and the
         null distribution
@@ -31,14 +30,16 @@ class StatisticalTest:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
 
-    def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
+    def empirical_pvalue(self, geneset: set, alternative: str = "less", max_iter: int = 100, cores: int = 1) -> \
+        [int, float, float, int, int]:
         """
+        Calculate the empirical pvalue on the genes list
+
         :param geneset: the geneset to elaborate
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
         :param cores: the number of cores to be used
-
-        :return: the list with the data calculated
+        :return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB): the list with the data calculated
         """
         # mapping geneset
         mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
@@ -64,12 +65,13 @@ class StatisticalTest:
                 len(geneset),
             )
 
-    def get_null_distribution_mp(self, geneset, iter=100, n_proc=1):
+    def get_null_distribution_mp(self, geneset: list, iter: int = 100, n_proc: int = 1):
         """
+        Calculate the null distribution with multiple cores on the geneset
+
         :param geneset: the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
-
         :return: the array with null distribution
         """
         if n_proc == 1:
@@ -88,11 +90,12 @@ class StatisticalTest:
 
         return np.asarray(null_distribution)
 
-    def get_null_distribution(self, geneset, n_samples):
+    def get_null_distribution(self, geneset: list, n_samples: int):
         """
+        Calculate the null distribution over the geneset
+
         :param geneset: the geneset to be used
         :param n_samples: the number of samples to be taken
-
         :return: the random distribution calculated
         """
         np.random.seed()
@@ -109,9 +112,15 @@ class StatisticalTest:
 ###############################################################################
 
 
-def geneset_localisation_statistic_median(network, geneset, diz={}, observed_flag=False):
+def geneset_localisation_statistic_median(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) \
+    -> float:
     """
-    median shortest path for each node
+    Calculate the median shortest path for each node
+
+    :param network: the network used in the analysis
+    :param geneset: the geneset to analyse
+    :param diz: the dictionary containing the genes name
+    :param observed_flag: XXXX
     """
     cum_sum = 0.0
     geneset_index = [diz["nodes"].index(i) for i in geneset]
@@ -125,9 +134,15 @@ def geneset_localisation_statistic_median(network, geneset, diz={}, observed_fla
     return cum_sum / float(len(geneset))
 
 
-def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
+def geneset_localisation_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) \
+    -> float:
     """
     Identify the genes in a geneset
+
+    :param network: the network used in the analysis
+    :param geneset: the geneset to analyse
+    :param diz: the dictionary containing the genes name
+    :param observed_flag: XXXX
     """
     n = np.array([diz["nodes"].index(i) for i in geneset])
     diz = diz["matrix"]
@@ -138,9 +153,14 @@ def geneset_localisation_statistic(network, geneset, diz, observed_flag=False):
     return sum_columns / len(n)
 
 
-def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_module_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) -> float:
     """
     Evaluate the length of a observed network
+
+    :param network: the network used in the analysis
+    :param geneset: the geneset to analyse
+    :param diz: the dictionary containing the genes name
+    :param observed_flag: XXXX
     """
     # Largest Connected Component for the subgraph induced by the geneset
     module = nx.subgraph(network, geneset)
@@ -155,9 +175,15 @@ def geneset_module_statistic(network, geneset, diz={}, observed_flag=False):
         return 0
 
 
-def geneset_total_degree_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_total_degree_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) -> \
+    float:
     """
     Total degree of the geneset: average total_degree
+
+    :param network: the network used in the analysis
+    :param geneset: the geneset to analyse
+    :param diz: the dictionary containing the genes name
+    :param observed_flag: XXXX
     """
     degree = nx.degree(network)
     geneset = list(geneset)
@@ -165,9 +191,15 @@ def geneset_total_degree_statistic(network, geneset, diz={}, observed_flag=False
     return np.average(total)
 
 
-def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_internal_degree_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) \
+    -> float:
     """
     Internal degree ratio: average of the ratio internal_degree/total_degree
+
+    :param network: the network used in the analysis
+    :param geneset: the geneset to analyse
+    :param diz: the dictionary containing the genes name
+    :param observed_flag: XXXX
     """
     degree = nx.degree(network)
     total = np.array([degree[g] for g in geneset])
@@ -182,9 +214,14 @@ def geneset_internal_degree_statistic(network, geneset, diz={}, observed_flag=Fa
     return np.average(ratio)
 
 
-def geneset_RW_statistic(network, geneset, diz={}, observed_flag=False):
+def geneset_RW_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) -> np.ndarray:
     """
     Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
+
+    :param network: the network used in the analysis
+    :param geneset: the geneset to analyse
+    :param diz: the dictionary containing the genes name
+    :param observed_flag: XXXX
     """
     try:
         diz["matrix"]

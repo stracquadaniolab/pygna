@@ -1,5 +1,6 @@
 import logging
 import numpy as np
+import pandas as pd
 import multiprocessing
 
 
@@ -14,8 +15,8 @@ class DiffusionTest:
     Please refer to the single method documentation for the returning values
     """
 
-    def __init__(self, test_statistic, nodes, diffusion_matrix, weights_table, names_col="name", weights_col="stat",
-                 diz={}, ):
+    def __init__(self, test_statistic, nodes: list, diffusion_matrix: np.matrix, weights_table: pd.DataFrame,
+                 names_col: str = "name", weights_col: str = "stat", diz: dict = {}):
         """
         :param test_statistic: the function to be applied to calculate the statistics
         :param nodes: the network nodes
@@ -30,7 +31,6 @@ class DiffusionTest:
         self.nodes = nodes
         self.diffusion_matrix = diffusion_matrix
         self.diz = diz
-        # print(type(self.__network))
         self.universe = set(self.nodes)
 
         self.table = weights_table[weights_table[names_col].isin(self.nodes)]
@@ -48,14 +48,16 @@ class DiffusionTest:
         for k in range(len(self.table_index)):
             self.weights[self.table_index[k], 0] = self.table[weights_col].values.tolist()[k]
 
-    def empirical_pvalue(self, geneset, alternative="less", max_iter=100, cores=1):
+    def empirical_pvalue(self, geneset: list, alternative: str = "less", max_iter: int = 100, cores: int = 1) -> \
+        [int, float, float, int, int]:
         """
+        Calculate the empirical pvalue on the genes list
+
         :param geneset: the geneset to elaborate
         :param alternative: the pvalue selection of the observed genes
         :param max_iter: the number of iterations to be performed
         :param cores: the number of cores to be used
-
-        :return: the list with the data calculated
+        :return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB): the list with the data calculated
         """
         # mapping geneset
 
@@ -73,9 +75,8 @@ class DiffusionTest:
             logging.info("Observed %f." % observed)
 
             # iterations
-            null_distribution = DiffusionTest.get_null_distribution_mp(
-                self, geneset_index, max_iter, n_proc=cores
-            )
+            null_distribution = DiffusionTest.get_null_distribution_mp(self, geneset_index, max_iter, n_proc=cores)
+
             # computing empirical pvalue
             pvalue = 1
             if alternative == "greater":
@@ -85,12 +86,13 @@ class DiffusionTest:
 
             return observed, pvalue, null_distribution, len(mapped_geneset), len(geneset)
 
-    def get_null_distribution_mp(self, geneset_index, iter=100, n_proc=1):
+    def get_null_distribution_mp(self, geneset_index: list, iter: int = 100, n_proc: int = 1) -> np.ndarray:
         """
+        Calculate the null distribution with multiple cores on the geneset
+
         :param geneset_index: the geneset id that point to the geneset to be used
         :param iter: the number of iterations to perform
         :param n_proc: the number of cpu to use for the elaboration
-
         :return: the array with null distribution
         """
         print("n_proc=" + str(n_proc))
@@ -111,12 +113,13 @@ class DiffusionTest:
 
         return np.asarray(null_distribution)
 
-    def get_null_distribution(self, geneset_index, n_samples, randomize="index"):
+    def get_null_distribution(self, geneset_index: list, n_samples: int, randomize: str = "index") -> list:
         """
+        Calculate the null distribution over the geneset
+
         :param geneset_index: the geneset id that points to the geneset to be used
         :param n_samples: the number of samples to be taken
-
-        :return: the random distribution calculated
+        :return: the random distribution calculated for each element
         """
         np.random.seed()
         random_dist = []
@@ -136,7 +139,8 @@ class DiffusionTest:
 ###############################################################################
 
 
-def weights_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed_flag=False):
+def weights_diffusion_statistic(matrix: np.matrix, weights: np.matrix, geneset_index: list, diz: dict = {},
+                                observed_flag: bool = False) -> float:
     """
     Not in use.
     This statistic reweights the original weights and
@@ -155,11 +159,16 @@ def weights_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed
     return stat
 
 
-def hotnet_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed_flag=False):
+def hotnet_diffusion_statistic(matrix: np.matrix, weights: np.matrix, geneset_index: list, diz: dict = {},
+                               observed_flag: bool = False) -> np.ndarray:
     """
     HOTNET2 like diffusion.
-    Applies the diagonal matrix of weights and gets all rows and
-    columns according to the genelist
+    Applies the diagonal matrix of weights and gets all rows and columns according to the genelist
+
+    :param matrix: the matrix corresponding to the graph
+    :param weights: the matrix of which it will be created the diagonal matrix
+    :param geneset_index: the gene list index
+    :param observed_flag: TBD
     """
     weights = np.diagflat(weights.T)
     if matrix.shape[1] != weights.shape[0]:

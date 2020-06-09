@@ -15,7 +15,7 @@ class Output:
     """
 
     def __init__(self, network_filename: str, output_table_results_file: str, analysis: str, geneset_file: str,
-                 setnames: str, geneset_file_B: str = None, setnames_B: str = None):
+                 setnames: list, geneset_file_B: str = None, setnames_B: list = None):
         """
         :param network_filename: the file containing the network
         :param output_table_results_file: the output table that contains the results to use
@@ -69,7 +69,7 @@ class Output:
         os.remove(self.table_file_name)
 
     def update_st_table_empirical(self, setname: str, n_mapped: int, n_geneset: int, number_of_permutations: int,
-                                  observed: int, empirical_pvalue: float, mean_null: float, var_null: float) -> None:
+                                  observed: int, empirical_pvalue: float, mean_null: np.mean, var_null: np.var) -> None:
         """
         Update the table content
 
@@ -105,7 +105,7 @@ class Output:
     def update_comparison_table_empirical(self, setname_A: str, setname_B: str, n_geneset_A: int, n_mapped_A: int,
                                           n_geneset_B: int, n_mapped_B: int, n_overlaps: int,
                                           number_of_permutations: int, observed: int, empirical_pvalue: float,
-                                          mean_null: float, var_null: float) -> None:
+                                          mean_null: np.mean, var_null: np.var) -> None:
         """
         Update the content of the comparison table
 

@@ -30,10 +30,10 @@ class ReadTsv(ReadingData):
     A class used to read the .tsv network file inside pygna
     """
 
-    def __init__(self, filename: str, pd_table: pd.DataFrame = False, int_type: int = None):
+    def __init__(self, filename: str, pd_table: bool = False, int_type: int = None):
         """
-        :param filename: str, represents the path to the network file
-        :param pd_table: bool, if the results is going to be a pd.dataframe
+        :param filename: represents the path to the network file
+        :param pd_table: if the results is going to be a pd.dataframe
         """
         super().__init__()
         self.filename = filename
