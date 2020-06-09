@@ -3,11 +3,16 @@ import seaborn as sns
 import logging
 import numpy as np
 from matplotlib.offsetbox import AnchoredText
+import networkx as nx
+import pandas as pd
 
 
-def plot_degree(degree_object, output_file):
+def plot_degree(degree_object: nx.Graph, output_file: str):
     """
     Diagnosis tool for the degree object
+
+    :param degree_object: the graph to plot
+    :param output_file: the path to save the file
     """
 
     D = dict(degree_object)
@@ -20,15 +25,11 @@ def plot_degree(degree_object, output_file):
     key_max = max(degrees.keys(), key=(lambda k: degrees[k]))
     g1 = sns.distplot([degrees[key_max]], hist=False, kde=False, rug=True, color='r', ax=axes)
     axes.annotate('%s: %d' % (key_max, degrees[key_max]), xy=(degrees[key_max], 0),
-                  xytext=(degrees[key_max], axes.dataLim.y1 / 2),
-                  arrowprops=dict(arrowstyle="->")
-                  )
+                  xytext=(degrees[key_max], axes.dataLim.y1 / 2), arrowprops=dict(arrowstyle="->"))
 
     g1 = sns.distplot([np.median(degree_values)], hist=False, kde=False, rug=True, color='r', ax=axes)
     axes.annotate('median %f' % np.median(degree_values), xy=(np.median(degree_values), 0),
-                  xytext=(np.median(degree_values), axes.dataLim.y1 / 2),
-                  arrowprops=dict(arrowstyle="->")
-                  )
+                  xytext=(np.median(degree_values), axes.dataLim.y1 / 2), arrowprops=dict(arrowstyle="->"))
 
     sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
     g1.set_ylabel("Density")
@@ -43,11 +44,14 @@ def plot_degree(degree_object, output_file):
         fig.savefig(output_file + '.png', format="png")
 
 
-def plot_connected_components(c_components, output_file):
+def plot_connected_components(c_components: nx.connected_components, output_file: str) -> None:
     """
     Diagnosis tool for the connected components object.
     Creates the histogram of the components length, to analyse the relationship between the lcc
     and the other c_components, and prints some overall stats about the connected components
+
+    :param c_components: the list of the connected components
+    :param output_file:  the path to save the file
     """
     c_components_len = [len(k) for k in c_components]
 
@@ -75,24 +79,36 @@ def plot_connected_components(c_components, output_file):
         fig.savefig(output_file + '.png', format="png")
 
 
-def plot_diffusion_matrix(nodes, matrix, filename, show_labels=False):
+def plot_diffusion_matrix(nodes: list, matrix: np.matrix, filename: str, show_labels: bool = False) -> None:
     """
     Diagnosis tool for a diffusion matrix.
     Shows the weighted adjacency matrix that is the output of a build process
+
+    :param nodes: the network nodes
+    :param matrix: the diffusion matrix
+    :param filename: the path to save the file
+    :param show_labels: if labels should be plotted
     """
 
     logging.info("Plotting figure as " + str(filename))
     fig, axes = plt.subplots(1)
     axes.imshow(matrix, cmap="PuBu")
-    if show_labels == True:
+    if show_labels:
         pass
     plt.show()
     fig.savefig(filename + ".pdf", format="pdf")
 
 
-def plot_null_distribution(null_distribution, observed, output_file, setname, alternative="greater"):
+def plot_null_distribution(null_distribution: list, observed: list, output_file: str, setname: str,
+                           alternative: str = "greater") -> None:
     """
     Saves the density plot of the null distribution and pinpoints the observed value
+
+    :param null_distribution: the list with the values from the null distribution
+    :param observed: list of the observed genes
+    :param output_file: the path to save the file
+    :param setname: the name of the gene set
+    :param alternative: use "greater" if you want to take the genes with greater than the observed value
     """
 
     fig, axes = plt.subplots(1, figsize=(8, 6))

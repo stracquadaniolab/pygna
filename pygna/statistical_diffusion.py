@@ -68,7 +68,8 @@ class DiffusionTest:
             geneset_index = [map_table2matrix(self.nodes, i) for i in mapped_geneset]
             logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
 
-            observed = self.test_statistic(self.diffusion_matrix,self.weights,geneset_index,self.diz,observed_flag=True)
+            observed = self.test_statistic(self.diffusion_matrix, self.weights, geneset_index, self.diz,
+                                           observed_flag=True)
             logging.info("Observed %f." % observed)
 
             # iterations
@@ -82,13 +83,7 @@ class DiffusionTest:
             else:
                 pvalue = (np.sum(null_distribution <= observed) + 1) / (float(max_iter) + 1)
 
-            return (
-                observed,
-                pvalue,
-                null_distribution,
-                len(mapped_geneset),
-                len(geneset),
-            )
+            return observed, pvalue, null_distribution, len(mapped_geneset), len(geneset)
 
     def get_null_distribution_mp(self, geneset_index, iter=100, n_proc=1):
         """
@@ -107,7 +102,7 @@ class DiffusionTest:
             n_trial = int(iter / n_proc)
             print("n_trial=" + str(n_trial))
             results = [p.apply_async(DiffusionTest.get_null_distribution,
-                                     args=(self, geneset_index, n_trial),)for w in list(range(1, n_proc + 1))]
+                                     args=(self, geneset_index, n_trial), ) for w in list(range(1, n_proc + 1))]
             null_distribution = np.array([])
             for r in results:
                 null_distribution = np.hstack((null_distribution, np.array(r.get())))
@@ -131,7 +126,7 @@ class DiffusionTest:
                 np.random.shuffle(random_weights)
             else:
                 np.random.shuffle(geneset_index)
-            random_dist.append(self.test_statistic(self.diffusion_matrix,random_weights,geneset_index,self.diz,
+            random_dist.append(self.test_statistic(self.diffusion_matrix, random_weights, geneset_index, self.diz,
                                                    observed_flag=True))
         return random_dist
 
@@ -141,9 +136,7 @@ class DiffusionTest:
 ###############################################################################
 
 
-def weights_diffusion_statistic(
-    matrix, weights, geneset_index, diz={}, observed_flag=False
-):
+def weights_diffusion_statistic(matrix, weights, geneset_index, diz={}, observed_flag=False):
     """
     Not in use.
     This statistic reweights the original weights and

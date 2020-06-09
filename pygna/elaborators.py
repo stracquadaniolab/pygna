@@ -14,7 +14,6 @@ class TableElaboration:
 
         :param table: dataframerepresenting the table to be cleaned
         :param stat_col: the column to be cleaned
-
         :return: the table cleaned from the N/A values
         """
         logging.info("original table has %d rows" % len(table))
@@ -32,7 +31,6 @@ class TableElaboration:
         :param filter_column: Column with the values to be filtered
         :param alternative: Alternative to use for the filterK with "less" the filter is applied <threshold; otherwise >= threshold
         :param threshold: Threshold for the filter
-
         :return: The table filtered
         """
         threshold = float(threshold)
