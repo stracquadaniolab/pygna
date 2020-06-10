@@ -13,6 +13,7 @@ PyGNA is a Geneset Network Analysis python package: it performs various analyses
 
     quickstart
     tutorial
+    vignettes
     CLI
     simulations
     changelog

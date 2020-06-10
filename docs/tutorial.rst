@@ -169,6 +169,3 @@ The package is integrable in Snakemake pipelines. We already provide
 some sample analyses in [snakemake workflow](https://github.com/stracquadaniolab/workflow-pygna).
 but we encourage to explore all the functionalities of the package and to raise issues
 for bugs and alternative functionalities you might need.
-
-
-

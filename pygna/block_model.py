@@ -32,6 +32,15 @@ class BlockModel(object):
         Set the nodes name of the block model
 
         :param nodes_names: the names list
+
+        Example
+        _______
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> nodes = list("A", "B", "C")
+        >>> bm.set_nodes(nodes)
         """
         self.nodes = nodes_names
         self.n_nodes = len(nodes_names)
@@ -41,6 +50,15 @@ class BlockModel(object):
         Change block model matrix
 
         :param block_model_matrix: the block model matrix
+
+        Example
+        _______
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> bmm = pd.DataFrame(mydata_matrix)
+        >>> bm.set_bm(bmm)
         """
 
         if block_model_matrix.shape[0] == self.n_clusters:
@@ -53,6 +71,14 @@ class BlockModel(object):
         Pass the percentage of nodes in each block as a list, for example [0.5, 0.5]
 
         :param nodes_percentage: percentage of the nodes
+
+        Example
+        _______
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> bm.set_nodes_in_block_percentage([0.5, 0.5])
         """
         self.nodes_percentage = nodes_percentage
 
@@ -61,12 +87,22 @@ class BlockModel(object):
         Set the nodes in the block model
 
         :param nodes_in_block: the number of nodes in the block list
+
+        Example
+        _______
+
+
         """
         self.nodes_in_block = nodes_in_block
 
     def create_graph(self) -> None:
         """
         Create a graph from the parameters passed in the constructor of the class
+
+        Example
+        _______
+        >>> bm = BlockModel(np.array(config["BlockModel"]["matrix"]), n_nodes=config["BlockModel"]["n_nodes"], nodes_percentage=config["BlockModel"]["nodes_percentage"])
+        >>> bm.create_graph()
         """
         reject = True
         logging.info('Reject=' + str(reject))
@@ -85,6 +121,14 @@ class BlockModel(object):
         Plot the block model graph
 
         :param output_folder: the folder where to save the result
+
+        Example
+        _______
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> bm.plot_graph("block_model_path.pdf")
         """
         plot_bm_graph(self.graph, self.bm, output_folder=output_folder)
 
@@ -93,6 +137,14 @@ class BlockModel(object):
         Save the network on a given file
 
         :param output_file: the output path where to save the results
+
+        Example
+        _______
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> bm.write_network("network.tsv")
         """
         self.network_file = output_file
 
@@ -108,6 +160,14 @@ class BlockModel(object):
         Save the gene list to a GMT file
 
         :param output_file: the output path where to save the results
+
+        Example
+        _______
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> bm.write_cluster_genelist("genes.gmt")
         """
         self.genelist_file = output_file
         clusters = nx.get_node_attributes(self.graph, "cluster")
@@ -124,7 +184,7 @@ class BlockModel(object):
             logging.error("output file format unknown")
 
 
-def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame, nodes_in_block: bool = False,
+def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame, nodes_in_block: list = False,
                            node_names: list = None, nodes_percentage: list = None) -> nx.Graph:
     """
     This function creates a graph with n_nodes number of vertices and a matrix block_model that describes the intra e inter-block connectivity.
@@ -135,6 +195,11 @@ def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame, nodes_in_blo
     :param nodes_in_block: the list of nodes in the block model
     :param node_names: the list of names in the block model
     :param nodes_percentage: the percentage of nodes to use for the calculations, passed through a list for example [0.5, 0.5]
+
+    Example
+    _______
+
+    >>> graph = generate_graph_from_sm(n_nodes, bm, nodes_in_block, nodes, nodes_percentage)
     """
 
     if not node_names:
@@ -172,6 +237,10 @@ def plot_bm_graph(graph: nx.Graph, block_model: pd.DataFrame, output_folder: str
     :param graph: the graph with name of the nodes
     :param block_model: the block model
     :param output_folder: the folder where to save the file
+
+    Example
+    _______
+    >>> plot_bm_graph(graph, bm, output_folder)
     """
     nodes = graph.nodes()
     colors = ['#b15928', '#1f78b4', '#6a3d9a', '#33a02c', '#ff7f00']
