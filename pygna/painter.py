@@ -275,8 +275,8 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         )
 
     # Set the font size
-    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=10)
-    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=10)
+    g2.set_yticklabels(g2.get_yticklabels(), rotation=0, fontsize=15)
+    g2.set_xticklabels(g2.get_xticklabels(), rotation=90, fontsize=15)
     axes.set_xlabel("")
     axes.set_ylabel("")
 
@@ -535,7 +535,7 @@ def stars(pvalue: float) -> str:
     """
     if not math.isnan(pvalue):
         if pvalue > 0.05:
-            return "ns"
+            return ""
         elif 0.01 < pvalue <= 0.05:
             return "*"
         elif 0.001 < pvalue <= 0.01:

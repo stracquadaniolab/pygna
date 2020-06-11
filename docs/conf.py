@@ -94,15 +94,22 @@ html_theme = 'sphinx_rtd_theme'
 # documentation.
 #
 # html_theme_options = {}
-html_static_path = ['_static/']
 
+html_static_path = ['_static/']
+html_logo = "_static/pygna_logo.png"
 html_theme_options = {
-    "description": "A scalable tool for geneset analysis of biological networks",
-    'logo':'pygna_logo.png',
-    "github_user": "stracquadaniolab",
-    "github_repo": "pygna",
-    "fixed_sidebar": True,
-    "logo_name": False,  # noqa
+    'canonical_url': '',
+    'analytics_id': 'UA-XXXXXXX-1',  #  Provided by Google in your dashboard
+    'logo_only': False,
+    'display_version': True,
+    'prev_next_buttons_location': 'bottom',
+    'style_external_links': False,
+    # Toc options
+    'collapse_navigation': True,
+    'sticky_navigation': True,
+    'navigation_depth': 4,
+    'includehidden': True,
+    'titles_only': False
 }
 
 # Add any paths that contain custom static files (such as style sheets) here,
