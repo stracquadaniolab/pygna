@@ -45,6 +45,12 @@ class Output:
         Set the diffusion matrix file
 
         :param diffusion_matrix_file: set the diffusion matrix file to use
+
+        Example
+        ______
+        >>> setnames = ["A", "B", "C"]
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> out.set_diffusion_matrix("diffusion_matrix.csv")
         """
         self.diffusion_matrix_file = diffusion_matrix_file
 
@@ -52,6 +58,12 @@ class Output:
     def create_st_table_empirical(self) -> None:
         """
         Create the headings of the table in csv format
+
+        Example
+        _______
+        >>> setnames = ["A", "B", "C"]
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> out.create_st_table_empirical()
         """
         tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         self.table_file_name = tmp.name
@@ -64,6 +76,13 @@ class Output:
     def close_temporary_table(self) -> None:
         """
         Remove the temporary file
+
+        Example
+        _______
+        >>> setnames = ["A", "B", "C"]
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> out.create_st_table_empirical()
+        >>> out.close_temporary_table()
         """
         shutil.copy(self.table_file_name, self.output_table_results)
         os.remove(self.table_file_name)
@@ -81,6 +100,13 @@ class Output:
         :param empirical_pvalue: value of the empirical p-value
         :param mean_null: mean of the null distribution
         :param var_null: var of the null distribution
+
+        Example
+        _______
+        >>> setnames = ["A", "B", "C"]
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> out.create_st_table_empirical()
+        >>> out.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed, pvalue=0.001, mean_null=np.mean(0.11), var_null=np.var(0.2))
         """
         setname = setname.replace(",", "_")
         with open(self.table_file_name, "a") as f:
@@ -93,6 +119,12 @@ class Output:
     def create_comparison_table_empirical(self) -> None:
         """
         Write the hadings for the comparison table
+
+        Example
+        _______
+        >>> setnames = ["A", "B", "C"]
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> out.create_comparison_table_empirical()
         """
         tmp = tempfile.NamedTemporaryFile(mode='w+t', delete=False)
         self.table_file_name = tmp.name
@@ -121,6 +153,26 @@ class Output:
         :param empirical_pvalue: value of the empirical pvalue
         :param mean_null: mean of the null distribution
         :param var_null: variance of the null distribution
+
+        Example
+        _______
+        >>> import itertools
+        >>> import pygna.command as cm
+        >>> import pygna.reading_class as rc
+        >>> import pygna.statistical_comparison as sc
+        >>> geneset_a = rc.ReadGmt("genset_file").get_geneset("brca")
+        >>> setnames = [key for key in geneset_a.keys()]
+        >>> network = rc.ReadTsv("network_file.tsv").get_network()
+        >>> distance_matrix_filename = "distance_matrix.tsv"
+        >>> in_memory = True
+        >>> network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
+        >>> sp_diz = {"nodes": cm.read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
+        ...           "matrix": cm.read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+        >>> st_comparison = sc.StatisticalComparison(sc.comparison_shortest_path, network, diz=sp_diz, n_proc=2)
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> for pair in itertools.combinations(setnames, 2):
+        ...     observed, pvalue, null_d, a_mapped, b_mapped = st_comparison.comparison_empirical_pvalue(set(geneset_a[pair[0]]), set(geneset_a[pair[1]]), max_iter=number_of_permutations)
+        ...     out.update_comparison_table_empirical(pair[0], pair[1], len(set(geneset_a[pair[0]])), a_mapped, len(set(geneset_a[pair[1]])), b_mapped, n_overlaps, number_of_permutations, observed, pvalue, np.mean(null_d), np.var(null_d))
         """
         setname_A = setname_A.replace(",", "_")
         setname_B = setname_B.replace(",", "_")
@@ -137,6 +189,19 @@ class Output:
         :param key: the key name to store
         :param descriptor: the descriptor of the gene list
         :param gene_list: the gene list to write
+
+        Example
+        _______
+        >>> geneset = rc.ReadGmt("geneset_file.csv").get_geneset("brca")
+        >>> setnames = [key for key in geneset.keys()]
+        >>> import pygna.reading_class as rc
+        >>> network = rc.ReadTsv("network_file.tsv").get_network()
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> for setname, item in geneset.items():
+        ...     item = set(item)
+        ...     module = nx.subgraph(network, item)
+        ...     lcc = sorted(list(nx.connected_components(module)), key=len, reverse=True)[0]
+        ...     out.add_GMT_entry("brca", "topology_module", lcc)
         """
         try:
             self.GMT_dict[key]
@@ -153,6 +218,20 @@ class Output:
         Write the GMT line on the GMT file
 
         :param output_gmt: the GMT to print
+
+        Example
+        _______
+        >>> geneset = rc.ReadGmt("geneset_file.csv").get_geneset("brca")
+        >>> setnames = [key for key in geneset.keys()]
+        >>> import pygna.reading_class as rc
+        >>> network = rc.ReadTsv("network_file.tsv").get_network()
+        >>> out = Output("networkfile.tsv", "results.csv", "myanalysis", "genset_a.csv", setnames)
+        >>> for setname, item in geneset.items():
+        ...     item = set(item)
+        ...     module = nx.subgraph(network, item)
+        ...     lcc = sorted(list(nx.connected_components(module)), key=len, reverse=True)[0]
+        ...     out.add_GMT_entry("brca", "topology_module", lcc)
+        >>> out.create_GMT_output("output_lcc.gmt")
         """
         self.output_gmt = output_gmt
         print_GMT(self.GMT_dict, self.output_gmt)
@@ -164,6 +243,11 @@ def print_GMT(gmt_dictionary: dict, output_file: str) -> None:
 
     :param gmt_dictionary: the dictionary containing the data
     :param output_file: the file to save the data
+
+    Example
+    _______
+    >>> gmt_dict = {"key": "dict_sets"}
+    >>> print_GMT(gmt_dict, "mygmt.gmt")
     """
     with open(output_file, "w") as f:
         f.write("")
@@ -183,6 +267,11 @@ def apply_multiple_testing_correction(table_file: str, pval_col: str = "empirica
     :param pval_col: the name column containing the empirical pvalue
     :param method: the correction method to use
     :param threshold: the threshold to use in the method
+
+    Example
+    _______
+    >>> table_filename = "pygna_comparison_results.csv"
+    >>> apply_multiple_testing_correction(table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1)
     """
     with open(table_file, "r+") as f:
         table = pd.read_csv(f)
@@ -205,6 +294,13 @@ def write_graph_summary(graph: nx.Graph, output_file: str, net_name: str = None)
     :param graph: the graph to print
     :param output_file: the name of the file to print
     :param net_name: the name of the network
+
+    Example
+    _______
+    >>> import pygna.reading_class as rc
+    >>> text_output = "My summary stats"
+    >>> network = rc.ReadTsv("mynetwork.tsv").get_network()
+    >>> write_graph_summary(network, text_output, "mynetwork.tsv")
     """
 
     if not net_name:

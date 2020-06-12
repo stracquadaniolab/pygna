@@ -26,6 +26,14 @@ class Converters:
         :param entrez_col: the column containing the entrez ID
         :param geneset: column containing the entrez to convert
         :return: list containing the string names
+
+        Example
+        _______
+        >>> gmt_data = rc.ReadGmt(".gmt", True).get_data()
+        >>> converted = []
+        >>> for k, d in gmt_data.items():
+        >>>     converted[k] = Converters.convert_e2s(d["genes"], tsv_data,entrez_col, symbol_col)
+
         """
         logging.info("Converting Entrez ID -> Symbols")
         unknown_counter = 0
@@ -53,6 +61,13 @@ class Converters:
         :param entrez_col: the column containing the entrez ID
         :param geneset: column containing the strings to convert
         :return: list containing the entrez names
+
+        Example
+        _______
+         >>> gmt_data = rc.ReadGmt(".gmt", True).get_data()
+         >>> converted = []
+         >>> for k, d in gmt_data.items():
+         >>>    converted[k] = gmt_data[k]["genes"] = Converters.convert_s2e(d["genes"], tsv_data, entrez_col, symbol_col)
         """
         logging.info("Converting Symbols -> Entrez ID")
         geneset_entrez = []

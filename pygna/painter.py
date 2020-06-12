@@ -303,9 +303,7 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
     The defined threshold are for x: zscore and y: -log10(pvalue)
     """
 
-    out.apply_multiple_testing_correction(
-        table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1
-    )
+    out.apply_multiple_testing_correction(table_filename, pval_col="empirical_pvalue", method="fdr_bh", threshold=0.1)
 
     with open(table_filename, "r") as f:
         df = pd.read_csv(f, sep=",")
@@ -529,9 +527,11 @@ def stars(pvalue: float) -> str:
     Converts a pvalue into the corresponding stars
 
     :param pvalue: The P-Value to be converted
-    :type: float
-    :rtype: str
     :return: A string corresponding to the significance of the P-Value
+
+    Example
+    _______
+    >>> label = stars(0.027)
     """
     if not math.isnan(pvalue):
         if pvalue > 0.05:

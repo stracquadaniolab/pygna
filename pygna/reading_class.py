@@ -9,8 +9,9 @@ import sys
 
 
 class ReadingData(object):
-    """Abstract class used to read different types of file. You can implement your own reading method, but remember
-    that each subclass must implement the 'readfile' and 'get_data' methods
+    """
+    Abstract class used to read different types of file. You can implement your own reading method, but remember
+    that each subclass must implement the **readfile** and **get_data** methods
     """
 
     def __init__(self):
@@ -18,10 +19,16 @@ class ReadingData(object):
 
     @abc.abstractmethod
     def __readfile(self):
+        """
+        Implement this method to read your custom file
+        """
         raise NotImplementedError
 
     @abc.abstractmethod
     def get_data(self):
+        """
+        Get the data from the reading class. This method must be always overridden
+        """
         raise NotImplementedError
 
 
@@ -80,6 +87,10 @@ class ReadTsv(ReadingData):
         Returns the data of the tsv file
 
         :return: list representing the genes read in the file
+
+        Example
+        _______
+        >>> tsvdata = ReadTsv("mydata.tsv").get_data()
         """
         if self.pd_table:
             return pd.read_table(self.filename)
@@ -91,6 +102,10 @@ class ReadTsv(ReadingData):
         Returns the nx.graph object of the network
 
         :return: graph containing the network information
+
+        Example
+        _______
+        >>> tsvdata = ReadTsv("mydata.tsv").get_network()
         """
         return self.graph
 
@@ -134,6 +149,10 @@ class ReadGmt(ReadingData):
         Returns the data of the gmt file
 
         :return: dict representing the genes list
+
+        Example
+        _______
+        >>> gmtdata = ReadGmt("mydata.gmt").get_data()
         """
         return self.gmt_data
 
@@ -143,6 +162,10 @@ class ReadGmt(ReadingData):
 
         :param setname: str, the setname to extract
         :return: the geneset data
+
+        Example
+        _______
+        >>> gmtdata = ReadGmt("mydata.gmt").get_geneset("brca")
         """
         if setname is not None:
             if setname in self.gmt_data:
@@ -192,6 +215,10 @@ class ReadCsv(ReadingData):
         Returns the data of the csv file
 
         :return: dataframe representing the data read inside the .csv
+
+        Example
+        _______
+        >>> csvdata = ReadCsv("mydata.csv").get_data()
         """
         return self.data
 
@@ -228,6 +255,10 @@ class ReadTxt(ReadingData):
         Get the dataframe from the class
 
         :return: dataframe object from the file read
+
+        Example
+        _______
+        >>> txtdata = ReadTxt("mydata.txt").get_data()
         """
         return pd.DataFrame(self.data)
 
@@ -273,5 +304,9 @@ class ReadDistanceMatrix(ReadingData):
         """Return the data of the HDF5 Matrix
 
         :return: table data, the data of the HDF5 Matrix and table nodes, the nodes of the HDF5 Matrix
+
+        Example
+        _______
+        >>> nodes, data = ReadDistanceMatrix("mydata.hdf5").get_data()
         """
         return self.nodes, self.data

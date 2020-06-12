@@ -41,7 +41,7 @@ setup(
     # test info and requirements
     test_suite='tests',
     tests_require=[],
-    python_requires='>=3',
+    python_requires='>=3.7',
 
     # package deployment info
     include_package_data=True,
@@ -56,7 +56,7 @@ setup(
 
     classifiers=[
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
         'Topic :: Scientific/Engineering :: Bio-Informatics'
     ]
 )

@@ -12,6 +12,11 @@ def plot_degree(degree_object: nx.Graph, output_file: str):
 
     :param degree_object: the graph to plot
     :param output_file: the path to save the file
+
+    Example
+    _______
+    >>> graph = nx.complete_graph(100)
+    >>> plot_degree(nx.degree(graph), "graph_degree")
     """
 
     D = dict(degree_object)
@@ -78,7 +83,7 @@ def plot_connected_components(c_components: nx.connected_components, output_file
         fig.savefig(output_file + '.png', format="png")
 
 
-def plot_diffusion_matrix(nodes: list, matrix: np.matrix, filename: str, show_labels: bool = False) -> None:
+def plot_diffusion_matrix(nodes: list, matrix: np.ndarray, filename: str, show_labels: bool = False) -> None:
     """
     Diagnosis tool for a diffusion matrix.
     Shows the weighted adjacency matrix that is the output of a build process
@@ -87,6 +92,12 @@ def plot_diffusion_matrix(nodes: list, matrix: np.matrix, filename: str, show_la
     :param matrix: the diffusion matrix
     :param filename: the path to save the file
     :param show_labels: if labels should be plotted
+
+    Example
+    _______
+    >>> nodes = ["A", "B", "C"]
+    >>> matrix = np.random.rand(3,2)
+    >>> plot_diffusion_matrix(nodes, matrix, "diff_matrix.pdf")
     """
 
     logging.info("Plotting figure as " + str(filename))
@@ -101,7 +112,7 @@ def plot_diffusion_matrix(nodes: list, matrix: np.matrix, filename: str, show_la
 def plot_null_distribution(null_distribution: list, observed: list, output_file: str, setname: str,
                            alternative: str = "greater") -> None:
     """
-    Saves the density plot of the null distribution and pinpoints the observed value
+    Saves the density plot of the null distribution and pinpoints the observed value. Please refer to the CLI for the usage of this function
 
     :param null_distribution: the list with the values from the null distribution
     :param observed: list of the observed genes

@@ -23,6 +23,12 @@ class DegreeModel(object):
         Set the name of the nodes
 
         :param nodes_names: the list with the nodes name
+
+        Example
+        _______
+        >>> nodes = list("A", "B", "C")
+        >>> dm = DegreeModel()
+        >>> dm.set_nodes(nodes)
         """
         self.nodes = nodes_names
         self.n_nodes = len(nodes_names)
@@ -30,6 +36,11 @@ class DegreeModel(object):
     def create_graph(self) -> None:
         """
         Create a graph from the nodes
+
+        Example
+        _______
+        >>> dm = DegreeModel()
+        >>> dm.create_graph()
         """
         reject = True
         logging.info("Reject=" + str(reject))
@@ -52,6 +63,11 @@ class DegreeModel(object):
         Write on file the network as an edge list
 
         :param output_file: the file path where to save the network
+
+        Example
+        _______
+        >>> dm = DegreeModel()
+        >>> dm.write_network("myoutputfile.tsv")
         """
         self.network_file = output_file
 
@@ -67,6 +83,11 @@ class DegreeModel(object):
         Write the GMT gene list on file
 
         :param output_file: the file path where to save the gene list
+
+        Example
+        _______
+        >>> dm = DegreeModel()
+        >>> dm.write_genelist("myoutput.gmt")
         """
         self.genelist_file = output_file
 
@@ -97,6 +118,15 @@ def generate_graph_vip(n_nodes: int, n_vip: int, network_prob: float = 0.5, vip_
     :param network_prob: probability of connection in the network
     :param vip_prob: probability of connection of the vip
     :param node_names: list of nodes for the network
+
+    Example
+    _______
+    >>> n_nodes = 100
+    >>> n_vip = 10
+    >>> network_prob = 0.5
+    >>> vip_prob = 1
+    >>> nodes = ["A", "B", "C"]
+    >>> graph = generate_graph_vip(n_nodes, n_vip, network_prob=network_prob, vip_prob=vip_prob, node_names=nodes)
     """
 
     if not node_names:
@@ -132,6 +162,11 @@ def plot_vip_graph(graph: nx.Graph, output_folder: str = None) -> None:
 
     :param graph: the graph to plot
     :param output_folder: the folder path where to save the file
+
+    Example
+    _______
+    >>> g = nx.complete_graph(100)
+    >>> plot_vip_graph(g, "./")
     """
     nodes = graph.nodes()
     colors = ["#b15928", "#1f78b4"]
@@ -181,6 +216,11 @@ def plot_adjacency(graph: nx.Graph, output_folder: str, prefix: str) -> None:
     :param graph: the graph to plot
     :param output_folder: the folder where to save the file
     :param prefix: the prefix to give to the file
+
+    Example
+    _______
+    >>> g = nx.complete_graph(100)
+    >>> plot_adjacency(g, "./","adj_matrix_")
     """
     plt.figure(figsize=(13.5, 5))
 
