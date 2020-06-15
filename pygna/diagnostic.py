@@ -56,6 +56,19 @@ def plot_connected_components(c_components: nx.connected_components, output_file
 
     :param c_components: the list of the connected components
     :param output_file:  the path to save the file
+
+    Example
+    _______
+    >>> from pygna import diagnostic
+    >>> import pygna.reading_class as rc
+    >>> network = rc.ReadTsv("network_file.tsv").get_network()
+    >>> geneset = rc.ReadGmt("geneset_input_file.gmt").get_geneset("brca")
+    >>> c_components_figure_file = "components_plot.pdf"
+    >>> for setname, item in geneset.items():
+    ...     graph = nx.subgraph(network, item)
+    ...     diagnostic.plot_connected_components(nx.connected_components(graph), c_components_figure_file)
+
+
     """
     c_components_len = [len(k) for k in c_components]
 
@@ -119,6 +132,18 @@ def plot_null_distribution(null_distribution: list, observed: list, output_file:
     :param output_file: the path to save the file
     :param setname: the name of the gene set
     :param alternative: use "greater" if you want to take the genes with greater than the observed value
+
+    Example
+    _______
+    >>> from pygna import diagnostic
+    >>> import pygna.statistical_test as st
+    >>> import pygna.reading_class as rc
+    >>> network = rc.ReadTsv("network_file.tsv").get_network()
+    >>> st_test = st.StatisticalTest(st.geneset_total_degree_statistic, network)
+    >>> geneset = rc.ReadGmt("geneset_file.gmt").get_geneset("brca")
+    >>> for setname, item in geneset.items():
+    ...     observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item, max_iter=500, alternative="greater", cores=10)
+    ...     diagnostic.plot_null_distribution(null_d, observed, "./results/" + setname +'_total_degree_null_distribution.pdf', setname=setname)
     """
 
     fig, axes = plt.subplots(1, figsize=(8, 6))

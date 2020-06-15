@@ -90,8 +90,11 @@ class BlockModel(object):
 
         Example
         _______
-
-
+        >>> p = 0.5
+        >>> n_nodes = 1000
+        >>> matrix = np.array([[1, 2], [3, 4]])
+        >>> bm = BlockModel(matrix, n_nodes=n_nodes, nodes_percentage=[p, 1 - p])
+        >>> bm.set_nodes_in_block(1000)
         """
         self.nodes_in_block = nodes_in_block
 
@@ -198,7 +201,8 @@ def generate_graph_from_sm(n_nodes: int, block_model: pd.DataFrame, nodes_in_blo
 
     Example
     _______
-
+    >>> bm = pd.DataFrame(mydata_matrix)
+    >>> nodes = list("A","B","C")
     >>> graph = generate_graph_from_sm(n_nodes, bm, nodes_in_block, nodes, nodes_percentage)
     """
 
@@ -240,7 +244,9 @@ def plot_bm_graph(graph: nx.Graph, block_model: pd.DataFrame, output_folder: str
 
     Example
     _______
-    >>> plot_bm_graph(graph, bm, output_folder)
+    >>> bm = pd.DataFrame(mydata_matrix)
+    >>> graph = nx.complete_graph(100)
+    >>> plot_bm_graph(graph, bm, output_folder="./results/")
     """
     nodes = graph.nodes()
     colors = ['#b15928', '#1f78b4', '#6a3d9a', '#33a02c', '#ff7f00']
