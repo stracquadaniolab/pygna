@@ -8,6 +8,9 @@ from pygna import output
 
 
 class DegreeModel(object):
+    """
+    This class represent a degree model
+    """
     def __init__(self, network_prob: float = 0.5, vip_prob: float = 1, n_nodes: int = 10,
                  vip_percentage: float = 0.1):
         self.n_nodes = n_nodes
@@ -20,7 +23,7 @@ class DegreeModel(object):
 
     def set_nodes(self, nodes_names: list) -> None:
         """
-        Set the name of the nodes
+        Set the name of the nodes and calculate the lenght of the list
 
         :param nodes_names: the list with the nodes name
 
@@ -80,7 +83,7 @@ class DegreeModel(object):
 
     def write_genelist(self, output_file: str) -> None:
         """
-        Write the GMT gene list on file
+        Write the GMT gene list on a specific file
 
         :param output_file: the file path where to save the gene list
 
@@ -158,7 +161,7 @@ def generate_graph_vip(n_nodes: int, n_vip: int, network_prob: float = 0.5, vip_
 
 def plot_vip_graph(graph: nx.Graph, output_folder: str = None) -> None:
     """
-    Plot the VIP graph on the specific folder
+    Plot the VIP graph in the specific folder
 
     :param graph: the graph to plot
     :param output_folder: the folder path where to save the file

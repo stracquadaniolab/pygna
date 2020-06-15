@@ -9,7 +9,7 @@ import pygna.output as output
 
 class Converters:
     """
-    This class is has utilities that can be used to convert the data
+    This class is wrap static methods that can be used to convert the data from a format to another. Please refer to each class method for the specific function
     """
 
     def __init__(self):
@@ -19,7 +19,7 @@ class Converters:
     def convert_e2s(cls, geneset: pd.DataFrame, tsv_data: pd.DataFrame, entrez_col: str = "NCBI Gene ID",
                     symbol_col: str = "Approved symbol") -> list:
         """
-        Method to convert the entrez 2 string
+        Method to convert the entrez genes to symbols
 
         :param tsv_data: the dataframe to work on
         :param symbol_col: the column containing the symbols
@@ -54,7 +54,7 @@ class Converters:
     def convert_s2e(cls, geneset: pd.DataFrame, tsv_data: pd.DataFrame, entrez_col: str = "NCBI Gene ID",
                     symbol_col: str = "Approved symbol") -> list:
         """
-        Method to convert the string 2 entrez
+        Method to convert the genes symbols to entrez id.
 
         :param tsv_data: the dataframe to work on
         :param symbol_col: the column containing the symbols
@@ -216,7 +216,7 @@ class CsvToGmt(Converters):
 
     def _elaborate(self) -> pd.DataFrame:
         """
-        This method performs the cleaning and the filtering of the table
+        This method performs cleaning and filtering of the table
 
         :return: dataframe representing the cleaned and filter table
         """
@@ -246,7 +246,7 @@ class CsvToGmt(Converters):
 
     def _csv_output(self) -> None:
         """
-        This method save the pd.dataframe in a CSV file
+        This method save the dataframe in a CSV file
         """
 
         if self.output_csv.endswith(".csv"):
@@ -257,7 +257,7 @@ class CsvToGmt(Converters):
 
 class GmtToGmtEnriched(Converters):
     """
-    This Class converts a GMT file, adding information about the Entrez ID or the symbol
+    This Class is used to convert a GMT file, adding information about the Entrez ID or the symbol
     """
 
     def __init__(self, gmt_file: str, output_gmt_file: str, conversion: str, entrez_col: str, symbol_col: str,

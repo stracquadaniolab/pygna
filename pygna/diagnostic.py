@@ -8,7 +8,7 @@ import networkx as nx
 
 def plot_degree(degree_object: nx.Graph, output_file: str):
     """
-    Diagnosis tool for the degree object
+    Diagnosis tool for the degree object. It takes a graph and plot its statistics
 
     :param degree_object: the graph to plot
     :param output_file: the path to save the file
@@ -98,8 +98,7 @@ def plot_connected_components(c_components: nx.connected_components, output_file
 
 def plot_diffusion_matrix(nodes: list, matrix: np.ndarray, filename: str, show_labels: bool = False) -> None:
     """
-    Diagnosis tool for a diffusion matrix.
-    Shows the weighted adjacency matrix that is the output of a build process
+    Diagnosis tool for a diffusion matrix. It shows the weighted adjacency matrix that is the output of a build process
 
     :param nodes: the network nodes
     :param matrix: the diffusion matrix

@@ -10,8 +10,7 @@ def map_table2matrix(node_list, x):
 
 class DiffusionTest:
     """
-    This class elaborates the diffusion statistics.
-    It elaborates the diffusion tests over the given network.
+    This class elaborates the diffusion statistics. It elaborates the diffusion tests over the given network.
     Please refer to the single method documentation for the returning values
     """
 

@@ -34,7 +34,7 @@ class ReadingData(object):
 
 class ReadTsv(ReadingData):
     """
-    A class used to read the .tsv network file inside pygna
+    This class is used to read and parse a network file in a tab-separated format (tsv).
     """
 
     def __init__(self, filename: str, pd_table: bool = False, int_type: int = None):
@@ -112,7 +112,7 @@ class ReadTsv(ReadingData):
 
 class ReadGmt(ReadingData):
     """
-    A class used to read the .gmt gene file inside pygna
+    This class is used to read a gmt file, which contains information about the genes with a setname and separated by a comma
     """
 
     def __init__(self, filename: str, read_descriptor: bool = False):
@@ -160,7 +160,7 @@ class ReadGmt(ReadingData):
         """
         Returns the geneset from the gmt file
 
-        :param setname: str, the setname to extract
+        :param setname: the setname to extract
         :return: the geneset data
 
         Example
@@ -180,7 +180,7 @@ class ReadGmt(ReadingData):
 
 class ReadCsv(ReadingData):
     """
-    A class used to read the .csv data file
+    This class is used to read a csv file.
     """
 
     def __init__(self, filename: str, sep: str = ",", use_cols: list = None, column_to_fill: str = None):

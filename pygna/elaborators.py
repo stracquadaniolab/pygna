@@ -4,7 +4,7 @@ import pandas as pd
 
 class TableElaboration:
     """
-    This class contains methods to use to elaborate a table
+    This class contains static methods to clean and filter specific columns of a table
     """
 
     @staticmethod
@@ -31,7 +31,7 @@ class TableElaboration:
     def filter_table(table: pd.DataFrame, filter_column: str = "padj", alternative: str = "less",
                      threshold: float = 0.01) -> pd.DataFrame:
         """
-        This method filters a table according to a filter rule
+        This method filters a table according to a filter rule èassed as input
 
         :param table: The table to be filtered
         :param filter_column: Column with the values to be filtered

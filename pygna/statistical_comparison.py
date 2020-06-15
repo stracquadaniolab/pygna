@@ -131,7 +131,7 @@ class StatisticalComparison:
 ###  TEST STATISTICS FOR COMPARISONS  #########################################
 ###############################################################################
 
-def comparison_shortest_path(network: nx.Graph, genesetA: list, genesetB: list, diz: dict) -> float:
+def comparison_shortest_path(network: nx.Graph, genesetA: set, genesetB: set, diz: dict) -> float:
     """
     Evaluate the shortest path between two genesets
 

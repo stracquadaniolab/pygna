@@ -11,7 +11,7 @@ import shutil
 
 class Output:
     """
-    This class prints the data on files
+    This class is used to print different data on files
     """
 
     def __init__(self, network_filename: str, output_table_results_file: str, analysis: str, geneset_file: str,
@@ -57,7 +57,7 @@ class Output:
     # Tables for stats
     def create_st_table_empirical(self) -> None:
         """
-        Create the headings of the table in csv format
+        Create the headings of the table that are going to be wrinnte in the csv file
 
         Example
         _______
@@ -90,7 +90,7 @@ class Output:
     def update_st_table_empirical(self, setname: str, n_mapped: int, n_geneset: int, number_of_permutations: int,
                                   observed: int, empirical_pvalue: float, mean_null: np.mean, var_null: np.var) -> None:
         """
-        Update the table content
+        Update the table content, adding a new line to the file
 
         :param setname: the name of the geneset
         :param n_mapped: the number of mapped genes
@@ -139,7 +139,7 @@ class Output:
                                           number_of_permutations: int, observed: int, empirical_pvalue: float,
                                           mean_null: np.mean, var_null: np.var) -> None:
         """
-        Update the content of the comparison table
+        Update the content of the comparison table, adding a new row on the file
 
         :param setname_A: the name of the geneset A
         :param setname_B: the name of the geneset B
@@ -261,7 +261,7 @@ def print_GMT(gmt_dictionary: dict, output_file: str) -> None:
 def apply_multiple_testing_correction(table_file: str, pval_col: str = "empirical_pvalue", method: str = "fdr_bh",
                                       threshold: float = 0.1) -> None:
     """
-    Apply the multiple testing correction and save the file on csv
+    Apply the multiple testing correction and save the file in a csv file
 
     :param table_file: the name of the file to read
     :param pval_col: the name column containing the empirical pvalue

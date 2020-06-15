@@ -11,8 +11,7 @@ from palettable.colorbrewer.sequential import *
 
 class PygnaFigure(ABC):
     """
-    Abstract class that implements a general figure in Pygna. It has a class attribute representing the default ratios
-    for the figures
+    Abstract class that implements a general figure in Pygna. It has a class attribute representing the default height/width ratios for the figures
     """
     ratios = {
         "volcano": [3, 4],
@@ -29,6 +28,7 @@ class PygnaFigure(ABC):
         """
         This method saves the figure using the matplotlib framework
         """
+
         plt.savefig(self.filename)
 
     def _get_dimensions(self, fig_type: str, size: int) -> [int, int, int, int]:

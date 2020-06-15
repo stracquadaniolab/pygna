@@ -12,7 +12,7 @@ class BlockModel(object):
 
     def __init__(self, block_model_matrix, n_nodes: int = 10, nodes_percentage: list = None):
         """
-        This class implements block model reading and elaboration
+        This class implements a block model reading and elaboration methods
 
         :param block_model_matrix: the matrix to be used as block model
         :param n_nodes: the number of nodes
@@ -47,7 +47,7 @@ class BlockModel(object):
 
     def set_bm(self, block_model_matrix: pd.DataFrame) -> None:
         """
-        Change block model matrix
+        Change block model matrix used in the class
 
         :param block_model_matrix: the block model matrix
 
@@ -84,7 +84,7 @@ class BlockModel(object):
 
     def set_nodes_in_block(self, nodes_in_block: int) -> None:
         """
-        Set the nodes in the block model
+        Set the nodes number in the block model
 
         :param nodes_in_block: the number of nodes in the block list
 
