@@ -21,9 +21,10 @@ We have setup the docker image in order to let you use it "out of the box" as st
 
 .. code-block:: bash
 
-    $ docker run  docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
+    $ docker run docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
 
 you will be prompt to the Pygna help section.
+
 
 Getting started
 ---------------

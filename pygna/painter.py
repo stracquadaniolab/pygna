@@ -71,28 +71,25 @@ def paint_datasets_stats(table_filename: 'pygna results table',
         data["ind"] = data.index
 
         g = sns.catplot(
-            x="value",
-            y="setname",
+            y="value",
+            x="setname",
             hue="type",
             data=data,
-            height=6,
+            height=2.5,
             kind="bar",
             palette=palette_binary,
-            orient="h",
-            aspect=1,
+            orient="v",
+            aspect=1.5,
         )
 
         k = 0
         col = ["black", "#b64d50"]
         max_obs = np.max(data[data["type"] == "observed"]["value"])
-        for i, r in data[
-            data["type"] == "observed"
-        ].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
+        for i, r in data[data["type"] == "observed"].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
             pval = stars(r["pvalue"])
             g.facet_axis(0, 0).annotate(
-                "pval:" + pval,
-                xy=(r["value"], k),
-                xytext=(r["value"], k),
+                pval,
+                xy=(k-0.25, r["value"] + 0.1*r["value"]),
                 color=col[r["pvalue"] < (0.1 * 2 / len(data))],
                 fontsize=12,
             )
@@ -141,23 +138,21 @@ def paint_datasets_stats(table_filename: 'pygna results table',
         # fig, ax = plt.subplots(1, 1, figsize=(10, 20), sharex=True,sharey=True)
 
         g = sns.catplot(
-            x="value",
-            y="setname",
+            y="value",
+            x="setname",
             hue="type",
             data=data,
-            height=6,
+            height=2.5,
             kind="bar",
             palette=palette_binary,
-            orient="h",
-            aspect=1,
+            orient="v",
+            aspect=1.5,
         )
 
         k = 0
         col = ["black", "#b64d50"]
         max_obs = np.max(data[data["type"] == "observed"]["value"])
-        for i, r in data[
-            data["type"] == "observed"
-        ].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
+        for i, r in data[data["type"] == "observed"].iterrows():  # .sort_values(by=["pvalue"],ascending=True)
             pval = stars(r["pvalue"])
             g.facet_axis(0, 0).annotate(
                 "pval:" + pval,
@@ -261,6 +256,7 @@ def paint_comparison_matrix(table_filename: 'pygna comparison output',
         g2 = sns.heatmap(
             matrix,
             ax=axes,
+            cmap=palette,
             square=True,
             xticklabels=1,
             yticklabels=1,

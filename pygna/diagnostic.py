@@ -161,11 +161,11 @@ def plot_null_distribution(null_distribution: list, observed: list, output_file:
     g4 = axes.stem([observed], [ymax / 2], "r", "r--")
 
     sns.despine(ax=axes, top=True, bottom=False, right=True, left=True)
-    anchored_text = AnchoredText("Observed:%1.1E" % observed, loc=1, prop={'fontsize': 12, 'color': 'r'},
+    anchored_text = AnchoredText("Observed:%1.1E" % observed, loc=1, prop={'fontsize': 18, 'color': 'r'},
                                  **{'frameon': False})
     axes.add_artist(anchored_text)
-    axes.set_xlabel('Statistics', fontsize=12)
-    axes.set_ylabel('Density', fontsize=12)
+    axes.set_xlabel('Statistics', fontsize=18)
+    axes.set_ylabel('Density', fontsize=18)
     logging.info("Output for diagnostic null distribution: " + output_file)
     if output_file.endswith('.pdf'):
         fig.savefig(output_file, format="pdf")
