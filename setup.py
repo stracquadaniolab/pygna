@@ -11,7 +11,7 @@ setup(
     # package information
     name='pygna',
     packages=find_packages(),
-    version='3.1.5-dev',
+    version='3.1.6-dev',
     description='Geneset Network Analysis',
     long_description=readme,
     license='MIT',
