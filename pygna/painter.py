@@ -519,10 +519,15 @@ def plot_adjacency(
 def stars(pvalue: float) -> str:
     """
     Converts a pvalue into the corresponding stars:
+
     pval>0.05 : ""
+
     0.01< pval <= 0.05 : *
+
     0.001< pval <=0.01: * *
+
     0.0001< pval <= 0.001: * * *
+
     pval <=0.0001: * * * *
 
     :param pvalue: The P-Value to be converted

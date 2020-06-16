@@ -12,7 +12,18 @@ Alternatively you can install it through `pip`:
 
     >>> pip install pygna
 
-Please note, that `pip` will not install non Python requirements.
+We have prepared also a docker image that can be found at the following link:
+
+https://github.com/stracquadaniolab/pygna/packages
+
+By downloading the docker image named "Pygna", you will download a virtual machine with the latest version of pygna and its requirements.
+We have setup the docker image in order to let you use it "out of the box" as stand-alone app, so just by running the following line:
+
+.. code-block:: bash
+
+    $ docker run  docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
+
+you will be prompt to the Pygna help section.
 
 Getting started
 ---------------
@@ -33,7 +44,7 @@ The examples below show some basic analysis that can be carried out with pygna
 Example 1: Running pygna GNT analysis
 +++++++++++++++++++++++++++++++++++++
 
-In the `min-working-example` we provide some basic files to run this minimal example. You can follow this instructions to run a network 
+In the `min-working-example` we provide some basic files to run this minimal example. You can follow this instructions to run a network
 topology analysis on a single geneset file.
 WARNING: *Pay attention to the fact we set the number of permutations to 1000, if you are just willing to test the behaviour, use 50 or 100
 to speed up the process*
@@ -51,7 +62,7 @@ You can look at the plot of the results in the `barplot_rwr.png` file, and the c
 Example 2: Running pygna GNA analysis
 +++++++++++++++++++++++++++++++++++++
 
-In the `min-working-example` we provide some basic files to run this minimal example. You can follow this instructions to run a network 
+In the `min-working-example` we provide some basic files to run this minimal example. You can follow this instructions to run a network
 association analysis between two genesets.
 
 >>> cd ./your-path/min-working-example/
@@ -68,8 +79,8 @@ If you don't include the --results-figure flag at the comparison step, plot the 
 
 >>> pygna paint-comparison-matrix table_association_rwr.csv heatmap_association_rwr.png --rwr --annotate
 
-( include the -rwr flag for the right color coding 
-and --annotate for annotating the heatmap with the pvalue of each test ) 
+( include the -rwr flag for the right color coding
+and --annotate for annotating the heatmap with the pvalue of each test )
 
 The -k flag, keeps the -B geneset and permutes only on the set A.
 

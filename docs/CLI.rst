@@ -103,4 +103,25 @@ Utilities
 
 .. autofunction:: pygna.utils.convert_gmt
 .. autofunction:: pygna.utils.geneset_from_table
+.. autofunction:: pygna.utils.filter_table
+.. autofunction:: pygna.utils.generate_group_gmt
 .. autofunction:: pygna.utils.convert_csv
+
+
+Block Model
+___________
+
+.. autofunction:: pygna.block_model.generate_sbm2_network
+
+
+Painter
+_______
+
+
+.. autofunction:: pygna.painter.paint_datasets_stats
+
+.. autofunction:: pygna.painter.paint_comparison_matrix
+
+.. autofunction:: pygna.painter.paint_volcano_plot
+
+.. autofunction:: pygna.painter.plot_adjacency

@@ -12,7 +12,3 @@ Block Model
 
 
 .. autofunction:: pygna.block_model.generate_sbm_network
-
-
-.. autofunction:: pygna.block_model.generate_sbm2_network
-
