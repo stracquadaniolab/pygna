@@ -544,3 +544,79 @@ def stars(pvalue: float) -> str:
             return "* * *"
         else:
             return "* * * *"
+
+
+
+def paint_summary_gnt(output_figure: 'output figure filename',
+                        *input_tables: 'pass all gnt output tables that need to be included in the plot',
+                        setname: 'name of the dataset' = None,
+                        threshold: 'Value to threshold the colors' = 0.05,
+                        column_filter :'column where the threshold is applied'= 'empirical_pvalue',
+                        larger: 'if True the threshold is set as lower limit' = False,
+                        less_tests: 'comma separated string of the tests that are significant if lower than expected, otherwise pass empty string' = 'topology_sp'
+                        ):
+
+    """
+    Summary plot for all the gnt statistics of a single dataset.
+    :param output_figure: filename of the plot
+    :param input_tables: all gnt output tables that need to be included
+    :param setname: specify the name of the geneset to be plotted
+    :param column_filter: column where the threshold for significance is applied
+    :param threshold: value below/above which a test is significant
+    :param larger: if True the threshold is set as lower limit, otherwise will consider significant those below threshold
+    :param less_tests: comma separated string of the tests that are significant if lower than expected, otherwise pass empty string
+    """
+
+    df = pd.DataFrame()
+
+    for t in input_tables:
+        # Open all the input tables
+        with open(t, 'r') as f:
+            tab = pd.read_csv(f)
+            print(tab.head())
+            # Retrieve only the specific setname
+            if setname:
+                tab = tab[tab['setname']==setname]
+
+            # If the tab is longer than one element the plot cannot be shown
+            if len(tab)>1:
+                logging.warning('Showing multiple datasets')
+            df= df.append(tab)
+
+    ### All that come before can be decoupled (CLI/API)
+
+    df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
+
+    if (less_tests != ''):
+        ttt = lower_tests.split(',')
+        df['zscore'] = df['zscore']*((-1)*np.array([i in ttt for i in df['analysis']])+(1)*np.array([i not in ttt for i in df['analysis']]))
+
+    if larger:
+        df['significant'] = df[column_filter]>float(threshold)
+    else:
+        df['significant'] = df[column_filter]<float(threshold)
+
+    df = df.sort_values(by = ['setname','analysis'], ascending = False)
+
+
+    # CHoose size of the plot depending on the rows
+    height = len(df.analysis.unique())
+
+    if setname:
+        g1 = sns.catplot(x = 'zscore', y = 'analysis', data = df, hue = 'significant', kind = 'point', join = False, hue_order = [False, True],
+                        palette = RdBu_4.mpl_colors[0::3][::-1], height = 1+height/2, sharex=False, aspect = 1.5)
+        g1.axes[0][0].xaxis.grid(True)
+        g1.axes[0][0].yaxis.grid(True)
+        g1.axes[0][0].spines['bottom'].set_visible(True)
+
+    else:
+        g1 = sns.catplot(x = 'zscore', y = 'analysis', data = df, hue = 'significant', kind = 'point', join = False, hue_order = [False, True],
+                        col = 'setname', col_wrap = 2,  palette = RdBu_4.mpl_colors[0::3][::-1], height = height/2, aspect = 1.5,sharex=True)
+
+
+        for a in g1.axes:
+            a.xaxis.grid(True)
+            a.yaxis.grid(True)
+            a.spines['bottom'].set_visible(True)
+
+    g1.fig.savefig(output_figure)
