@@ -13,7 +13,7 @@ jobs:
       IMAGE_NAME: pygna
     strategy:
       matrix:
-        python: [3.7]
+        python: [3.8]
         numpy: [1.15]
     steps:
       - uses: actions/checkout@v1
@@ -42,7 +42,7 @@ jobs:
       - name: "Setup Python for PIP"
         uses: actions/setup-python@v1
         with:
-          python-version: 3.7
+          python-version: 3.8
 
       - name: "Install PIP required packages"
         run: pip install wheel twine
