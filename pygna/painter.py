@@ -553,7 +553,7 @@ def paint_summary_gnt(output_figure: 'output figure filename',
                         threshold: 'Value to threshold the colors' = 0.05,
                         column_filter :'column where the threshold is applied'= 'empirical_pvalue',
                         larger: 'if True the threshold is set as lower limit' = False,
-                        lower_tests: 'comma separated string of the tests that are significant if lower than expected, otherwise pass empty string' = 'topology_sp'
+                        less_tests: 'comma separated string of the tests that are significant if lower than expected, otherwise pass empty string' = 'topology_sp'
                         ):
 
     """
@@ -561,6 +561,10 @@ def paint_summary_gnt(output_figure: 'output figure filename',
     :param output_figure: filename of the plot
     :param input_tables: all gnt output tables that need to be included
     :param setname: specify the name of the geneset to be plotted
+    :param column_filter: column where the threshold for significance is applied
+    :param threshold: value below/above which a test is significant
+    :param larger: if True the threshold is set as lower limit, otherwise will consider significant those below threshold
+    :param less_tests: comma separated string of the tests that are significant if lower than expected, otherwise pass empty string
     """
 
     df = pd.DataFrame()
@@ -583,7 +587,7 @@ def paint_summary_gnt(output_figure: 'output figure filename',
 
     df['zscore'] = (df['observed']-df['mean(null)'])/np.sqrt(df['var(null)'].values)
 
-    if (lower_tests != ''):
+    if (less_tests != ''):
         ttt = lower_tests.split(',')
         df['zscore'] = df['zscore']*((-1)*np.array([i in ttt for i in df['analysis']])+(1)*np.array([i not in ttt for i in df['analysis']]))
 
