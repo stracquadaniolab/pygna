@@ -4,25 +4,15 @@ Command Line Tool
 Network Summaries and Visualisation
 -----------------------------------
 
-Before running any geneset-network analysis is a good practice to extract basic information
-on the network and the geneset or to visualise the network. We provide a function
-to obtain the network summary ( or the summary of a single genesets) and another
-utility to write an annotated graphml file ( visualise it on Cytoscape ).
+Before running any geneset-network analysis is a good practice to extract basic information on the network and the geneset or to visualise the network.
+We provide a function to obtain the network summary ( or the summary of a single genesets) and another utility to write an annotated graphml file ( visualise it on Cytoscape ).
 
 .. autofunction:: pygna.command.network_summary
+
 
 .. code-block:: text
 
     pygna network-summary [-h] [-g GENESET_INPUT_FILE] [-s SETNAME] network-file text-output degree-figure-file c-components-figure-file
-
-    This function saves the principal info of a graph:
-    - network properties
-    - degree distribution
-    - connected components diagnostic
-
-    If a geneset/setname is passed to the function, the properties of
-    the subgraph are evaluated
-
 
     positional arguments:
       network-file          network file
@@ -44,15 +34,6 @@ utility to write an annotated graphml file ( visualise it on Cytoscape ).
 .. code-block:: txt
 
     usage: pygna network-graphml [-h] [-s SETNAME] [--giant-component-only] [-m] network-file geneset-file output-file
-
-    This function generates a graphml file with nodes annotation.
-    Given a geneset, with k setnames, each node has k False/True
-    annotations for each set.
-
-    Warning: without minimal, this function saves the full network.
-    The minimal graph saves only the nodes in the geneset and those that
-    connect them with a shortest path.
-
 
     positional arguments:
       network-file          network file
@@ -86,13 +67,6 @@ GNT Module analysis
                                   [-r RESULTS_FIGURE] [-d DIAGNOSTIC_NULL_FOLDER]
                                   network-file geneset-file output-table
 
-    Performs geneset network topology module analysis.
-
-    It computes a p-value for the largest connected component
-    of the geneset being bigger than the one expected by chance
-    for a geneset of the same size.
-
-
     positional arguments:
       network-file          network file
       geneset-file          GMT geneset file
@@ -125,12 +99,6 @@ GNT Degree analysis
                                            [-d DIAGNOSTIC_NULL_FOLDER]
                                            network-file geneset-file output-table
 
-        Performs the analysis of internal degree.
-        It computes a p-value for the ratio of internal degree
-        of the geneset being bigger than the one expected by chance
-        for a geneset of the same size.
-
-
     positional arguments:
       network-file          network file
       geneset-file          GMT geneset file
@@ -156,13 +124,6 @@ GNT Degree analysis
     usage: pygna test-topology-total-degree [-h] [--setname SETNAME] [--size-cut SIZE_CUT] [--number-of-permutations NUMBER_OF_PERMUTATIONS] [-c CORES] [-r RESULTS_FIGURE]
                                         [-d DIAGNOSTIC_NULL_FOLDER]
                                         network-file geneset-file output-table
-
-        Performs the analysis of total degree of the .
-
-        It computes a p-value for the ratio of total degree
-        of the geneset being bigger than the one expected by chance
-        for a geneset of the same size.
-
 
     positional arguments:
       network-file          network file
@@ -193,14 +154,6 @@ GNT Shortest Path Analysis
                               [--diagnostic-null-folder DIAGNOSTIC_NULL_FOLDER]
                               network-file geneset-file distance-matrix-filename output-table
 
-        Performs geneset network topology shortest path analysis.
-
-        It computes a p-value for the average shortest path length
-        of the geneset being smaller than expected by chance
-        for a geneset of the same size.
-
-
-
     positional arguments:
       network-file          network file
       geneset-file          GMT geneset file
@@ -229,16 +182,10 @@ GNT Random Walk Analysis
 .. autofunction:: pygna.command.test_topology_rwr
 
 .. code-block:: text
+
     usage: pygna test-topology-rwr [-h] [--setname SETNAME] [--size-cut SIZE_CUT] [--number-of-permutations NUMBER_OF_PERMUTATIONS] [-c CORES] [-i]
                                [--results-figure RESULTS_FIGURE] [-d DIAGNOSTIC_NULL_FOLDER]
                                network-file geneset-file rwr-matrix-filename output-table
-
-        Performs the analysis of random walk probabilities.
-        Given the RWR matrix ,
-        it compares the probability of walking between the genes in the geneset
-        compared to those of walking between the nodes
-        of a geneset with the same size
-
 
     positional arguments:
       network-file          network file, use a network with weights
@@ -280,22 +227,6 @@ GNA Shortest Path
                                  [--number-of-permutations NUMBER_OF_PERMUTATIONS] [-r RESULTS_FIGURE]
                                  network-file file-geneset-a distance-matrix-filename output-table
 
-        Performs comparison of network location analysis. If the flag
-        --keep  is passed, the B geneset is kept
-        fixed, and doesnt't get permuted
-
-        It computes a p-value for the shortest path distance
-        between two genesets being smaller than expected by chance
-
-        If only A_geneset_file is passed the analysis is run on all the couples
-        of sets in the file,
-        if both A_geneset_file and B_geneset_file are passed, one can specify
-        the setnames for both, if there is only one geneset in the file, setname_X
-        can be omitted,
-        if both sets are in the same file, B_geneset_file can be not specified,
-        but setnames are needed.
-
-
     positional arguments:
       network-file          network file
       file-geneset-a        GMT geneset file, if it's the only parameter passed the analysis is gonna be run on all the couples of datasets, otherwise specify the other files
@@ -334,20 +265,6 @@ GNA Random Walk
                                   [--number-of-permutations NUMBER_OF_PERMUTATIONS] [--results-figure RESULTS_FIGURE]
                                   network-file file-geneset-a rwr-matrix-filename output-table
 
-        Performs comparison of network location analysis.
-
-        It computes a p-value for the shortest path distance
-        between two genesets being smaller than expected by chance
-
-        If only A_geneset_file is passed the analysis is run on all the couples
-        of sets in the file,
-        if both A_geneset_file and B_geneset_file are passed, one can specify
-        the setnames for both, if there is only one geneset in the file, setname_X
-        can be omitted,
-        if both sets are in the same file, B_geneset_file can be not specified,
-        but setnames are needed.
-
-
     positional arguments:
       network-file          network file
       file-geneset-a        GMT geneset file
@@ -375,7 +292,6 @@ GNA Random Walk
 Weights Diffusion Analysis
 --------------------------
 
-**Please be aware that this function is still a beta version.**
 
 .. autofunction:: pygna.command.test_diffusion_hotnet
 
@@ -384,13 +300,6 @@ Weights Diffusion Analysis
     usage: pygna test-diffusion-hotnet [-h] [--name-column NAME_COLUMN] [-w WEIGHT_COLUMN] [--filter-column FILTER_COLUMN] [--filter-condition FILTER_CONDITION]
                                    [--filter-threshold FILTER_THRESHOLD] [--normalise] [-s SIZE_CUT] [--number-of-permutations NUMBER_OF_PERMUTATIONS] [-c CORES] [-i]
                                    network-file geneset-file rwr-matrix-filename output-table
-
-        Performs the analysis of random walk applying the weights of an upstream analysis.
-        Given a csv file the user needs to specify the columns of interest and
-        the threshold of significance.
-        For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic
-        function.
-
 
     positional arguments:
       network-file          network file, use a network with weights
@@ -437,6 +346,18 @@ To evaluate the matrix of shortest paths we can use the following function:
 
 .. code-block:: text
 
+    usage: pygna build-distance-matrix [-h] [-g] network-file output-file
+
+    positional arguments:
+      network-file          network file
+      output-file           distance matrix output file, use .hdf5
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -g, --giant-component-only
+                            compute the shortest paths only for nodes in the giant component (default: True)
+
+
 Diffusion matrix
 ++++++++++++++++
 
@@ -446,26 +367,178 @@ is set to $0.80$ as default, but can be given by the user.
 
 .. autofunction:: pygna.command.build_rwr_diffusion
 
+.. code-block:: text
+
+    usage: pygna build-rwr-diffusion [-h] [-b BETA] [-o OUTPUT_FILE] network-file
+
+    positional arguments:
+      network-file          network file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -b BETA, --beta BETA  0.85
+      -o OUTPUT_FILE, --output-file OUTPUT_FILE
+                            distance matrix output file (use .hdf5) (default: -)
+
 Show Results
 ------------
 
 .. autofunction:: pygna.painter.paint_datasets_stats
+
+.. code-block:: text
+
+    usage: pygna paint-datasets-stats [-h] [-a ALTERNATIVE] table-filename output-file
+
+    positional arguments:
+      table-filename        pygna results table
+      output-file           figure file, use pdf or png extension
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -a ALTERNATIVE, --alternative ALTERNATIVE
+                            'greater'
+
 .. autofunction:: pygna.painter.paint_comparison_matrix
+
+.. code-block:: text
+
+    usage: pygna paint-comparison-matrix [-h] [-r] [-s] [-a] table-filename output-file
+
+    positional arguments:
+      table-filename        pygna comparison output
+      output-file           output figure file, specify png or pdf file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -r, --rwr             use rwr is the table comes from a rwr analysis (default: False)
+      -s, --single-geneset  use true if the comparison has been done for a single file (default: False)
+      -a, --annotate        set true if uou want to print the pvalue inside the cell (default: False)
+
 
 Utilities
 ---------
 
-.. autofunction:: pygna.utils.convert_gmt
+
 .. autofunction:: pygna.utils.geneset_from_table
-.. autofunction:: pygna.utils.filter_table
+
+.. code-block:: text
+
+    usage: pygna geneset-from-table [-h] [--output-gmt OUTPUT_GMT] [--output-csv OUTPUT_CSV] [-n NAME_COLUMN] [-f FILTER_COLUMN] [-a ALTERNATIVE] [-t THRESHOLD]
+                                [-d DESCRIPTOR]
+                                input-file setname
+
+    positional arguments:
+      input-file            input csv file
+      setname               name of the set
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --output-gmt OUTPUT_GMT
+                            output gmt name (default: -)
+      --output-csv OUTPUT_CSV
+                            output csv name (default: -)
+      -n NAME_COLUMN, --name-column NAME_COLUMN
+                            column with the names (default: 'Unnamed: 0')
+      -f FILTER_COLUMN, --filter-column FILTER_COLUMN
+                            column with the values to be filtered (default: 'padj')
+      -a ALTERNATIVE, --alternative ALTERNATIVE
+                            alternative to use for the filter, with less the filter is applied <threshold, otherwise >= threshold (default: 'less')
+      -t THRESHOLD, --threshold THRESHOLD
+                            threshold for the filter (default: 0.01)
+      -d DESCRIPTOR, --descriptor DESCRIPTOR
+                            descriptor for the gmt file (default: -)
+
+
+.. autofunction:: pygna.utils.convert_gmt
+
+.. code-block:: text
+
+    usage: pygna convert-gmt [-h] [-e ENTREZ_COL] [-s SYMBOL_COL] gmt-file output-gmt-file conversion converter-map-filename
+
+    positional arguments:
+      gmt-file              gmt file to be converted
+      output-gmt-file       output file
+      conversion            e2s or s2e
+      converter-map-filename
+                            tsv table used to convert gene names
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -e ENTREZ_COL, --entrez-col ENTREZ_COL
+                            name of the entrez column (default: 'NCBI Gene ID')
+      -s SYMBOL_COL, --symbol-col SYMBOL_COL
+                            name of the symbol column (default: 'Approved symbol')
+
+
 .. autofunction:: pygna.utils.generate_group_gmt
+
+.. code-block:: text
+
+    usage: pygna generate-group-gmt [-h] [-n NAME_COL] [-g GROUP_COL] [-d DESCRIPTOR] input-table output-gmt
+
+    positional arguments:
+      input-table           table to get the geneset from
+      output-gmt            output gmt file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -n NAME_COL, --name-col NAME_COL
+                            'Gene'
+      -g GROUP_COL, --group-col GROUP_COL
+                            'Cancer'
+      -d DESCRIPTOR, --descriptor DESCRIPTOR
+                            'cancer_genes'
+
 .. autofunction:: pygna.utils.convert_csv
 
+.. code-block:: text
+
+    usage: pygna convert-csv [-h] [--converter-map-filename CONVERTER_MAP_FILENAME] [--output-file OUTPUT_FILE] [-e ENTREZ_COL] [-s SYMBOL_COL]
+                         csv-file conversion original-name-col new-name-col geneset
+
+    positional arguments:
+      csv-file              csv file where to add a name column
+      conversion            e2s or s2e
+      original-name-col     column name to be converted
+      new-name-col          name of the new column with the converted names
+      geneset               the geneset to convert
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --converter-map-filename CONVERTER_MAP_FILENAME
+                            tsv table used to convert gene names (default: 'entrez_name.tsv')
+      --output-file OUTPUT_FILE
+                            if none, table is saved in the same input file (default: -)
+      -e ENTREZ_COL, --entrez-col ENTREZ_COL
+                            name of the entrez column (default: 'NCBI Gene ID')
+      -s SYMBOL_COL, --symbol-col SYMBOL_COL
+                            name of the symbol column (default: 'Approved symbol')
 
 Block Model
 ___________
 
 .. autofunction:: pygna.block_model.generate_sbm2_network
+
+.. code-block:: text
+
+    usage: pygna generate-sbm2-network [-h] [--prefix PREFIX] [--n-nodes N_NODES] [-t THETA0] [--percentage PERCENTAGE] [-d DENSITY] [--n-simulations N_SIMULATIONS]
+                                   output-folder
+
+    positional arguments:
+      output-folder         folder where the simulations are saved
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --prefix PREFIX       prefix for the simulations (default: 'sbm')
+      --n-nodes N_NODES     nodes in the network (default: 1000)
+      -t THETA0, --theta0 THETA0
+                            probability of connection in the cluster (default: '0.9,0.7,0.5,0.2')
+      --percentage PERCENTAGE
+                            percentage of nodes in cluster 0, use ratio 0.1 = 10 percent (default: '0.1')
+      -d DENSITY, --density DENSITY
+                            multiplicative parameter used to define network density (default: '0.06,0.1,0.2')
+      --n-simulations N_SIMULATIONS
+                            number of simulated networks for each configuration (default: 3)
 
 
 Painter
@@ -473,6 +546,76 @@ _______
 
 
 .. autofunction:: pygna.painter.paint_datasets_stats
+
+.. code-block:: text
+
+    usage: pygna paint-datasets-stats [-h] [-a ALTERNATIVE] table-filename output-file
+
+    positional arguments:
+      table-filename        pygna results table
+      output-file           figure file, use pdf or png extension
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -a ALTERNATIVE, --alternative ALTERNATIVE
+                            'greater'
+
 .. autofunction:: pygna.painter.paint_comparison_matrix
+
+.. code-block:: text
+
+    usage: pygna paint-comparison-matrix [-h] [-r] [-s] [-a] table-filename output-file
+
+    positional arguments:
+      table-filename        pygna comparison output
+      output-file           output figure file, specify png or pdf file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -r, --rwr             use rwr is the table comes from a rwr analysis (default: False)
+      -s, --single-geneset  use true if the comparison has been done for a single file (default: False)
+      -a, --annotate        set true if uou want to print the pvalue inside the cell (default: False)
+
 .. autofunction:: pygna.painter.paint_volcano_plot
-.. autofunction:: pygna.painter.plot_adjacency
+
+.. code-block:: text
+
+    usage: pygna paint-volcano-plot [-h] [-r] [-i ID_COL] [--threshold-x THRESHOLD_X] [--threshold-y THRESHOLD_Y] [-a] table-filename output-file
+
+    positional arguments:
+      table-filename        pygna comparison output
+      output-file           output figure file, specify png or pdf file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -r, --rwr             use rwr is the table comes from a rwr analysis (default: False)
+      -i ID_COL, --id-col ID_COL
+                            'setname_B'
+      --threshold-x THRESHOLD_X
+                            0
+      --threshold-y THRESHOLD_Y
+                            2
+      -a, --annotate        False
+
+
+.. autofunction:: pygna.painter.paint_summary_gnt
+
+.. code-block:: text
+
+    usage: pygna paint-summary-gnt [-h] [-s SETNAME] [-t THRESHOLD] [-c COLUMN_FILTER] [--larger] [--less-tests LESS_TESTS] output-figure [input_tables [input_tables ...]]
+
+    positional arguments:
+      output-figure         output figure filename
+      input_tables          -
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -s SETNAME, --setname SETNAME
+                            name of the dataset (default: -)
+      -t THRESHOLD, --threshold THRESHOLD
+                            Value to threshold the colors (default: 0.05)
+      -c COLUMN_FILTER, --column-filter COLUMN_FILTER
+                            column where the threshold is applied (default: 'empirical_pvalue')
+      --larger              if True the threshold is set as lower limit (default: False)
+      --less-tests LESS_TESTS
+                            comma separated string of the tests that are significant if lower than expected, otherwise pass empty string (default: 'topology_sp')

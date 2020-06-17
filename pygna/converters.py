@@ -304,7 +304,7 @@ class GroupGmt(Converters):
     def __init__(self, input_table: str, output_gmt: str, name_col: str = "Gene", group_col: str = "Cancer",
                  descriptor: str = "cancer_genes"):
         """
-        :param input_table: the filename path
+        :param input_table: the filename path (it must be in .csv, .tsv or .txt format)
         :param output_gmt: the output gmt file path
         :param name_col: the name of the column to write the genes
         :param group_col:the name of the column to group

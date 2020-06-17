@@ -169,3 +169,33 @@ The package is integrable in Snakemake pipelines. We already provide
 some sample analyses in [snakemake workflow](https://github.com/stracquadaniolab/workflow-pygna).
 but we encourage to explore all the functionalities of the package and to raise issues
 for bugs and alternative functionalities you might need.
+
+
+Converting data using Pygna
++++++++++++++++++++++++++++
+
+One of the most important feature in pygna is the possibility to convert a file from a format to another.
+In particular here we propose some examples on how to use the converter classes.
+
+
+Converting into GMT files
+_________________________
+From a general table containing all the genes to analyse, we can call the following command in order to get a GMT file that is correctly read from pygna:
+
+.. code-block:: bash
+
+    $ pygna geneset-from-table gene_analysis.csv brca --output-gmt brca_analysis.gmt -f significant -d significant -n genes.Entrezid -t 0.5 -a greater
+
+It is possible to use pygna to merge different setnames in a single gmt file through the function `generate-group-gmt`.
+You can override the default parameters, to match the reading exactly on your table.
+
+.. code-block:: bash
+
+    $ pygna generate-group-gmt gene_analysis.csv setnames_gmt.gmt group-col Cancer_Setnames
+
+If you want just to add a column corresponding to the EntrezID or the gene's symbol, you can use the following command:
+
+.. code-block:: bash
+
+    $ pygna convert-csv mygenefile.csv e2s original-col-name EntrezID new-name-col Symbols geneset brca
+
