@@ -803,3 +803,41 @@ def network_graphml(
             nx.set_node_attributes(network, dict_nodes, setname)
 
     nx.write_graphml(network, output_file)
+
+
+def network_gmt(network_file: "network file",
+                geneset_file: "GMT geneset file",
+                setname: "The setname to analyse",
+                o: "The output file name (should be csv)",
+                graphml: "Save the graphml plot" = False):
+    """
+    This function evaluate all the connected components in the subgraph pf the network with a given setname.
+    Multiple setnames can be passed to this function to analyze all of them in a run.
+    The file produces a csv output and optionally a plot of the subnetwork with the connected components analysed.
+    """
+    network = rc.ReadTsv(network_file).get_network()
+    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
+
+    output1 = out.Output(network_file, o, "network_gmt", geneset_file, setname)
+    output1.create_st_table_empirical()
+    cclist = list()
+
+    for setname, item in geneset.items():
+        item = set(item)
+        subnetwork = nx.subgraph(network, item)
+        connected_components = nx.connected_components(subnetwork)
+        i = 0
+        for cc in connected_components:
+            if len(cc) > 1:
+                i = i + 1
+                cclist.append(cc)
+                nodes = {}
+                for node in cc:
+                    nodes[node] = i
+                nx.set_node_attributes(network, values=nodes, name=setname)
+                output1.add_GMT_entry(setname + "_" + str(i), "network_gmt", cc)
+        output1.create_GMT_output(o)
+
+        if graphml:
+            output_file = o[:-4] + setname + ".graphml"
+            nx.write_graphml(subnetwork, output_file)
