@@ -237,16 +237,16 @@ def geneset_RW_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observ
 
 def calculate_centrality(graph: nx.Graph, matrix: dict) -> dict:
     """
-       This function calculate the graph centrality.
-       It considers the whole graph and calculate the shortest path, then for each node in the graph calculate the node centrality as follows:
+    This function calculate the graph centrality.
+    It considers the whole graph and calculate the shortest path, then for each node in the graph calculate the node centrality as follows:
 
-       node_centrality = len(sp) -1 / tot_sp
+    node_centrality = len(sp) -1 / tot_sp
 
-       where sp is the distance of the node with each other node and tot_sp is the total shortest paths for the whole graph.
+    where sp is the distance of the node with each other node and tot_sp is the total shortest paths for the whole graph.
 
-       :param graph: The network to analyse
-       :param matrix: The dictionary containing nodes and distance matrix
-       """
+    :param graph: The network to analyse
+    :param matrix: The dictionary containing nodes and distance matrix
+    """
 
     graph_centrality = {}
     for n in graph.nodes:
