@@ -16,7 +16,7 @@ build:
 
 requirements:
   host:
-    - python
+    - python =3.8
     - pip
     - setuptools
     - numpy >=1.16
@@ -26,11 +26,11 @@ requirements:
     - pytables >=3.4.4
     - seaborn >=0.9
     - palettable
-    - networkx >=2.2
+    - networkx ==2.3
     - argh
 
   run:
-    - python
+    - python =3.8
     - numpy >=1.16
     - scipy
     - matplotlib
@@ -38,7 +38,7 @@ requirements:
     - pytables >=3.4.4
     - seaborn >=0.9
     - palettable
-    - networkx >=2.2
+    - networkx ==2.3
     - argh
 
 test:
