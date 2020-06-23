@@ -17,6 +17,7 @@ We have prepared also a docker image that can be found at the following link:
 https://github.com/stracquadaniolab/pygna/packages
 
 By downloading the docker image named "Pygna", you will download a virtual machine with the latest version of pygna and its requirements.
+First download and install the docker environment. Then run it either by command line or by opening the application.
 We have setup the docker image in order to let you use it "out of the box" as stand-alone app, so just by running the following line:
 
 .. code-block:: bash
@@ -24,6 +25,13 @@ We have setup the docker image in order to let you use it "out of the box" as st
     $ docker run docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
 
 you will be prompt to the Pygna help section.
+
+You can use pygna commands I/O functions using the classic docker functionality.
+Here below is an example that paint the dataset statistics:
+
+
+.. code-block:: bash
+    $ docker run --rm -v "$PWD:$PWD" -w "$PWD" docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest paint-datasets-stats pygna_stats.csv pygna_stats.png
 
 
 Getting started
