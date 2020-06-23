@@ -808,12 +808,12 @@ def network_graphml(
 def network_gmt(network_file: "network file",
                 geneset_file: "GMT geneset file",
                 setname: "The setname to analyse",
-                o: "The output file name (should be csv)",
-                graphml: "Save the graphml plot" = False):
+                o: "The output file name (should be gmt)",
+                graphml: "The name of the graphml file"):
     """
     This function evaluate all the connected components in the subgraph pf the network with a given setname.
     Multiple setnames can be passed to this function to analyze all of them in a run.
-    The file produces a csv output and optionally a plot of the subnetwork with the connected components analysed.
+    The file produces a gmt output and optionally a plot of the subnetwork with the connected components analysed.
     """
     network = rc.ReadTsv(network_file).get_network()
     geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
@@ -838,6 +838,4 @@ def network_gmt(network_file: "network file",
                 output1.add_GMT_entry(setname + "_" + str(i), "network_gmt", cc)
         output1.create_GMT_output(o)
 
-        if graphml:
-            output_file = o[:-4] + setname + ".graphml"
-            nx.write_graphml(subnetwork, output_file)
+        nx.write_graphml(subnetwork, graphml)
