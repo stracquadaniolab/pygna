@@ -10,3 +10,4 @@ palettable
 networkx<=2.3
 statsmodels
 argh
+mygene

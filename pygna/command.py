@@ -16,6 +16,7 @@ import scipy
 import scipy.linalg.interpolative
 import itertools
 import tables
+import mygene
 
 
 def read_distance_matrix(distance_matrix_filename, in_memory=False):
@@ -805,11 +806,12 @@ def network_graphml(
     nx.write_graphml(network, output_file)
 
 
-def network_gmt(network_file: "network file",
-                geneset_file: "GMT geneset file",
-                setname: "The setname to analyse",
-                o: "The output file name (should be gmt)",
-                graphml: "The name of the graphml file"):
+def get_connected_components(network_file: "network file",
+                             geneset_file: "GMT geneset file",
+                             setname: "The setname to analyse",
+                             o: "The output file name (should be gmt)",
+                             graphml: "The name of the graphml file",
+                             convert_entrez: "Convert EntrezID->Symbol" = True):
     """
     This function evaluate all the connected components in the subgraph pf the network with a given setname.
     Multiple setnames can be passed to this function to analyze all of them in a run.
@@ -822,6 +824,7 @@ def network_gmt(network_file: "network file",
     output1.create_st_table_empirical()
     cclist = list()
 
+    mg = mygene.MyGeneInfo()
     for setname, item in geneset.items():
         item = set(item)
         subnetwork = nx.subgraph(network, item)
@@ -830,6 +833,11 @@ def network_gmt(network_file: "network file",
         for cc in connected_components:
             if len(cc) > 1:
                 i = i + 1
+                if convert_entrez:
+                    cc = mg.querymany(list(cc), scopes='entrezgene', fields='symbol', species='human')
+                    gene_list = list()
+                    [gene_list.append(e["symbol"]) for e in cc]
+                    cc = gene_list
                 cclist.append(cc)
                 nodes = {}
                 for node in cc:

@@ -24,7 +24,7 @@ def main():
         # network summary and graph file
         cmd.network_summary,
         cmd.network_graphml,
-        cmd.network_gmt,
+        cmd.get_connected_components,
         # geneset network topology analyses
         cmd.test_topology_total_degree,
         cmd.test_topology_internal_degree,

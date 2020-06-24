@@ -28,6 +28,7 @@ requirements:
     - palettable
     - networkx ==2.3
     - argh
+    - mygene
 
   run:
     - python =3.8
@@ -40,6 +41,7 @@ requirements:
     - palettable
     - networkx ==2.3
     - argh
+    - mygene
 
 test:
   commands:
