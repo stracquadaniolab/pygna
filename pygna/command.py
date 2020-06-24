@@ -200,10 +200,8 @@ def test_topology_rwr(
 ):
     """
         Performs the analysis of random walk probabilities.
-        Given the RWR matrix ,
-        it compares the probability of walking between the genes in the geneset
-        compared to those of walking between the nodes
-        of a geneset with the same size
+        Given the RWR matrix , it compares the probability of walking between the genes in the geneset compared to
+        those of walking between the nodes of a geneset with the same size
     """
 
     network = rc.ReadTsv(network_file).get_network()
@@ -816,6 +814,8 @@ def get_connected_components(network_file: "network file",
     This function evaluate all the connected components in the subgraph pf the network with a given setname.
     Multiple setnames can be passed to this function to analyze all of them in a run.
     The file produces a gmt output and optionally a plot of the subnetwork with the connected components analysed.
+
+    Please notice that to convert the entrezID into Symbols, a stable internet connection is required
     """
     network = rc.ReadTsv(network_file).get_network()
     geneset = rc.ReadGmt(geneset_file).get_geneset(setname)

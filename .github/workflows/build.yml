@@ -1,8 +1,8 @@
-name: "Build and release a new version"
+name: "Build"
 
 on:
     push:
-        tags:
+        branches:
         - '*'
 
 jobs:
@@ -35,9 +35,6 @@ jobs:
             conda build . --no-build-id --numpy ${{ matrix.numpy }} --output-folder ./conda-build
             conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
 
-      - name: "Upload Conda package"
-        run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
-
       - name: "Setup Python for PIP"
         uses: actions/setup-python@v1
         with:
@@ -48,16 +45,3 @@ jobs:
 
       - name: "Build PIP package"
         run: python setup.py sdist bdist_wheel
-
-      - name: "Publish package on PyPi"
-        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
-
-      - name: "Build the Docker image"
-        uses: docker/build-push-action@v1
-        with:
-          dockerfile: ./docker/dockerfile
-          registry: docker.pkg.github.com
-          repository: ${{ github.repository }}/pygna
-          tags: latest
-          username: ${{ github.ref }}
-          password: ${{ secrets.GH_TOKEN }}

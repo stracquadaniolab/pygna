@@ -4,4 +4,4 @@ Utils
 .. autoclass:: pygna.utils.YamlConfig
     :members:
 
-.. autofunction:: pygna.command.network_gmt
+.. autofunction:: pygna.command.get_connected_components

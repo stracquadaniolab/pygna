@@ -31,7 +31,7 @@ We provide a function to obtain the network summary ( or the summary of a single
 
 .. autofunction:: pygna.command.network_graphml
 
-.. code-block:: txt
+.. code-block:: text
 
     usage: pygna network-graphml [-h] [-s SETNAME] [--giant-component-only] [-m] network-file geneset-file output-file
 
@@ -61,7 +61,7 @@ GNT Module analysis
 
 .. autofunction:: pygna.command.test_topology_module
 
-.. code-block:: txt
+.. code-block:: text
 
     usage: pygna test-topology-module [-h] [--setname SETNAME] [--size-cut SIZE_CUT] [--number-of-permutations NUMBER_OF_PERMUTATIONS] [-c CORES] [--output-lcc OUTPUT_LCC]
                                   [-r RESULTS_FIGURE] [-d DIAGNOSTIC_NULL_FOLDER]
@@ -93,7 +93,7 @@ GNT Degree analysis
 
 .. autofunction:: pygna.command.test_topology_internal_degree
 
-.. code-block:: txt
+.. code-block:: text
 
     usage: pygna test-topology-internal-degree [-h] [--setname SETNAME] [--size-cut SIZE_CUT] [--number-of-permutations NUMBER_OF_PERMUTATIONS] [-c CORES] [-r RESULTS_FIGURE]
                                            [-d DIAGNOSTIC_NULL_FOLDER]
@@ -513,6 +513,24 @@ Utilities
                             name of the entrez column (default: 'NCBI Gene ID')
       -s SYMBOL_COL, --symbol-col SYMBOL_COL
                             name of the symbol column (default: 'Approved symbol')
+
+.. autofunction:: pygna.command.get_connected_components
+
+    .. code-block:: text
+
+    usage: pygna get-connected-components [-h] [-c] network-file geneset-file setname o graphml
+
+    positional arguments:
+      network-file          network file
+      geneset-file          GMT geneset file
+      setname               The setname to analyse
+      o                     The output file name (should be gmt)
+      graphml               The name of the graphml file
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      -c, --convert-entrez  Convert EntrezID->Symbol (default: True)
+
 
 Block Model
 ___________
