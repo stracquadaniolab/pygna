@@ -59,5 +59,7 @@ Example simulated dataset generation and Analysis
 
 **Generation of the network and genesets**
 
->>> pygna generate-simulated-network ../simulationBM.yaml
+.. code-block:: bash
+
+    $ pygna generate-simulated-network ../simulationBM.yaml
 

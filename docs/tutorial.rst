@@ -33,9 +33,13 @@ independent from the genesets and the analysis.
 For this reason we have implemented a separate step for evaluating and saving the shortest path
 and rwr matrices.
 
->>> pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
+.. code-block:: bash
 
->>> pygna build-distance-matrix barabasi.interactome.tsv interactome_SP.hdf5
+    $ pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
+
+.. code-block:: bash
+
+    $ pygna build-distance-matrix barabasi.interactome.tsv interactome_SP.hdf5
 
 
 Analysis
@@ -60,7 +64,9 @@ Here a simplified structure of the available tests:
 The call for each test is quite similar, we check now the topology-rwr test function
 to review the fundamental parameters
 
->>> pygna test-topology-rwr -h
+.. code-block:: bash
+
+    $ pygna test-topology-rwr -h
 
 .. code-block:: text
 
@@ -115,26 +121,27 @@ OUTPUT: <network_sp>.hdf5, <network_rwr>.hdf5, <table_results_test>_<test>.csv
 
 Generate the network matrices:
 
->>> pygna build-distance-matrix <network> <network_sp>.hdf5
->>> pygna build-rwr-diffusion <network> --output-file <network_rwr>.hdf5
+.. code-block:: bash
+
+    $ pygna build-distance-matrix <network> <network_sp>.hdf5
+    $ pygna build-rwr-diffusion <network> --output-file <network_rwr>.hdf5
 
 Topology tests:
 
->>> pygna test-topology-module <network> <geneset> <table_results_test>_topology_module.csv --number-of-permutations 100 --cores 4
+.. code-block:: bash
 
->>> pygna test-topology-rwr <network> <geneset> <network_rwr>.hdf5 <table_results_test>_topology_rwr.csv --number-of-permutations 100 --cores 4
-
->>> pygna test-topology-internal-degree <network> <geneset> <table_results_test>_topology_internal_degree.csv --number-of-permutations 100 --cores 4
-
->>> pygna test-topology-sp <network> <geneset> <network_sp>.hdf5 <table_results_test>_topology_sp.csv --number-of-permutations 100 --cores 4
-
->>> pygna test-topology-total-degree <network> <geneset> <table_results_test>_topology_total_degree.csv --number-of-permutations 100 --cores 4
+    $ pygna test-topology-module <network> <geneset> <table_results_test>_topology_module.csv --number-of-permutations 100 --cores 4
+    $ pygna test-topology-rwr <network> <geneset> <network_rwr>.hdf5 <table_results_test>_topology_rwr.csv --number-of-permutations 100 --cores 4
+    $ pygna test-topology-internal-degree <network> <geneset> <table_results_test>_topology_internal_degree.csv --number-of-permutations 100 --cores 4
+    $ pygna test-topology-sp <network> <geneset> <network_sp>.hdf5 <table_results_test>_topology_sp.csv --number-of-permutations 100 --cores 4
+    $ pygna test-topology-total-degree <network> <geneset> <table_results_test>_topology_total_degree.csv --number-of-permutations 100 --cores 4
 
 Association tests:
 
->>> pygna test-association-sp <network> <geneset> <network_sp>.hdf5 <table_results_test>_association_sp.csv -B <geneset_pathways> --keep --number-of-permutations 100 --cores 4
+.. code-block:: bash
 
->>> pygna test-association-rwr <network> <geneset> <network_rwr>.hdf5 <table_results_test>_association_rwr.csv -B <geneset_pathways> --keep --number-of-permutations 100 --cores 4
+    $ pygna test-association-sp <network> <geneset> <network_sp>.hdf5 <table_results_test>_association_sp.csv -B <geneset_pathways> --keep --number-of-permutations 100 --cores 4
+    $ pygna test-association-rwr <network> <geneset> <network_rwr>.hdf5 <table_results_test>_association_rwr.csv -B <geneset_pathways> --keep --number-of-permutations 100 --cores 4
 
 Analysis of a geneset from a table (e.g. DeSeq2)
 ------------------------------------------------
@@ -151,7 +158,10 @@ format.
 Here is how to obtain a gmt file of the significant genes obtained by DeSeq2.
 we are here using *diff_exp* as name for the output geneset and we are filtering for padj<0.01.
 
->>> pygna geneset-from-table <deseq>.csv diff_exp <deseq>.gmt --descriptor deseq
+.. code-block:: bash
+
+    $ pygna geneset-from-table <deseq>.csv diff_exp <deseq>.gmt --descriptor deseq
+
 
 Here is how to tweak the default behaviour to filter any csv table.
 
@@ -159,8 +169,10 @@ The filter is applied using the values in the filter_column (for example pvalues
 alternative and threshold parameters to specify what the filter should be. Bare in mind the filter
 is supposed to be applied to **numerical values**. The output gmt will have the gene-names in the <name_column>
 
->>> pygna geneset-from-table <filename>.csv <setname> <filename>.gmt --name-colum <gene_names_column> --filter-column <filter-col>
-<'less'> --threshold <th> --descriptor <descriptor string>
+.. code-block:: bash
+
+    $ pygna geneset-from-table <filename>.csv <setname> <filename>.gmt --name-colum <gene_names_column> --filter-column <filter-col> <'less'> --threshold <th> --descriptor <descriptor string>
+
 
 Pipelines
 ---------

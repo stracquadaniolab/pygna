@@ -7,8 +7,12 @@ Network Summaries and Visualisation
 Before running any geneset-network analysis is a good practice to extract basic information on the network and the geneset or to visualise the network.
 We provide a function to obtain the network summary ( or the summary of a single genesets) and another utility to write an annotated graphml file ( visualise it on Cytoscape ).
 
-.. autofunction:: pygna.command.network_summary
+Network Summary
+***************
 
+    This function saves the principal info of a graph: - network properties - degree distribution - connected components diagnostic
+
+    If a geneset/setname is passed to the function, the properties of the subgraph are evaluated
 
 .. code-block:: text
 
@@ -29,7 +33,12 @@ We provide a function to obtain the network summary ( or the summary of a single
                             specify a single geneset (default: -)
 
 
-.. autofunction:: pygna.command.network_graphml
+Network Graphml
+***************
+
+    This function generates a graphml file with nodes annotation. Given a geneset, with k setnames, each node has k False/True annotations for each set.
+
+    Warning: without minimal, this function saves the full network. The minimal graph saves only the nodes in the geneset and those that connect them with a shortest path.
 
 .. code-block:: text
 
@@ -59,7 +68,13 @@ For each of them a single geneset topology is tested with the specified test sta
 GNT Module analysis
 +++++++++++++++++++
 
-.. autofunction:: pygna.command.test_topology_module
+Test Topology Module
+********************
+
+    Performs geneset network topology module analysis.
+
+    It computes a p-value for the largest connected component of the geneset being bigger than the one expected by chance for a geneset of the same size.
+
 
 .. code-block:: text
 
@@ -91,7 +106,12 @@ GNT Module analysis
 GNT Degree analysis
 +++++++++++++++++++
 
-.. autofunction:: pygna.command.test_topology_internal_degree
+Test topology internal degree
+*****************************
+
+
+Performs the analysis of internal degree. It computes a p-value for the ratio of internal degree of the geneset being bigger than the one expected by chance for a geneset of the same size.
+
 
 .. code-block:: text
 
@@ -117,7 +137,13 @@ GNT Degree analysis
       -d DIAGNOSTIC_NULL_FOLDER, --diagnostic-null-folder DIAGNOSTIC_NULL_FOLDER
                             plot null distribution, pass the folder where all the figures are going to be saved (one for each dataset) (default: -)
 
-.. autofunction:: pygna.command.test_topology_total_degree
+Test topology total degree
+**************************
+
+    Performs the analysis of total degree of the network.
+
+    It computes a p-value for the ratio of total degree of the geneset being bigger than the one expected by chance for a geneset of the same size.
+
 
 .. code-block:: txt
 
@@ -146,7 +172,13 @@ GNT Degree analysis
 GNT Shortest Path Analysis
 +++++++++++++++++++++++++++
 
-.. autofunction:: pygna.command.test_topology_sp
+Test topology shortest path
+***************************
+
+    Performs geneset network topology shortest path analysis.
+
+    It computes a p-value for the average shortest path length of the geneset being smaller than expected by chance for a geneset of the same size.
+
 
 .. code-block:: text
 
@@ -179,7 +211,12 @@ GNT Shortest Path Analysis
 GNT Random Walk Analysis
 ++++++++++++++++++++++++
 
-.. autofunction:: pygna.command.test_topology_rwr
+Test topology random walk with restart
+**************************************
+
+
+Performs the analysis of random walk probabilities. Given the RWR matrix, it compares the probability of walking between the genes in the geneset compared to those of walking between the nodes of a geneset with the same size
+
 
 .. code-block:: text
 
@@ -219,7 +256,15 @@ For each of them two sets are compared, one can pass:
 GNA Shortest Path
 +++++++++++++++++++
 
-.. autofunction:: pygna.command.test_association_sp
+Test association shortest path
+******************************
+
+    Performs comparison of network location analysis. If the flag –keep is passed, the B geneset is kept fixed, and doesnt’t get permuted
+
+    It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
+
+    If only A_geneset_file is passed the analysis is run on all the couples of sets in the file, if both A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not specified, but setnames are needed.
+
 
 .. code-block:: text
 
@@ -257,7 +302,16 @@ GNA Shortest Path
 GNA Random Walk
 +++++++++++++++++++
 
-.. autofunction:: pygna.command.test_association_rwr
+Test association random walk with restart
+*****************************************
+
+
+    Performs comparison of network location analysis.
+
+    It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
+
+    If only A_geneset_file is passed the analysis is run on all the couples of sets in the file, if both A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not specified, but setnames are needed.
+
 
 .. code-block:: text
 
@@ -292,8 +346,11 @@ GNA Random Walk
 Weights Diffusion Analysis
 --------------------------
 
+Test diffusion hotnet
+*********************
 
-.. autofunction:: pygna.command.test_diffusion_hotnet
+Performs the analysis of random walk applying the weights of an upstream analysis. Given a csv file the user needs to specify the columns of interest and the threshold of significance. For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic function.
+
 
 .. code-block:: text
 
@@ -342,7 +399,10 @@ Shortest Paths matrix
 
 To evaluate the matrix of shortest paths we can use the following function:
 
-.. autofunction:: pygna.command.build_distance_matrix
+Build distance matrix
+*********************
+
+Build a shortest path distance matrix for a given network. Matrix can be saved as a .txt file or a .hdf5 one.
 
 .. code-block:: text
 
@@ -365,7 +425,10 @@ To evaluate the diffusion matrix we have the below function that
 implements a Randowm Walk with Restart algorithm. The $beta$ parameter
 is set to $0.80$ as default, but can be given by the user.
 
-.. autofunction:: pygna.command.build_rwr_diffusion
+Build random walk diffusion matrix
+**********************************
+
+Build the RWR_diffusion_matrix
 
 .. code-block:: text
 
@@ -383,7 +446,11 @@ is set to $0.80$ as default, but can be given by the user.
 Show Results
 ------------
 
-.. autofunction:: pygna.painter.paint_datasets_stats
+Paint dataset statistics
+************************
+
+This function plots the results of of a GNT test. Pass the results table generated by one of the functions and the output figure file (png or pdf). In case you are using a SP test, pass also ‘less’ as an alternative.
+
 
 .. code-block:: text
 
@@ -398,7 +465,10 @@ Show Results
       -a ALTERNATIVE, --alternative ALTERNATIVE
                             'greater'
 
-.. autofunction:: pygna.painter.paint_comparison_matrix
+Paint comparison matrix
+***********************
+
+This function plots the results of of a GNA test. Pass the results table generated by one of the functions and the output figure file (png or pdf). With rwr you can specify whether the test is a rwr association, in this case a different palette and limits are sets. Specify if the results are obtained using association with only one genesets (multiple setnames in the same file). Pass the annotate flag to have the pvalue annotation on the plot
 
 .. code-block:: text
 
@@ -418,8 +488,10 @@ Show Results
 Utilities
 ---------
 
+Geneset from table
+******************
 
-.. autofunction:: pygna.utils.geneset_from_table
+Generate a table with the genes setname.
 
 .. code-block:: text
 
@@ -449,7 +521,10 @@ Utilities
                             descriptor for the gmt file (default: -)
 
 
-.. autofunction:: pygna.utils.convert_gmt
+Convert gmt file
+****************
+
+Convert a GMT file by adding a the entrez or symbol column for each gene
 
 .. code-block:: text
 
@@ -470,7 +545,10 @@ Utilities
                             name of the symbol column (default: 'Approved symbol')
 
 
-.. autofunction:: pygna.utils.generate_group_gmt
+Generate group of gmt
+*********************
+
+Generate a single GMT file with the addition of the column description
 
 .. code-block:: text
 
@@ -489,7 +567,10 @@ Utilities
       -d DESCRIPTOR, --descriptor DESCRIPTOR
                             'cancer_genes'
 
-.. autofunction:: pygna.utils.convert_csv
+Convert csv file
+****************
+
+Convert a CSV file by adding a conversion genes column (for entrezID or symbol)
 
 .. code-block:: text
 
@@ -514,9 +595,15 @@ Utilities
       -s SYMBOL_COL, --symbol-col SYMBOL_COL
                             name of the symbol column (default: 'Approved symbol')
 
-.. autofunction:: pygna.command.get_connected_components
+Get connected components
+************************
 
-    .. code-block:: text
+This function evaluate all the connected components in the subgraph pf the network with a given setname. Multiple setnames can be passed to this function to analyze all of them in a run. The file produces a gmt output and optionally a plot of the subnetwork with the connected components analysed.
+
+Please notice that to convert the entrezID into Symbols, a stable internet connection is required
+
+
+.. code-block:: text
 
     usage: pygna get-connected-components [-h] [-c] network-file geneset-file setname o graphml
 
@@ -535,7 +622,10 @@ Utilities
 Block Model
 ___________
 
-.. autofunction:: pygna.block_model.generate_sbm2_network
+Generate stochastic block model network
+***************************************
+
+This function generates the simulated networks and genesets using the stochastic block model with 2 BLOCKS as described in the paper. The output names are going to be prefix_t_<theta0>_p_<percentage>_d_<density>_s_<n_simulation>_network.tsv or _genes.gmt One connected cluster while the rest of the network has the same probability of connection. SBM = d *[theta0, 1-theta0 1-theta0, 1-theta0] The simulator checks for connectedness of the generated network, if the generated net is not connected, a new simulation is generated.
 
 .. code-block:: text
 
@@ -562,23 +652,10 @@ ___________
 Painter
 _______
 
+Paint comparison matrix
+***********************
 
-.. autofunction:: pygna.painter.paint_datasets_stats
-
-.. code-block:: text
-
-    usage: pygna paint-datasets-stats [-h] [-a ALTERNATIVE] table-filename output-file
-
-    positional arguments:
-      table-filename        pygna results table
-      output-file           figure file, use pdf or png extension
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      -a ALTERNATIVE, --alternative ALTERNATIVE
-                            'greater'
-
-.. autofunction:: pygna.painter.paint_comparison_matrix
+This function plots the results of of a GNA test. Pass the results table generated by one of the functions and the output figure file (png or pdf). With rwr you can specify whether the test is a rwr association, in this case a different palette and limits are sets. Specify if the results are obtained using association with only one genesets (multiple setnames in the same file). Pass the annotate flag to have the pvalue annotation on the plot
 
 .. code-block:: text
 
@@ -594,7 +671,13 @@ _______
       -s, --single-geneset  use true if the comparison has been done for a single file (default: False)
       -a, --annotate        set true if uou want to print the pvalue inside the cell (default: False)
 
-.. autofunction:: pygna.painter.paint_volcano_plot
+Paint a volcano plot
+********************
+
+This function plots the results of of a GNA test of association of a single geneset against multiple pathways. Pass the results table generated by one of the functions and the output figure file (png or pdf). From the results table, a multiple testing correction is applied and the results are those plotted.
+
+The defined threshold are for x: zscore and y: -log10(pvalue)
+
 
 .. code-block:: text
 
@@ -616,7 +699,10 @@ _______
       -a, --annotate        False
 
 
-.. autofunction:: pygna.painter.paint_summary_gnt
+Paint summary of GNT analysis
+*****************************
+
+Plot the summary for the GNT analysis
 
 .. code-block:: text
 

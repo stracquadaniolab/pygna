@@ -6,11 +6,15 @@ Installation
 
 The easiest and fastest way to install `pygna` using `conda`:
 
-    >>> conda install -c stracquadaniolab -c bioconda -c conda-forge pygna
+.. code-block:: bash
+
+    $ conda install -c stracquadaniolab -c bioconda -c conda-forge pygna
 
 Alternatively you can install it through `pip`:
 
-    >>> pip install pygna
+.. code-block:: bash
+
+    $ pip install pygna
 
 We have prepared also a docker image that can be found at the following link:
 
@@ -31,6 +35,7 @@ Here below is an example that paint the dataset statistics:
 
 
 .. code-block:: bash
+
     $ docker run --rm -v "$PWD:$PWD" -w "$PWD" docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest paint-datasets-stats pygna_stats.csv pygna_stats.png
 
 
@@ -58,13 +63,15 @@ topology analysis on a single geneset file.
 WARNING: *Pay attention to the fact we set the number of permutations to 1000, if you are just willing to test the behaviour, use 50 or 100
 to speed up the process*
 
->>> cd ./your-path/min-working-example/
+.. code-block:: bash
 
->>> pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
+    $ cd ./your-path/min-working-example/
 
->>> pygna test-topology-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_topology_rwr.csv --number-of-permutations 1000 --cores 4
+    $ pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
 
->>> pygna paint-datasets-stats table_topology_rwr.csv barplot_rwr.png
+    $ pygna test-topology-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_topology_rwr.csv --number-of-permutations 1000 --cores 4
+
+    $ pygna paint-datasets-stats table_topology_rwr.csv barplot_rwr.png
 
 You can look at the plot of the results in the `barplot_rwr.png` file, and the corresponding table in  `table_topology_rwr.csv`.
 
@@ -74,19 +81,27 @@ Example 2: Running pygna GNA analysis
 In the `min-working-example` we provide some basic files to run this minimal example. You can follow this instructions to run a network
 association analysis between two genesets.
 
->>> cd ./your-path/min-working-example/
+.. code-block:: bash
 
-skip this step if the matrix is already computed
+    $ cd ./your-path/min-working-example/
 
->>> pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
+Skip this step if the matrix is already computed
+
+.. code-block:: bash
+
+    $ pygna build-rwr-diffusion barabasi.interactome.tsv --output-file interactome_RWR.hdf5
 
 The association analysis is run N x M times (N number of genesets, M number of pathways), we use only 50 permutations in this example to avoid long computations; however, the recommended value is 1000.
 
->>> pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_association_rwr.csv -B disgenet_cancer_groups_subset.gmt --keep --number-of-permutations 100 --cores 4
+.. code-block:: bash
+
+    $ pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_association_rwr.csv -B disgenet_cancer_groups_subset.gmt --keep --number-of-permutations 100 --cores 4
 
 If you don't include the --results-figure flag at the comparison step, plot the matrix as follows
 
->>> pygna paint-comparison-matrix table_association_rwr.csv heatmap_association_rwr.png --rwr --annotate
+.. code-block:: bash
+
+    $ pygna paint-comparison-matrix table_association_rwr.csv heatmap_association_rwr.png --rwr --annotate
 
 ( include the -rwr flag for the right color coding
 and --annotate for annotating the heatmap with the pvalue of each test )
@@ -98,9 +113,10 @@ WARNING: In this case, both A and B genesets are the same, usually you would use
 
 If setname B is not passed, the analysis is run between each couple of setnames in the geneset.
 
->>> pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_within_comparison_rwr.csv --number-of-permutations 100 --cores 4
+.. code-block:: bash
 
->>> pygna paint-comparison-matrix table_within_comparison_rwr.csv heatmap_within_comparison_rwr.png --rwr --single-geneset
+    $ pygna test-association-rwr barabasi.interactome.tsv disgenet_cancer_groups_subset.gmt interactome_RWR.hdf5 table_within_comparison_rwr.csv --number-of-permutations 100 --cores 4
+    $ pygna paint-comparison-matrix table_within_comparison_rwr.csv heatmap_within_comparison_rwr.png --rwr --single-geneset
 
 
 
