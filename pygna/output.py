@@ -130,7 +130,7 @@ class Output:
         self.table_file_name = tmp.name
         try:
             tmp.write("analysis,setname_A,setname_B,n_geneset_A,n_mapped_A,n_geneset_B,n_mapped_B,n_overlaps,"
-                      "number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network\n ")
+                      "number_of_permutations,observed,empirical_pvalue,mean(null),var(null),network\n")
         finally:
             tmp.close()
 
