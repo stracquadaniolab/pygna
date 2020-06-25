@@ -7,6 +7,12 @@ We provide a function to obtain the network summary ( or the summary of a single
 Network Properties
 ++++++++++++++++++++
 
+`network-summary` saves the principal info of a graph:
+- network properties
+- degree distribution
+- connected components diagnostic
+
+If a geneset/setname is passed to the function, the properties of the subgraph are evaluated
 
 .. code-block:: text
 
@@ -30,7 +36,11 @@ Network Properties
 Cytoscape visualisation
 ++++++++++++++++++++++++
 
-.. autofunction:: pygna.command.network_graphml
+`network-graphml` generates a graphml file with nodes annotation.
+Given a geneset, with k setnames, each node has k False/True annotations for each set.
+
+Warning: without minimal, this function saves the full network.
+The minimal graph saves only the nodes in the geneset and those that connect them with a shortest path.
 
 .. code-block:: text
 
@@ -52,8 +62,13 @@ Cytoscape visualisation
 Connected components
 +++++++++++++++++++++
 
+`get-connected-components` evaluate all the connected components in the subgraph pf the network with a given setname.
+Multiple setnames can be passed to this function to analyze all of them in a run.
+The file produces a gmt output and optionally a plot of the subnetwork with the connected components analysed.
 
-    .. code-block:: text
+Please notice that to convert the entrezID into Symbols, a stable internet connection is required
+
+.. code-block:: text
 
     usage: pygna get-connected-components [-h] [-c] network-file geneset-file setname o graphml
 

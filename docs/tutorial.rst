@@ -12,7 +12,7 @@ test, the genes in the set are mapped to a given network (usually a large refere
 network as the BioGRID one) and some statistic is evaluated.
 
 Networks are read as tab separated text files with each couple of nodes that have an edge
-between them: node_a  node_b
+between them: :math:`node_a  node_b`
 
 Genesets use the gmt format, where each genesets:
 `name \tab descriptor \tab gene1 \tab gene2`
@@ -68,49 +68,6 @@ to review the fundamental parameters
 .. code-block:: bash
 
     $ pygna test-topology-rwr -h
-
-.. code-block:: text
-
-    usage: pygna test-topology-rwr [-h] [--setname SETNAME] [--size-cut SIZE_CUT]
-                                [--number-of-permutations NUMBER_OF_PERMUTATIONS]
-                                [-c CORES] [-i]
-                                [--results-figure RESULTS_FIGURE]
-                                [-d DIAGNOSTIC_NULL_FOLDER]
-                                network-file geneset-file rwr-matrix-filename
-                                output-table
-
-            Performs the analysis of random walk probabilities.
-            Given the RW matrix ( either normal random walk or RW with restart),
-            it compares the probability of walking between the genes in the geneset
-            compared to those of walking between the nodes
-            of a geneset with the same size
-
-
-    positional arguments:
-    network-file          network file, use a network with weights
-    geneset-file          GMT geneset file
-    rwr-matrix-filename   hdf5 RWR matrix obtained with pygna
-    output-table          output results table, use .csv extension
-
-    optional arguments:
-    -h, --help            show this help message and exit
-    --setname SETNAME     Geneset to analyse (default: -)
-    --size-cut SIZE_CUT   removes all genesets with a mapped length < size_cut
-                            (default: 20)
-    --number-of-permutations NUMBER_OF_PERMUTATIONS
-                            number of permutations for computing the empirical
-                            pvalue (default: 500)
-    -c CORES, --cores CORES
-                            Number of cores for the multiprocessing (default: 1)
-    -i, --in-memory       set if you want the large matrix to be read in memory
-                            (default: False)
-    --results-figure RESULTS_FIGURE
-                            barplot of results, use pdf or png extension (default:
-                            -)
-    -d DIAGNOSTIC_NULL_FOLDER, --diagnostic-null-folder DIAGNOSTIC_NULL_FOLDER
-                            plot null distribution, pass the folder where all the
-                            figures are going to be saved (one for each dataset)
-                            (default: -)
 
 Complete Analysis of one geneset
 --------------------------------
@@ -221,14 +178,15 @@ Pygna prepares ready-to-publish plots of all the analysis results.
 Here is an example of a barplot of the GNT rwr analysis for multiple genesets:
 
 
-
-**#TODO: add a usage example (bash), and a plot**
-
-
 .. code-block:: bash
 
-    $ pygna
+    $ pygna paint-datasets-stats pygna_gnt_results.csv pygna_gnt.png
 
+
+Which produced a plot similar to the following:
+
+
+.. image:: _static/barplot.png
 
 For a complete list of the plots refer to :ref:`visualisation`
 
@@ -240,8 +198,7 @@ Check :ref:`customization` for a full tutorial on how to do that.
 
 
 **#TODO: add a usage example test_centrality.py**
-For the new centrality test create a single py file with
-a
+For the new centrality test create a single py file with a
 
 
 .. toctree::
@@ -254,6 +211,6 @@ a
 Diagnostic
 +++++++++++++++++++
 
-For the GNT tests we also provide soe diagnostic tools.
+For the GNT tests we also provide some diagnostic tools.
 
 **#TODO: Add example of distribution plot**

@@ -3,16 +3,15 @@ Large Matrices creation
 -----------------------
 
 Along with the network and the geneset, some analyses require an additional large matrix to be passed as input.
-In particular, the analysis of shortest path and diffusion are evaluating a matrix of shape NxN (N being the number of nodes),
+In particular, the analysis of shortest path and diffusion are evaluating a matrix of shape :math:`NxN` (N being the number of nodes),
 since those are invariant to the geneset analysed, they must be evaluated and saved only once.
 
 
 Shortest Paths matrix
 +++++++++++++++++++++
 
-To evaluate the matrix of shortest paths we can use the following function:
 
-.. autofunction:: pygna.command.build_distance_matrix
+Build a shortest path distance matrix for a given network. Matrix can be saved as a .txt file or a .hdf5 one.
 
 .. code-block:: text
 
@@ -31,11 +30,9 @@ To evaluate the matrix of shortest paths we can use the following function:
 Diffusion matrix
 ++++++++++++++++
 
-To evaluate the diffusion matrix we have the below function that
-implements a Randowm Walk with Restart algorithm. The $beta$ parameter
-is set to $0.80$ as default, but can be given by the user.
+To evaluate the diffusion matrix we have the below function that implements a Randowm Walk with Restart algorithm.
+The :math:`beta` parameter is set to 0.80 as default, but can be given by the user.
 
-.. autofunction:: pygna.command.build_rwr_diffusion
 
 .. code-block:: text
 
@@ -58,7 +55,9 @@ Converting tables and names
 Dataset from table
 +++++++++++++++++++++
 
-.. autofunction:: pygna.utils.geneset_from_table
+Converts a csv file to a gmt allowing to filter the elements using the values of one of the columns.
+The user can specify the column used to retrieve the name of the objects and the filter condition.
+The output can be either a gmt with the names of the genes that pass the filter or a csv with the whole filtered table, otherwise both can be created.
 
 .. code-block:: text
 
@@ -91,7 +90,7 @@ Dataset from table
 Convert gene names
 +++++++++++++++++++++
 
-.. autofunction:: pygna.utils.convert_gmt
+`convert-gmt` is used to convert a GMT file, adding information about the Entrez ID or the symbol
 
 .. code-block:: text
 
@@ -112,7 +111,9 @@ Convert gene names
                             name of the symbol column (default: 'Approved symbol')
 
 
-.. autofunction:: pygna.utils.generate_group_gmt
+`generate-group-gmt` generates a gmt file of multiple setnames.
+From the table file, it groups the names in the group_col (the column you want to use to group them) and prints the genes in the name_col.
+Set the descriptor according to your needs
 
 .. code-block:: text
 
@@ -131,7 +132,7 @@ Convert gene names
       -d DESCRIPTOR, --descriptor DESCRIPTOR
                             'cancer_genes'
 
-.. autofunction:: pygna.utils.convert_csv
+`convert-csv`  is used to add a column with the entrezID or Symbols to a CSV file.
 
 .. code-block:: text
 

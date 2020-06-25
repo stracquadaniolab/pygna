@@ -47,8 +47,7 @@ def network_summary(network_file: "network file",
     - degree distribution
     - connected components diagnostic
 
-    If a geneset/setname is passed to the function, the properties of
-    the subgraph are evaluated
+    If a geneset/setname is passed to the function, the properties of the subgraph are evaluated
     """
     logging.info("Evaluating network summary, please wait")
     network = rc.ReadTsv(network_file).get_network()
@@ -684,7 +683,7 @@ def build_distance_matrix(
 ):
     """
         Build a shortest path distance matrix for a given network.
-        Matrix can be saved as a lm.txt file or a .hdf5 one.
+        Matrix can be saved as a .txt file or a .hdf5 one.
     """
     logging.info("Converting distance matrix, please wait...")
     network = rc.ReadTsv(network_file).get_network()

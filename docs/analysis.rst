@@ -11,9 +11,9 @@ GNT Module analysis
 Test Topology Module
 ********************
 
-    Performs geneset network topology module analysis.
+`test-topology-module` performs geneset network topology module analysis.
 
-    It computes a p-value for the largest connected component of the geneset being bigger than the one expected by chance for a geneset of the same size.
+It computes a p-value for the largest connected component of the geneset being bigger than the one expected by chance for a geneset of the same size.
 
 
 .. code-block:: text
@@ -50,7 +50,8 @@ Test topology internal degree
 *****************************
 
 
-Performs the analysis of internal degree. It computes a p-value for the ratio of internal degree of the geneset being bigger than the one expected by chance for a geneset of the same size.
+`test-topology-internal-degree` performs the analysis of internal degree.
+It computes a p-value for the ratio of internal degree of the geneset being bigger than the one expected by chance for a geneset of the same size.
 
 
 .. code-block:: text
@@ -80,9 +81,8 @@ Performs the analysis of internal degree. It computes a p-value for the ratio of
 Test topology total degree
 **************************
 
-    Performs the analysis of total degree of the network.
-
-    It computes a p-value for the ratio of total degree of the geneset being bigger than the one expected by chance for a geneset of the same size.
+`test-topology-total-degree` performs the analysis of total degree of the network.
+It computes a p-value for the ratio of total degree of the geneset being bigger than the one expected by chance for a geneset of the same size.
 
 
 .. code-block:: text
@@ -115,9 +115,8 @@ GNT Shortest Path Analysis
 Test topology shortest path
 ***************************
 
-    Performs geneset network topology shortest path analysis.
-
-    It computes a p-value for the average shortest path length of the geneset being smaller than expected by chance for a geneset of the same size.
+`test-topology-sp` performs geneset network topology shortest path analysis.
+It computes a p-value for the average shortest path length of the geneset being smaller than expected by chance for a geneset of the same size.
 
 
 .. code-block:: text
@@ -155,7 +154,7 @@ Test topology random walk with restart
 **************************************
 
 
-Performs the analysis of random walk probabilities. Given the RWR matrix, it compares the probability of walking between the genes in the geneset compared to those of walking between the nodes of a geneset with the same size
+`test-topology-rwr` performs the analysis of random walk probabilities. Given the RWR matrix, it compares the probability of walking between the genes in the geneset compared to those of walking between the nodes of a geneset with the same size
 
 
 .. code-block:: text
@@ -203,11 +202,9 @@ GNA Shortest Path
 Test association shortest path
 ******************************
 
-    Performs comparison of network location analysis. If the flag –keep is passed, the B geneset is kept fixed, and doesnt’t get permuted
-
-    It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
-
-    If only A_geneset_file is passed the analysis is run on all the couples of sets in the file, if both A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not specified, but setnames are needed.
+`pygna test-association-sp` performs comparison of network location analysis. If the flag –keep is passed, the B geneset is kept fixed, and doesnt’t get permuted
+It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
+If only A_geneset_file is passed the analysis is run on all the couples of sets in the file, if both A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not specified, but setnames are needed.
 
 
 .. code-block:: text
@@ -250,11 +247,9 @@ Test association random walk with restart
 *****************************************
 
 
-    Performs comparison of network location analysis.
-
-    It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
-
-    If only A_geneset_file is passed the analysis is run on all the couples of sets in the file, if both A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not specified, but setnames are needed.
+`test-association-rwr` performs comparison of network location analysis.
+It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
+If only A_geneset_file is passed the analysis is run on all the couples of sets in the file, if both A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not specified, but setnames are needed.
 
 
 .. code-block:: text
@@ -293,7 +288,9 @@ Weights Diffusion Analysis
 Test diffusion hotnet
 *********************
 
-Performs the analysis of random walk applying the weights of an upstream analysis. Given a csv file the user needs to specify the columns of interest and the threshold of significance. For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic function.
+Performs the analysis of random walk applying the weights of an upstream analysis.
+Given a csv file the user needs to specify the columns of interest and the threshold of significance.
+For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic function.
 
 
 .. code-block:: text
@@ -328,4 +325,3 @@ Performs the analysis of random walk applying the weights of an upstream analysi
       -c CORES, --cores CORES
                             Number of cores for the multiprocessing (default: 1)
       -i, --in-memory       set if you want the large matrix to be read in memory (default: False)
-
