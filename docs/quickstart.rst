@@ -29,9 +29,9 @@ you will be prompt to the Pygna help section.
 You can use pygna commands I/O functions using the classic docker functionality.
 Here below is an example that paint the dataset statistics:
 
-
 .. code-block:: bash
-    $ docker run --rm -v "$PWD:$PWD" -w "$PWD" docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest paint-datasets-stats pygna_stats.csv pygna_stats.png
+
+    $ docker run --rm -v "$PWD:$PWD" -w "$PWD" docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest paint-datasets-stats pygna_gnt_results.csv pygna_gnt.png
 
 
 Getting started
@@ -55,7 +55,8 @@ Example 1: Running pygna GNT analysis
 
 In the `min-working-example` we provide some basic files to run this minimal example. You can follow this instructions to run a network
 topology analysis on a single geneset file.
-WARNING: *Pay attention to the fact we set the number of permutations to 1000, if you are just willing to test the behaviour, use 50 or 100
+
+**WARNING**: Pay attention to the fact we set the number of permutations to 1000, if you are just willing to test the behaviour, use 50 or 100
 to speed up the process*
 
 >>> cd ./your-path/min-working-example/
@@ -94,7 +95,7 @@ and --annotate for annotating the heatmap with the pvalue of each test )
 The -k flag, keeps the -B geneset and permutes only on the set A.
 
 
-WARNING: In this case, both A and B genesets are the same, usually you would use a different B geneset to check all the combinations.
+**WARNING**: In this case, both A and B genesets are the same, usually you would use a different B geneset to check all the combinations.
 
 If setname B is not passed, the analysis is run between each couple of setnames in the geneset.
 

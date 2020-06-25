@@ -38,6 +38,7 @@ and rwr matrices.
 >>> pygna build-distance-matrix barabasi.interactome.tsv interactome_SP.hdf5
 
 
+
 Analysis
 +++++++++++++++++
 
@@ -199,3 +200,48 @@ If you want just to add a column corresponding to the EntrezID or the gene's sym
 
     $ pygna convert-csv mygenefile.csv e2s original-col-name EntrezID new-name-col Symbols geneset brca
 
+
+Showing the results
+--------------------
+
+Pygna prepares ready-to-publish plots of all the analysis results.
+
+Here is an example of a barplot of the GNT rwr analysis for multiple genesets:
+
+
+
+**#TODO: add a usage example (bash), and a plot**
+
+
+.. code-block:: bash
+
+    $ pygna
+
+
+For a complete list of the plots refer to :ref:`visualisation`
+
+Adding GNT or GNA test statistics
+-----------------------------------
+
+Pygna can be easily extended to perform different test statistics.
+Check :ref:`customization` for a full tutorial on how to do that.
+
+
+**#TODO: add a usage example test_centrality.py**
+For the new centrality test create a single py file with
+a
+
+
+.. toctree::
+    :maxdepth: 1
+
+    vignettes
+
+
+
+Diagnostic
++++++++++++++++++++
+
+For the GNT tests we also provide soe diagnostic tools.
+
+**#TODO: Add example of distribution plot**

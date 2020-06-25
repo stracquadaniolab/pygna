@@ -1,4 +1,4 @@
-Simulated Networks
+Benchmarking
 ==================
 
 We have created a framework for testing the performance of Geneset Network analysis: it allows
@@ -7,10 +7,6 @@ The model we use is the Stochastic Block Model and Degree Model that provides a 
 and identify clusters into it.
 
 The function to generate a simulated dataset is:
-
-.. autofunction:: pygna.degree_model.generate_hdn_network
-
-.. autofunction:: pygna.block_model.generate_sbm_network
 
 .. autofunction:: pygna.painter.plot_adjacency
 
