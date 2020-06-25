@@ -1,4 +1,4 @@
-{% set version = "3.1.7-dev" %}
+{% set version = "3.1.8-dev" %}
 
 package:
   name: pygna
