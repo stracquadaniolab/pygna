@@ -2,13 +2,20 @@ FROM python:3.8-slim
 
 # author of file
 LABEL maintainer="Fabio Cassano <fabio.cassano@ed.ac.uk>"
+LABEL maintainer="Giovanni Stracquadanio <giovanni.stracquadanio@ed.ac.uk>"
 
-# instruction to be run during image build
-RUN python3 -m venv pygna_env
-RUN pip install pygna
+# update sources and install tini
+RUN apt-get update --fix-missing && apt-get autoremove \
+    && apt-get clean \
+    && apt-get install tini \
+    && apt-get autoremove \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-ENV TINI_VERSION v0.19.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--", "pygna"]
+# copy the package and install pygna
+WORKDIR /opt
+COPY . .
+RUN python setup.py install
+
+ENTRYPOINT ["/usr/bin/tini", "--", "pygna"]
 

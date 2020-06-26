@@ -2,12 +2,16 @@
 
 Current version: 3.1.8-dev
 
-[![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/platforms.svg)](https://anaconda.org/stracquadaniolab/pygna)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/stracquadaniolab/pygna?style=flat-square)
 [![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/version.svg)](https://anaconda.org/stracquadaniolab/pygna)
+![Build](https://github.com/stracquadaniolab/pygna/workflows/Build/badge.svg)
+![Release](https://github.com/stracquadaniolab/pygna/workflows/Release/badge.svg)
 
-PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code.
+PyGNA is a framework for statistical network analysis of high-throughput experiments. It can
+be used both as a standalone command line application or it can be used as API
+to develop custom analyses.
 
-For an overview of PyGNA functionalities check the infographic below, otherwise dive into the [Getting started](#getting-started) guide.
+For an overview of PyGNA functionalities check the infographic below or dive into our [Getting started](#getting-started) tour.
 
 ![Infographic](docs/pygna_infographic-01.png)
 
@@ -29,6 +33,10 @@ It can be easily called from a terminal window with:
 You will be prompted to the help section of Pygna.
 
 
+You can also run pygna using Docker as follows:
+
+    $ docker run docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
+
 ## Getting started
 
 A typical `pygna` analysis consists of 3 steps:
@@ -42,7 +50,7 @@ Otherwise you can check our [snakemake workflow](https://github.com/stracquadani
 our workflow contains sample data that you can use to familiarize with our software.
 
 
-The examples below show some basic analysis that can be carried out with pygna
+The examples below show some basic analysis that can be carried out with pygna.
 
 ### Example 1: Running pygna GNT analysis
 
@@ -91,8 +99,9 @@ The official documentation for `pygna` can be found on [readthedocs](https://pyg
 
 ## Authors
 
-- Viola Fanfani (v.fanfani@sms.ed.ac.uk): lead developer.
-- Giovanni Stracquadanio (giovanni.stracquadanio@ed.ac.uk)
+- Viola Fanfani (v.fanfani@sms.ed.ac.uk): lead developer and mantainer.
+- Fabio Cassano (fabio.cassano@ed.ac.uk): support.
+- Giovanni Stracquadanio (giovanni.stracquadanio@ed.ac.uk): corresponding author.
 
 ## Citation
 
@@ -101,4 +110,3 @@ A unified framework for geneset network analysis. Viola Fanfani, Giovanni Stracq
 ## Issues
 
 Please post an issue to report a bug or request new features.
-We are now working on code refactoring and standardising the I/O behaviour.

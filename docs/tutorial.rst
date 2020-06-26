@@ -7,31 +7,32 @@ General Usage
 Data Input/Output
 +++++++++++++++++
 
-PyGNA relies on two fundamental objects, a network and a geneset. Regardless of the
-test, the genes in the set are mapped to a given network (usually a large reference
-network as the BioGRID one) and some statistic is evaluated.
+PyGNA relies requires two data sources, a network and a geneset. Regardless of
+the test, the genes in the geneset are mapped to the input network (e.g. BioGrid) and
+then statistical tests are carried out.
 
-Networks are read as tab separated text files with each couple of nodes that have an edge
-between them: :math:`node_a  node_b`
+Networks are read as tab separated text files, where edges are represented by a node pair.
 
-Genesets use the gmt format, where each genesets:
+Genesets use the GMT format, where each geneset is reported as:
 `name \tab descriptor \tab gene1 \tab gene2`
 
-Each gmt file can have a single geneset or multiple of them, PyGNA is able to both analyse all of them
-or to restrict the analysis to a single geneset ( specifying the setname of interest ).
+Since GMT file can have multiple genesets, PyGNA can either run the analyses on all
+of them or on a user-specified subset.
 
-All the results are stored in csv tables reporting all results and parameters of the analysis.
-Those can be easily visualised using the plotting utilities that produce either pdf or png figures.
+Results are stored in CSV files, along with the parameters of the analysis.
+Results can be easily visualised using PyGNA plotting utilities, and save either
+as PDF or PNG files.
 
-Large Matrices
-+++++++++++++++
+Matrix computation
+++++++++++++++++++
 
-Computing the shortest path and the interaction probabilities between each couple of nodes
-in the network can be very expensive and time consuming. Luckily, this is a step
-independent from the genesets and the analysis.
+Computing the shortest path and the interaction probabilities between each pair
+of nodes in the network can be computationally taxing. However, since matrices
+are never modified by statistical tests, they can be computed as part of a
+pre-processing step.
 
-For this reason we have implemented a separate step for evaluating and saving the shortest path
-and rwr matrices.
+For this reason, we have implemented a separate step for evaluating and saving
+the shortest path and RWR matrices.
 
 .. code-block:: bash
 
@@ -46,35 +47,39 @@ and rwr matrices.
 Analysis
 +++++++++++++++++
 
-PyGNA provides both topology tests on single genesets or association tests on couples of them.
-run pygna -h to show all possible options or check the whole :ref:`CLI` documentation.
+PyGNA provides commands for running geneset network topology (GNT) and geneset
+network analysis (GNA) tests. Running `pygna -h` shows all the available
+analyses, whereas extend documentation can be found :ref:`CLI` here.
 
 Here a simplified structure of the available tests:
 
-- **topology**:
+- **geneset network topology**:
     - module
     - internal degree
     - total degree
     - shortest path
     - random walk
 
-- **association**:
+- **geneset network association**:
     - shortest path
     - random walk
 
-The call for each test is quite similar, we check now the topology-rwr test function
-to review the fundamental parameters
+The analyses commands have all the same interface; for example, the available RWR GNT analysis
+options can be checked by running:
 
 .. code-block:: bash
 
     $ pygna test-topology-rwr -h
 
-Complete Analysis of one geneset
+Complete analysis of one geneset
 --------------------------------
 
-In case you have your own geneset you can completely characterise it using PyGNA as follows (names of min_working_example).
+In case you have your own geneset you can completely characterise it using PyGNA
+as follows (names of min_working_example).
 
-Necessary INPUT: <network> and <geneset> and possibly <geneset_pathway> to run the association analysis.
+INPUT: <network> and <geneset>, and/or a <geneset_pathway> to run the
+association analysis.
+
 OUTPUT: <network_sp>.hdf5, <network_rwr>.hdf5, <table_results_test>_<test>.csv
 
 Generate the network matrices:
@@ -104,28 +109,28 @@ Association tests:
 Analysis of a geneset from a table (e.g. DeSeq2)
 ------------------------------------------------
 
-We understand that in many cases the genes one wants to analyse are in a table-like format.
-Hence, we provide a function to create a gmt geneset from a table, with the possibility of
-applying a filter to the data. You can even just use it to return a gmt with all the genes
-in a column by applying a dummy filter.
+In many workflows, the genes to analyse are stored in a table-like format. Hence,
+we provide a function to create a GMT geneset from a table, with the possibility
+of applying a filter to the data. You can even just use it to return a gmt with
+all the genes in a column by applying a dummy filter.
 
-**NOTE**: In case you would like to apply more filters, just use the output_csv instead of
-gmt, this way the first filters would just cut the original data returning the same table
-format.
+**NOTE**: In case you would like to apply more filters, just use the output_csv
+command, instead of GMT, in order to only filter the original data and return
+the table in the original format.
 
-Here is how to obtain a gmt file of the significant genes obtained by DeSeq2.
-we are here using *diff_exp* as name for the output geneset and we are filtering for padj<0.01.
+Here, for example, we obtain a GMT file of the differentially expressed genes
+computed using DeSeq2, by selecting genes with padj<0.01.
 
 .. code-block:: bash
 
     $ pygna geneset-from-table <deseq>.csv diff_exp <deseq>.gmt --descriptor deseq
 
 
-Here is how to tweak the default behaviour to filter any csv table.
-
-The filter is applied using the values in the filter_column (for example pvalues) and cutting using the
-alternative and threshold parameters to specify what the filter should be. Bare in mind the filter
-is supposed to be applied to **numerical values**. The output gmt will have the gene-names in the <name_column>
+PyGNA implements a generic interface to filter any CSV file. Filters are applied
+s the values in the filter_column (for example pvalue) and cutting using the
+alternative and threshold parameters to specify what the filter should be. Bare
+in mind the filter is supposed to be applied to **numerical values**. The output
+gmt will have the gene-names in the <name_column>
 
 .. code-block:: bash
 
@@ -135,35 +140,35 @@ is supposed to be applied to **numerical values**. The output gmt will have the 
 Pipelines
 ---------
 
-The package is integrable in Snakemake pipelines. We already provide
-some sample analyses in [snakemake workflow](https://github.com/stracquadaniolab/workflow-pygna).
-but we encourage to explore all the functionalities of the package and to raise issues
-for bugs and alternative functionalities you might need.
+PyGNA can be seamlessly integrated into Snakemake workflows, and we provide a
+basic [snakemake workflow](https://github.com/stracquadaniolab/workflow-pygna)
+to carry out network analysis with PyGNA.
 
-
-Converting data using Pygna
+Converting data using PyGNA
 +++++++++++++++++++++++++++
 
-One of the most important feature in pygna is the possibility to convert a file from a format to another.
-In particular here we propose some examples on how to use the converter classes.
+One of the most important feature in pygna is the possibility to convert a file
+from a format to another. PyGNA supports:
 
+Converting into GMT format __________________________
 
-Converting into GMT files
-_________________________
-From a general table containing all the genes to analyse, we can call the following command in order to get a GMT file that is correctly read from pygna:
+Geneset in table-like formats (e.g. CSV) can be converted into GMT format as
+follows:
 
 .. code-block:: bash
 
     $ pygna geneset-from-table gene_analysis.csv brca --output-gmt brca_analysis.gmt -f significant -d significant -n genes.Entrezid -t 0.5 -a greater
 
-It is possible to use pygna to merge different setnames in a single gmt file through the function `generate-group-gmt`.
-You can override the default parameters, to match the reading exactly on your table.
+It is also possible to merge different setnames in a single gmt file through the
+function `generate-group-gmt`. You can override the default parameters, to match
+the columns in your table.
 
 .. code-block:: bash
 
     $ pygna generate-group-gmt gene_analysis.csv setnames_gmt.gmt group-col Cancer_Setnames
 
-If you want just to add a column corresponding to the EntrezID or the gene's symbol, you can use the following command:
+If you want to add a column corresponding to the EntrezID or the gene's symbol,
+you can use the following command:
 
 .. code-block:: bash
 
@@ -173,9 +178,10 @@ If you want just to add a column corresponding to the EntrezID or the gene's sym
 Showing the results
 --------------------
 
-Pygna prepares ready-to-publish plots of all the analysis results.
+PyGNA generates publication-ready plots for each analysis.
 
-Here is an example of a barplot of the GNT rwr analysis for multiple genesets:
+For example, a barplot of the GNT RWR analysis for multiple genesets can be
+generated by running:
 
 
 .. code-block:: bash
@@ -183,8 +189,7 @@ Here is an example of a barplot of the GNT rwr analysis for multiple genesets:
     $ pygna paint-datasets-stats pygna_gnt_results.csv pygna_gnt.png
 
 
-Which produced a plot similar to the following:
-
+which produced a plot similar to the following:
 
 .. image:: _static/barplot.png
 
@@ -193,8 +198,8 @@ For a complete list of the plots refer to :ref:`visualisation`
 Adding GNT or GNA test statistics
 -----------------------------------
 
-Pygna can be easily extended to perform different test statistics.
-Check :ref:`customization` for a full tutorial on how to do that.
+PyGNA can be easily extended to run user-defined statistical tests. Check
+:ref:`customization` for a full tutorial on how to do that.
 
 .. toctree::
     :maxdepth: 1
@@ -294,6 +299,6 @@ The code below shows how it is possible to implement a function such as the clos
 Diagnostic
 +++++++++++++++++++
 
-For the GNT tests we also provide some diagnostic tools.
+Diagnostic tools are implemented for GNT tests. **TODO** describe them here (briefly).
 
 **#TODO: Add example of distribution plot**

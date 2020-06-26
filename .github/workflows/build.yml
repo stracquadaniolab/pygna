@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: "Build, compile and upload"
+    name: "Build and test"
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: pygna
@@ -17,6 +17,15 @@ jobs:
         numpy: [1.15]
     steps:
       - uses: actions/checkout@v1
+
+      - name: "Setup Python"
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: "Check install"
+        run: python setup.py install
+
       - name: "Setup Conda"
         uses: s-weigand/setup-conda@v1
         with:
@@ -34,14 +43,3 @@ jobs:
             mkdir conda-build
             conda build . --no-build-id --numpy ${{ matrix.numpy }} --output-folder ./conda-build
             conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
-
-      - name: "Setup Python for PIP"
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: "Install PIP required packages"
-        run: pip install wheel twine
-
-      - name: "Build PIP package"
-        run: python setup.py sdist bdist_wheel

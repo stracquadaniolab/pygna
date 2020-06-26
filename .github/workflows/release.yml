@@ -1,4 +1,4 @@
-name: "Build and release a new version"
+name: "Release"
 
 on:
     push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   release:
-    name: "Build, compile and upload"
+    name: "Build and release"
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: pygna
@@ -17,6 +17,21 @@ jobs:
         numpy: [1.15]
     steps:
       - uses: actions/checkout@v1
+
+      - name: "Setup Python"
+        uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: "Install PIP required packages"
+        run: pip install wheel twine
+
+      - name: "Build PIP package"
+        run: python setup.py sdist bdist_wheel
+
+      - name: "Publish package on PyPi"
+        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
+
       - name: "Setup Conda"
         uses: s-weigand/setup-conda@v1
         with:
@@ -38,20 +53,6 @@ jobs:
       - name: "Upload Conda package"
         run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 
-      - name: "Setup Python for PIP"
-        uses: actions/setup-python@v1
-        with:
-          python-version: 3.8
-
-      - name: "Install PIP required packages"
-        run: pip install wheel twine
-
-      - name: "Build PIP package"
-        run: python setup.py sdist bdist_wheel
-
-      - name: "Publish package on PyPi"
-        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
-
       - name: "Build the Docker image"
         uses: docker/build-push-action@v1
         with:
@@ -59,5 +60,7 @@ jobs:
           registry: docker.pkg.github.com
           repository: ${{ github.repository }}/pygna
           tags: latest
+          tag_with_ref: true
+          tag_with_sha: true
           username: ${{ github.ref }}
           password: ${{ secrets.GH_TOKEN }}
