@@ -111,7 +111,7 @@ Analysis of a geneset from a table (e.g. DeSeq2)
 
 In many workflows, the genes to analyse are stored in a table-like format. Hence,
 we provide a function to create a GMT geneset from a table, with the possibility
-of applying a filter to the data. You can even just use it to return a gmt with
+of applying a filter to the data. You can even just use it to return a GMT with
 all the genes in a column by applying a dummy filter.
 
 **NOTE**: In case you would like to apply more filters, just use the output_csv
@@ -127,10 +127,10 @@ computed using DeSeq2, by selecting genes with padj<0.01.
 
 
 PyGNA implements a generic interface to filter any CSV file. Filters are applied
-s the values in the filter_column (for example pvalue) and cutting using the
-alternative and threshold parameters to specify what the filter should be. Bare
+to the values in the filter_column (for example pvalue) and the cut is performed using the
+alternative parameter. The threshold parameters are used to specify what the filter should be used. Bare
 in mind the filter is supposed to be applied to **numerical values**. The output
-gmt will have the gene-names in the <name_column>
+GMT will have the gene-names in the <name_column>
 
 .. code-block:: bash
 
@@ -150,7 +150,8 @@ Converting data using PyGNA
 One of the most important feature in pygna is the possibility to convert a file
 from a format to another. PyGNA supports:
 
-Converting into GMT format __________________________
+Converting into GMT format
+__________________________
 
 Geneset in table-like formats (e.g. CSV) can be converted into GMT format as
 follows:
@@ -199,7 +200,7 @@ Adding GNT or GNA test statistics
 -----------------------------------
 
 PyGNA can be easily extended to run user-defined statistical tests. Check
-:ref:`customization` for a full tutorial on how to do that.
+" :ref:`customization` " for a full tutorial on how to do that.
 
 .. toctree::
     :maxdepth: 1
@@ -294,6 +295,15 @@ The code below shows how it is possible to implement a function such as the clos
         MAIN
         """
         main()
+
+
+
+Centrality calculation
++++++++++++++++++++++++
+
+It is possible to access to the centrality calculation in the example with:
+
+.. autofunction:: pygna.centrality.calculate_centrality
 
 
 Diagnostic

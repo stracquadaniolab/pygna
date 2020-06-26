@@ -30,7 +30,7 @@ Load the network and the geneset you want to use
 Step 3: define your function
 ____________________________
 Define your custom function that implements your statistical test.
-It must always return a `float` value.
+It must always return a `float`, representing the statistical value calculated in the function.
 
 For example here it is reported the calculation of the geneset total degree
 
@@ -95,7 +95,7 @@ Load the dictionary, the network and the geneset that you are going to elaborate
 Step 3: define your function
 ____________________________
 Define your custom function that implements your statistical test.
-It must always return a `float` value.
+It must always return a `float`, representing the statistical value calculated in the function.
 
 For example here it is reported the calculation of comparison shortest path between two genesets.
 The return value is the length of the path between the two genesets.
@@ -140,8 +140,3 @@ Save the results using the pygna output function
     ...                                                      number_of_permutations, observed, pvalue, np.mean(null_d),
     ...                                                      np.var(null_d))
 
-
-Centrality calculation
-+++++++++++++++++++++++
-
-.. autofunction:: pygna.centrality.calculate_centrality

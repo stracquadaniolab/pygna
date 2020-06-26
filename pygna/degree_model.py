@@ -9,7 +9,7 @@ from pygna import output
 
 class DegreeModel(object):
     """
-    This class represent a degree model
+    This class is used to calculate a degree model
     """
     def __init__(self, network_prob: float = 0.5, vip_prob: float = 1, n_nodes: int = 10,
                  vip_percentage: float = 0.1):

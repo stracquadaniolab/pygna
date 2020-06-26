@@ -55,9 +55,9 @@ Converting tables and names
 Dataset from table
 +++++++++++++++++++++
 
-Converts a csv file to a gmt allowing to filter the elements using the values of one of the columns.
+Converts a csv file to a GMT allowing to filter the elements using the values of one of the columns.
 The user can specify the column used to retrieve the name of the objects and the filter condition.
-The output can be either a gmt with the names of the genes that pass the filter or a csv with the whole filtered table, otherwise both can be created.
+The output can be either a GMT with the names of the genes that pass the filter or a csv with the whole filtered table, otherwise both can be created.
 
 .. code-block:: text
 
@@ -111,7 +111,7 @@ Convert gene names
                             name of the symbol column (default: 'Approved symbol')
 
 
-`generate-group-gmt` generates a gmt file of multiple setnames.
+`generate-group-gmt` generates a GMT file of multiple setnames.
 From the table file, it groups the names in the group_col (the column you want to use to group them) and prints the genes in the name_col.
 Set the descriptor according to your needs
 
@@ -121,7 +121,7 @@ Set the descriptor according to your needs
 
     positional arguments:
       input-table           table to get the geneset from
-      output-gmt            output gmt file
+      output-gmt            output GMT file
 
     optional arguments:
       -h, --help            show this help message and exit

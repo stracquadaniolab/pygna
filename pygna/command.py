@@ -87,11 +87,10 @@ def test_topology_total_degree(
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None):
     """
-        Performs the analysis of total degree of the .
+    Performs the analysis of total degree of the .
 
-        It computes a p-value for the ratio of total degree
-        of the geneset being bigger than the one expected by chance
-        for a geneset of the same size.
+    It computes a p-value for the ratio of total degree of the geneset being bigger than the one expected by chance
+    for a geneset of the same size.
     """
     logging.info("Evaluating the test topology total degree, please wait")
     network = rc.ReadTsv(network_file).get_network()
@@ -147,10 +146,9 @@ def test_topology_internal_degree(
                             "(one for each dataset)" = None,
 ):
     """
-        Performs the analysis of internal degree.
-        It computes a p-value for the ratio of internal degree
-        of the geneset being bigger than the one expected by chance
-        for a geneset of the same size.
+    Performs the analysis of internal degree.
+    It computes a p-value for the ratio of internal degree of the geneset being bigger than the one expected by chance
+    for a geneset of the same size.
     """
 
     network = rc.ReadTsv(network_file).get_network()
@@ -198,9 +196,9 @@ def test_topology_rwr(
                             "(one for each dataset)" = None,
 ):
     """
-        Performs the analysis of random walk probabilities.
-        Given the RWR matrix , it compares the probability of walking between the genes in the geneset compared to
-        those of walking between the nodes of a geneset with the same size
+    Performs the analysis of random walk probabilities.
+    Given the RWR matrix, it compares the probability of walking between the genes in the geneset compared to
+    those of walking between the nodes of a geneset with the same size
     """
 
     network = rc.ReadTsv(network_file).get_network()
@@ -250,17 +248,15 @@ def test_topology_module(
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
-    output_lcc: "for creating a GMT file with the LCC lists pass a gmt filename" = None,
+    output_lcc: "for creating a GMT file with the LCC lists pass a GMT filename" = None,
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
 ):
     """
-        Performs geneset network topology module analysis.
-
-        It computes a p-value for the largest connected component
-        of the geneset being bigger than the one expected by chance
-        for a geneset of the same size.
+    Performs geneset network topology module analysis.
+    It computes a p-value for the largest connected component of the geneset being bigger than the one expected by chance
+    for a geneset of the same size.
     """
     network = rc.ReadTsv(network_file).get_network()
     geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
@@ -318,12 +314,11 @@ def test_topology_sp(
                             "(one for each dataset)" = None,
 ):
     """
-        Performs geneset network topology shortest path analysis.
+    Performs geneset network topology shortest path analysis.
 
-        It computes a p-value for the average shortest path length
-        of the geneset being smaller than expected by chance
-        for a geneset of the same size.
-
+    It computes a p-value for the average shortest path length
+    of the geneset being smaller than expected by chance
+    for a geneset of the same size.
     """
 
     network = rc.ReadTsv(network_file).get_network()
@@ -382,11 +377,11 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
                           in_memory: "set if you want the large matrix to be read in memory" = False,
                           ):
     """
-        Performs the analysis of random walk applying the weights of an upstream analysis.
-        Given a csv file the user needs to specify the columns of interest and
-        the threshold of significance.
-        For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic
-        function.
+    Performs the analysis of random walk applying the weights of an upstream analysis.
+    Given a csv file the user needs to specify the columns of interest and
+    the threshold of significance.
+    For the analysis the StatisticalDiffusion is used with hotnet_diffusion_statistic
+    function.
     """
 
     # Reading network file
@@ -444,7 +439,7 @@ def test_diffusion_hotnet(network_file: "network file, use a network with weight
 def test_association_sp(
     network_file: "network file",
     file_geneset_a: "GMT geneset file, if it's the only parameter passed the analysis is gonna be run on all the "
-                    "couples of datasets, otherwise specify the other files and setnames",
+                    "pair of datasets, otherwise specify the other files and setnames",
     distance_matrix_filename: "distance matrix file generated by pygna",
     output_table: "output results table, use .csv extension",
     setname_a: "Geneset A to analyse" = None,
@@ -458,20 +453,14 @@ def test_association_sp(
     results_figure: "barplot of results, use pdf or png extension" = None,
 ):
     """
-        Performs comparison of network location analysis. If the flag
-        --keep  is passed, the B geneset is kept
-        fixed, and doesnt't get permuted
+    Performs comparison of network location analysis. If the flag
+    --keep  is passed, the B geneset is kept fixed, and doesnt't get permuted.
 
-        It computes a p-value for the shortest path distance
-        between two genesets being smaller than expected by chance
-
-        If only A_geneset_file is passed the analysis is run on all the couples
-        of sets in the file,
-        if both A_geneset_file and B_geneset_file are passed, one can specify
-        the setnames for both, if there is only one geneset in the file, setname_X
-        can be omitted,
-        if both sets are in the same file, B_geneset_file can be not specified,
-        but setnames are needed.
+    It computes a p-value for the shortest path distance between two genesets being smaller than expected by chance
+    If only A_geneset_file is passed the analysis is run on all the pair of sets in the file, if both
+    A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one
+    geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not
+    specified, but setnames are needed.
     """
 
     if keep:
@@ -531,7 +520,7 @@ def test_association_sp(
                 \nOne of them is too short, analysis not done" % (len(set(geneset_a[pair[0]])),
                                                                   len(set(geneset_a[pair[1]]))))
 
-    else:  # Analysis of genesets into two different gmt files
+    else:  # Analysis of genesets into two different GMT files
 
         logging.info("geneset_a contains %d sets", (len(geneset_a)))
         sets_a = [key for key in geneset_a.keys()]
@@ -574,18 +563,15 @@ def test_association_rwr(
     results_figure: "heatmap of results" = None,
 ):
     """
-        Performs comparison of network location analysis.
+    Performs comparison of network location analysis.
 
-        It computes a p-value for the shortest path distance
-        between two genesets being smaller than expected by chance
+    It computes a p-value for the shortest path distance
+    between two genesets being smaller than expected by chance.
 
-        If only A_geneset_file is passed the analysis is run on all the couples
-        of sets in the file,
-        if both A_geneset_file and B_geneset_file are passed, one can specify
-        the setnames for both, if there is only one geneset in the file, setname_X
-        can be omitted,
-        if both sets are in the same file, B_geneset_file can be not specified,
-        but setnames are needed.
+    If only A_geneset_file is passed the analysis is run on all the pair of sets in the file, if both
+    A_geneset_file and B_geneset_file are passed, one can specify the setnames for both, if there is only one
+    geneset in the file, setname_X can be omitted, if both sets are in the same file, B_geneset_file can be not
+    specified, but setnames are needed.
     """
 
     if keep:
@@ -682,8 +668,8 @@ def build_distance_matrix(
     giant_component_only: "compute the shortest paths only for nodes in the giant component" = True,
 ):
     """
-        Build a shortest path distance matrix for a given network.
-        Matrix can be saved as a .txt file or a .hdf5 one.
+    Build a shortest path distance matrix for a given network.
+    Matrix can be saved as a .txt file or a .hdf5 one.
     """
     logging.info("Converting distance matrix, please wait...")
     network = rc.ReadTsv(network_file).get_network()
@@ -719,7 +705,7 @@ def build_rwr_diffusion(
     output_file: "distance matrix output file (use .hdf5) " = None,
 ):
     """
-        Build the RWR_diffusion_matrix
+    Build the RWR_diffusion_matrix
     """
 
     network = rc.ReadTsv(network_file).get_network()
@@ -812,7 +798,7 @@ def get_connected_components(network_file: "network file",
     """
     This function evaluate all the connected components in the subgraph pf the network with a given setname.
     Multiple setnames can be passed to this function to analyze all of them in a run.
-    The file produces a gmt output and optionally a plot of the subnetwork with the connected components analysed.
+    The file produces a GMT output and optionally a plot of the subnetwork with the connected components analysed.
 
     Please notice that to convert the entrezID into Symbols, a stable internet connection is required
     """

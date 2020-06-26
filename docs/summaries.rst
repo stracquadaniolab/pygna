@@ -64,7 +64,7 @@ Connected components
 
 `get-connected-components` evaluate all the connected components in the subgraph pf the network with a given setname.
 Multiple setnames can be passed to this function to analyze all of them in a run.
-The file produces a gmt output and optionally a plot of the subnetwork with the connected components analysed.
+The file produces a GMT output and optionally a plot of the subnetwork with the connected components analysed.
 
 Please notice that to convert the entrezID into Symbols, a stable internet connection is required
 
@@ -76,7 +76,7 @@ Please notice that to convert the entrezID into Symbols, a stable internet conne
       network-file          network file
       geneset-file          GMT geneset file
       setname               The setname to analyse
-      o                     The output file name (should be gmt)
+      o                     The output file name (should be GMT)
       graphml               The name of the graphml file
 
     optional arguments:

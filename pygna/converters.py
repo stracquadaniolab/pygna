@@ -174,9 +174,9 @@ class CsvToCsvEnriched(Converters):
 
 class CsvToGmt(Converters):
     """
-    This Class converts a csv file to a gmt allowing to filter the elements using the values of one of the columns.
+    This Class converts a csv file to a GMT allowing to filter the elements using the values of one of the columns.
     The user can specify the column used to retrieve the name of the objects and the filter condition. The output
-    can be either a gmt with the names of the genes that pass the filter or a csv with the whole filtered table,
+    can be either a GMT with the names of the genes that pass the filter or a csv with the whole filtered table,
     otherwise both can be created.
     """
 
@@ -186,13 +186,13 @@ class CsvToGmt(Converters):
         """
         :param input_file: str, the csv file
         :param setname: str, the name of the set
-        :param output_gmt: str, output gmt name
+        :param output_gmt: str, output GMT name
         :param output_csv: str, output csv name
         :param name_column: str, column with the names
         :param filter_column: str, column with the values to be filtered
         :param alternative: str, alternative to use for the filterK with "less" the filter is applied <threshold; otherwise >= threshold
         :param threshold: float, threshold for the filter
-        :param descriptor: str, descriptor for the gmt file
+        :param descriptor: str, descriptor for the GMT file
         """
         super().__init__()
         self.input_file = input_file
@@ -296,7 +296,7 @@ class GmtToGmtEnriched(Converters):
 
 class GroupGmt(Converters):
     """
-    This function generates a gmt file of multiple setnames. From the table file, it groups the names in the
+    This function generates a GMT file of multiple setnames. From the table file, it groups the names in the
     group_col (the column you want to use to group them) and prints the genes in the name_col. Set the descriptor
     according to your needs
     """
@@ -305,7 +305,7 @@ class GroupGmt(Converters):
                  descriptor: str = "cancer_genes"):
         """
         :param input_table: the filename path (it must be in .csv, .tsv or .txt format)
-        :param output_gmt: the output gmt file path
+        :param output_gmt: the output GMT file path
         :param name_col: the name of the column to write the genes
         :param group_col:the name of the column to group
         :param descriptor: the descriptor to use

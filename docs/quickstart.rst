@@ -48,11 +48,11 @@ A typical `pygna` analysis consists of 3 steps:
 3. Run the analysis you are interested into.
 4. Once you have the output tables, you can choose to visualize one or more plots.
 
-Otherwise you can check our [snakemake workflow](https://github.com/stracquadaniolab/workflow-pygna) for the full geneset analysis;
+Otherwise you can check our snakemake workflow (https://github.com/stracquadaniolab/workflow-pygna) for the full geneset analysis;
 our workflow contains sample data that you can use to familiarize with our software.
 
 
-The examples below show some basic analysis that can be carried out with pygna
+The examples below show some basic analysis that can be carried out with pygna.
 
 Example 1: Running pygna GNT analysis
 +++++++++++++++++++++++++++++++++++++
