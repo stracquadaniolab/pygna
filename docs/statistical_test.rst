@@ -15,5 +15,3 @@ Statistical Test
 .. autofunction:: pygna.statistical_test.geneset_internal_degree_statistic
 
 .. autofunction:: pygna.statistical_test.geneset_RW_statistic
-
-.. autofunction:: pygna.centrality.calculate_centrality

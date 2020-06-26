@@ -140,3 +140,8 @@ Save the results using the pygna output function
     ...                                                      number_of_permutations, observed, pvalue, np.mean(null_d),
     ...                                                      np.var(null_d))
 
+
+Centrality calculation
++++++++++++++++++++++++
+
+.. autofunction:: pygna.centrality.calculate_centrality

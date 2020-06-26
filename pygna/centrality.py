@@ -6,7 +6,7 @@ def calculate_centrality(graph: nx.Graph, matrix: dict) -> dict:
     This function calculate the graph centrality.
     It considers the whole graph and calculate the shortest path, then for each node in the graph calculate the node centrality as follows:
 
-    :math:`node_centrality = len(sp) -1 / tot_sp`
+    :math:`node centrality = len(sp) -1 / tot_{sp}`
 
     where sp is the distance of the node with each other node and tot_sp is the total shortest paths for the whole graph.
 
@@ -17,6 +17,7 @@ def calculate_centrality(graph: nx.Graph, matrix: dict) -> dict:
     _______
 
     .. code-block:: python
+
             import pygna.command.read_distance_matrix
             import pygna.reading_class as rc
             import pygna.centrality.calculate_centrality

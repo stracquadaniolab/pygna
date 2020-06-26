@@ -197,10 +197,6 @@ Pygna can be easily extended to perform different test statistics.
 Check :ref:`customization` for a full tutorial on how to do that.
 
 
-**#TODO: add a usage example test_centrality.py**
-For the new centrality test create a single py file with a
-
-
 .. toctree::
     :maxdepth: 1
 
