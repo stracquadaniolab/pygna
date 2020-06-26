@@ -48,10 +48,8 @@ class StatisticalTest:
         else:
             logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
             observed = self.__test_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
-            # iterations
             null_distribution = StatisticalTest.get_null_distribution_mp(self, mapped_geneset, max_iter, n_proc=cores)
             # computing empirical pvalue
-            pvalue = 1
             if alternative == "greater":
                 pvalue = (np.sum(null_distribution >= observed) + 1) / (float(max_iter) + 1)
             else:

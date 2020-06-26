@@ -2,7 +2,6 @@
 
 Current version: 3.1.8-dev
 
-[![Build Status](http://drone.stracquadaniolab.org/api/badges/stracquadaniolab/pygna/status.svg)](http://drone.stracquadaniolab.org/stracquadaniolab/pygna)
 [![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/platforms.svg)](https://anaconda.org/stracquadaniolab/pygna)
 [![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/version.svg)](https://anaconda.org/stracquadaniolab/pygna)
 
@@ -22,7 +21,13 @@ Alternatively you can install it through `pip`:
 
     $ pip install pygna
 
-Please note, that `pip` will not install non Python requirements.
+We also provide a docker image installation with the latest version of Pygna.
+It can be easily called from a terminal window with:
+
+     $ docker run docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
+
+You will be prompted to the help section of Pygna.
+
 
 ## Getting started
 
@@ -96,4 +101,4 @@ A unified framework for geneset network analysis. Viola Fanfani, Giovanni Stracq
 ## Issues
 
 Please post an issue to report a bug or request new features.
-We are now working on code refactoring and standardising the I/O behaviour. 
+We are now working on code refactoring and standardising the I/O behaviour.
