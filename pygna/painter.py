@@ -96,8 +96,9 @@ def paint_datasets_stats(table_filename: 'pygna results table',
             k += 1
 
         g.facet_axis(0, 0).xaxis.grid(color="gray", linestyle="dotted", linewidth=0.5)
-        g.set_xlabels(stat_name)
-        g.set_ylabels("")
+        g.set_ylabels(stat_name)
+        g.set_xticklabels(g.get_xticklabels(), rotation=45, horizontalalignment='right')
+        # g.set_ylabels("")
         g.despine(bottom=True, left=True)
 
     else:
@@ -164,8 +165,9 @@ def paint_datasets_stats(table_filename: 'pygna results table',
             k += 1
 
         g.facet_axis(0, 0).xaxis.grid(color="gray", linestyle="dotted", linewidth=0.5)
-        g.set_xlabels(stat_name)
-        g.set_ylabels("")
+        g.set_ylabels(stat_name)
+        g.set_xticklabels(g.get_xticklabels(), rotation=45, horizontalalignment='right')
+        # g.set_ylabels("")
         g.despine(bottom=True, left=True)
 
     if output_file.endswith('.pdf'):
