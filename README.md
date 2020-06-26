@@ -1,12 +1,10 @@
 # PyGNA: a Python framework for geneset network analysis
-
-Current version: 3.1.8
-
-[![Release Status](https://github.com/stracquadaniolab/pygna/workflows/.github/workflows/release.yml/badge.svg)](https://github.com/stracquadaniolab/pygna/workflows/.github/workflows/release.yml/badge.svg)
-[![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/platforms.svg)](https://anaconda.org/stracquadaniolab/pygna)
+![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/stracquadaniolab/pygna?style=flat-square)
 [![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/version.svg)](https://anaconda.org/stracquadaniolab/pygna)
+[![Build Status](https://github.com/stracquadaniolab/pygna/workflows/.github/workflows/build.yml/badge.svg)](https://github.com/stracquadaniolab/pygna/workflows/.github/workflows/build.yml/badge.svg)
+[![Release Status](https://github.com/stracquadaniolab/pygna/workflows/.github/workflows/release.yml/badge.svg)](https://github.com/stracquadaniolab/pygna/workflows/.github/workflows/release.yml/badge.svg)
 
-PyGNA is a unified framework for network analysis of high-throughput experiment results. It can be used both as a standalone command line application or it can be included as a package in your own python code.
+PyGNA is a unified framework for network analysis of high-throughput experiments. It can be used both as a standalone command line application or it can be used as API to develop custom analyses.
 
 For an overview of PyGNA functionalities check the infographic below or dive into the [Getting started](#getting-started) guide.
 
