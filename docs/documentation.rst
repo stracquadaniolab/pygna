@@ -1,7 +1,7 @@
-Pygna API
+API
 ===================
 
-The following sections describe the different Pygna classes and functions available.
+The following sections describe the different PyGNA classes and functions available.
 
 .. toctree::
     block_model

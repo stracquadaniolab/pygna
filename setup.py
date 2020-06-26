@@ -11,7 +11,7 @@ setup(
     # package information
     name='pygna',
     packages=find_packages(),
-    version='3.1.8-dev',
+    version='3.1.8',
     description='Geneset Network Analysis',
     long_description=readme,
     license='MIT',
@@ -34,7 +34,8 @@ setup(
         'palettable',
         'networkx==2.3',
         'statsmodels',
-        'argh'
+        'argh',
+        'mygene'
     ],
     setup_requires=[],
 

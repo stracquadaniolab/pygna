@@ -1,8 +1,8 @@
 Geneset Network Topology Analysis
 ---------------------------------
 
-Here are all the GNT analyses that pygna can perform.
-For each of them a single geneset topology is tested with the specified test statistics.
+Here are all the GNT analyses that pygna can perform. For each of them a single
+geneset topology is tested with the specified test statistics.
 
 
 GNT Module analysis
