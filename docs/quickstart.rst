@@ -103,8 +103,7 @@ If you don't include the --results-figure flag at the comparison step, plot the 
 
     $ pygna paint-comparison-matrix table_association_rwr.csv heatmap_association_rwr.png --rwr --annotate
 
-( include the -rwr flag for the right color coding
-and --annotate for annotating the heatmap with the pvalue of each test )
+Be careful to include the -rwr flag for the right color coding and --annotate for annotating the heatmap with the pvalue of each test
 
 The -k flag, keeps the -B geneset and permutes only on the set A.
 

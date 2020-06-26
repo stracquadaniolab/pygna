@@ -10,7 +10,6 @@ The following sections describe the different PyGNA classes and functions availa
     diagnostic
     elaborators
     output
-    painter
     plots
     reading_class
     statistical_comparison
