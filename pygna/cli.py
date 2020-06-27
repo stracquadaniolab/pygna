@@ -51,6 +51,8 @@ def main():
         utils.convert_csv,
         utils.generate_group_gmt,
         # simulations
+        bm.generate_gnt_sbm,
+        bm.generate_gna_sbm,
         dm.generate_hdn_network,
         bm.generate_sbm_network,
         bm.generate_sbm2_network,
