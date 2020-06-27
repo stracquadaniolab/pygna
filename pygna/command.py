@@ -789,46 +789,71 @@ def network_graphml(
     nx.write_graphml(network, output_file)
 
 
-def get_connected_components(network_file: "network file",
-                             geneset_file: "GMT geneset file",
-                             setname: "The setname to analyse",
-                             o: "The output file name (should be gmt)",
-                             graphml: "The name of the graphml file",
-                             convert_entrez: "Convert EntrezID->Symbol" = True):
+def get_connected_components(network_file: "network tsv file",
+                             output_gmt: "The output file name (should be gmt)",
+                             name : 'pass a name for the putput gmt terms',
+                             geneset_file: "GMT of the geneset file, is a file is passed please add the setname" = None,
+                             setname: "The setname to analyse" = None,
+                             graphml: "Pass a graphml filename to show the results on Cytoscape" = None,
+                             threshold: 'ignores all CC smaller than this value' = 1,
+                             convert_entrez: "pass flag to convert EntrezID->Symbol" = False):
     """
     This function evaluate all the connected components in the subgraph pf the network with a given setname.
     Multiple setnames can be passed to this function to analyze all of them in a run.
     The file produces a GMT output and optionally a plot of the subnetwork with the connected components analysed.
 
     Please notice that to convert the entrezID into Symbols, a stable internet connection is required
-    """
-    network = rc.ReadTsv(network_file).get_network()
-    geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
-    output1 = out.Output(network_file, o, "network_gmt", geneset_file, setname)
+    :param network_file: tsv network file
+    :param output_gmt: output gmt file that contains all the connected components
+    :param name : 'pass a name for the putput gmt terms',
+    :param geneset_file: GMT of the geneset file, is a file is passed please add the setname
+    :param setname: The setname to analyse from the gmt
+    :param graphml: Pass a graphml filename to show the results on Cytoscape
+    :param threshold: ignores all CC smaller than this value
+    :param convert_entrez: pass flag to convert EntrezID->Symbol
+    """
+
+    network = rc.ReadTsv(network_file).get_network()
+
+    if type(geneset_file)==str:
+        if setname==None:
+            geneset = rc.ReadGmt(geneset_file).get_geneset()
+            logging.error('using only first entry of the gmt: %s' %(list(geneset.keys())[0]))
+            geneset = geneset[list(geneset.keys())[0]]
+        else:
+            geneset = rc.ReadGmt(geneset_file).get_geneset(setname)[setname]
+        network = nx.subgraph(network, list(set(geneset)))
+
+    print(network)
+
+    output1 = out.Output(network_file, 'o.csv', "network_gmt", geneset_file, setname)
     output1.create_st_table_empirical()
     cclist = list()
 
     mg = mygene.MyGeneInfo()
-    for setname, item in geneset.items():
-        item = set(item)
-        subnetwork = nx.subgraph(network, item)
-        connected_components = nx.connected_components(subnetwork)
-        i = 0
-        for cc in connected_components:
-            if len(cc) > 1:
-                i = i + 1
-                if convert_entrez:
-                    cc = mg.querymany(list(cc), scopes='entrezgene', fields='symbol', species='human')
-                    gene_list = list()
-                    [gene_list.append(e["symbol"]) for e in cc]
-                    cc = gene_list
-                cclist.append(cc)
-                nodes = {}
-                for node in cc:
-                    nodes[node] = i
-                nx.set_node_attributes(network, values=nodes, name=setname)
-                output1.add_GMT_entry(setname + "_" + str(i), "network_gmt", cc)
-        output1.create_GMT_output(o)
 
-        nx.write_graphml(subnetwork, graphml)
+    connected_components = nx.connected_components(network)
+    i = 0
+    for cc in connected_components:
+        print(cc)
+        if len(cc) > threshold:
+            i = i + 1
+            if convert_entrez:
+                cc = mg.querymany(list(cc), scopes='entrezgene', fields='symbol', species='human')
+                gene_list = list()
+                [gene_list.append(e["symbol"]) for e in cc]
+                cc = gene_list
+            cclist.append(cc)
+
+            nodes = {}
+            for node in cc:
+                nodes[node] = i
+            output1.add_GMT_entry(name + "_" + str(i), "connected components", cc)
+
+    output1.create_GMT_output(output_gmt)
+
+    if len(network.nodes())>1000:
+        logging.info('There are more than 100 nodes in the network, the graphml file might be very large.')
+
+    nx.write_graphml(network, graphml)
