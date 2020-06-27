@@ -400,15 +400,6 @@ def generate_gna_sbm( output_tsv: 'output_network',
     The crosstalk is set both between the the first 4 blocks and the others.
 
     Make sure that 8*cluster_size < N
-    The SBM matrix is [A,-,-,-,-.-,-,-,-]
-                      [B,A,-,-,-,-,-,-,-]
-                      [d,d,A,-,-,-,-,-,-]
-                      [d,d,B,A,-,-,-,-,-]
-                      [d,d,d,d,d,-,-,-,-]
-                      [d,d,d,d,B,d,-,-,-]
-                      [d,d,d,d,d,d,d,-,-]
-                      [d,d,d,d,d,d,B,d,-]
-                      [d,d,d,d,d,d,d,d,d]
 
     :param output_tsv: output network filename
     :param output_gmt: output geneset filename, this contains only the blocks
@@ -519,12 +510,6 @@ def generate_gnt_sbm( output_tsv: 'output_network',
     This function generates 3 blocks with d*fold_change probability
     and other 3 blocks with d probability.
     Make sure that 6*cluster_size < N
-    The SBM matrix is [fc*d,    d,    d, d, d, d, d]
-                      [   d, fc*d,    d, d, d, d, d]
-                      [   d,    d, fc*d, d, d, d, d]
-                      [   d,    d,    d, d, d, d, d]
-                      [   d,    d,    d, d, d, d, d]
-                      [   d,    d,    d, d, d, d, d]
 
     :param output_tsv: output network filename
     :param output_gmt: output geneset filename, this contains only the blocks

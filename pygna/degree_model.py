@@ -260,3 +260,246 @@ def generate_hdn_network(output_folder: str, prefix: str, n_nodes: int = 1000, n
         dm.write_network(output_folder + prefix + "_s_" + str(i) + "_network.tsv")
         dm.write_genelist(output_folder + prefix + "_s_" + str(i) + "_genes.gmt")
         plot_adjacency(dm.graph, output_folder, prefix=prefix + "_s_" + str(i))
+
+
+
+
+def hdn_add_branching(input_geneset_file:'input geneset containing the sets to be merged',
+                    network_file: 'network filename',
+                    hdn_set:'setname of the VIPs'='cluster_1',
+                    general_set:'other geneset'='cluster_0',
+                    number_of_hdns:'number of seed VIPs to start adding nodes'=3,
+                    number_of_reps: 'number of new genesets created for each condition'=3,
+                    output_geneset_file=None,
+                    output_graph_file = None ):
+
+    """
+    Creates new genesets from the vip list, new genesets are created adding 1 step
+    nodes to vips. The new genes are created as branches.\n
+
+
+    :param input_geneset_file: input geneset containing the sets to be merged
+    :param network_file: network filename is needed to find the edges
+    :param hdn_set: setname of the HDNs in the geneset
+    :param general_set: other setname in the geneset
+    :param number_of_hdns: number of new genesets made of part of HDNs
+    :param number_of_reps: number of new genesets created for each condition
+    :param output_geneset_file: if no output gmt filename is passed, the data is added to the input file
+    :param output_geneset_file: if graphml file is passed the network with labels is written
+    """
+
+    if output_geneset_file:
+        logging.info('output written to: %s ' %output_geneset_file)
+    else:
+        output_geneset_file=input_geneset_file
+        logging.info('output written on the same file as the input %s' %output_geneset_file)
+
+
+    geneset = ps.GMTParser().read(input_geneset_file, read_descriptor=True)
+
+    network = ps.__load_network(network_file)
+    print(type(network))
+
+
+    # If graphml output is set, we create a MultiGraph from the original network
+    if output_graph_file:
+        MG = nx.MultiDiGraph()
+        MG.add_nodes_from(network)
+        print(MG.nodes())
+    try:
+        vips=set(geneset[hdn_set]['genes'])
+        general=set(geneset[general_set]['genes'])
+
+    except:
+        sys.exit('The vip setname could not be read')
+    if output_graph_file:
+        # add annotation
+        vip_dict = { i:1 if i in vips else 0 for i in list(network.nodes()) }
+        nx.set_node_attributes(MG, vip_dict, 'vip')
+
+    # new_geneset={}
+    # new_geneset[hdn_set]={}
+    # new_geneset[hdn_set]['descriptor']='original clusters'
+    # new_geneset[hdn_set]['genes']=list(vips)
+
+    # new_geneset[general_set]={}
+    # new_geneset[general_set]['descriptor']='original clusters'
+    # new_geneset[general_set]['genes']=list(general)
+    new_geneset=geneset
+
+    # A geneset is created for each repetition and combination of
+    # of first layer connections and length of the branch
+    for rep in range(number_of_reps):
+        for first_layer in [1]:
+            for branch_length in [5, 10, 15]:
+
+                new_name='branching_'+str(first_layer)+'_'+str(branch_length)+'_'+str(rep)
+                new_set=[]
+
+                for k in range(number_of_hdns):
+                    seed=random.choice(list(vips))
+                    new_set.append(seed)
+                    for fl in range(first_layer):
+                        # From the seed node, get a first connection node
+                        seed_edges=[i[1] for i in network.edges(seed)]
+                        new_node=random.choice(seed_edges)
+                        while new_node in new_set:
+                            new_node=random.choice(seed_edges)
+
+                        new_set.append(new_node)
+                        #if output_graph_file:
+                        #    MG.add_edges_from([(seed,new_node,{'branch':new_name, 'number':0})])
+                        #    nx.set_node_attributes(MG, {seed:'1'}, 'in_set')
+
+                        for br in range(branch_length-1):
+                            new_node_edges=[i[1] for i in network.edges(new_node)]
+                            if len(set(new_node_edges).difference(set(new_set)))>0:
+                                old_node=new_node
+                                new_node=random.choice(list(set(new_node_edges).difference(set(new_set))))
+
+                                new_set.append(new_node)
+
+
+                                kkk=nx.shortest_path_length(network, source=old_node, target=new_node)
+                                if kkk>1:
+                                    print('WARNING path length: %d' %kkk)
+
+                                if output_graph_file:
+                                    MG.add_edges_from([(old_node,new_node,{'branch':new_name, 'number':br+1})])
+                                    nx.set_node_attributes(MG, {old_node:'1'}, 'in_set')
+                if output_graph_file:
+                    nx.set_node_attributes(MG, {new_node:'1'}, 'in_set')
+                new_geneset[new_name]={}
+                new_geneset[new_name]['descriptor']='branching'
+                new_geneset[new_name]['genes']=new_set
+
+    all_nodes = set()
+    for k,diz in new_geneset.items():
+        if diz['descriptor']=='branching':
+
+            all_nodes=all_nodes.union(set(diz['genes']) )
+            for g in diz['genes']:
+                all_nodes=all_nodes.union(set(network[g].keys()))
+                ed=[(g,i) for i in network[g].keys()]
+                if output_graph_file:
+                    MG.add_edges_from(ed)
+
+
+    universe=set(network.nodes())
+    difference= universe.difference(all_nodes)
+
+    out.print_GMT(new_geneset, output_geneset_file)
+
+    if output_graph_file:
+        MG.remove_nodes_from(difference)
+        nx.write_graphml(MG, output_graph_file+ ".graphml")
+
+def hdn_add_partial(input_geneset_file:'input geneset containing the sets to be merged',
+                    hdn_set:'setname of the VIPs'='cluster_1',
+                    general_set:'other geneset'='cluster_0',
+                    reps: 'number of new genesets made of part of vips' = 3,
+                    percentage_partial_vips: 'percentage of vips in the new geneset' = '0.1,0.2,0.5',
+                    output_geneset_file=None):
+
+    """
+    Creates new genesets from the vip list, number of genesets and portion of
+    genes can be specified by input.\n
+
+    :param input_geneset_file: input geneset containing the sets to be merged
+    :param hdn_set: setname of the HDNs in the geneset
+    :param general_set: other setname in the geneset
+    :param reps: number of new genesets
+    :param percentage_partial_vips: percentage of HDNs in the new geneset
+    :param output_geneset_file: if no output gmt filename is passed, the data is
+    added to the input file
+    """
+
+    if type(percentage_partial_vips)==str:
+        percentage_partial_vips=percentage_partial_vips.replace('[','').replace(']','').replace(' ','')
+        percentage_partial_vips=[float(i) for i in percentage_partial_vips.split(',')]
+
+    if output_geneset_file:
+        logging.info('output written to: %s ' %output_geneset_file)
+    else:
+        output_geneset_file=input_geneset_file
+        logging.info('output written on the same file as the input %s' %output_geneset_file)
+
+    geneset = ps.GMTParser().read(input_geneset_file, read_descriptor=True)
+
+    try:
+        vips=set(geneset[hdn_set]['genes'])
+        general=set(geneset[general_set]['genes'])
+    except:
+        sys.exit('The vip setname could not be read')
+
+    # Genesets made of part of the vips
+    for perc in percentage_partial_vips:
+        for rep in range(reps):
+            new_name='Partial_vip_'+str(perc)+'_'+str(rep)
+            new_set=np.random.choice(list(vips), int(perc*len(vips)))
+            geneset[new_name]={}
+            geneset[new_name]['descriptor']='partial vip list'
+            geneset[new_name]['genes']=list(new_set)
+
+    out.print_GMT(geneset, output_geneset_file)
+
+def hdn_add_extended(input_geneset_file:'input geneset containing the sets to be merged',
+                    hdn_set:'setname of the VIPs'='cluster_1',
+                    general_set:'other geneset'='cluster_0',
+                    reps: 'number of new genesets made of part of vips' = 3,
+                    percentage_extended_vips: 'percentage of vips in the new geneset' = '[0.2]',
+                    ratio_others: 'ratio of genes to add to vips' = '[2,2.5,3,4]',
+                    output_geneset_file=None):
+
+    """
+    Creates new genesets from the vip list, number of genesets and portion of genes
+    can be specified by input. The final new geneset is going to be formed by:
+    percentage_ev*HDN_total + ratio*percentage_ev*vips_total.\n
+
+    :param input_geneset_file: input geneset containing the sets to be merged
+    :param hdn_set: setname of the HDNs in the geneset
+    :param general_set: other setname in the geneset
+    :param reps: number of new genesets made of part of HDNs
+    :param percentage_extended_vips: percentage of HDNs in the new geneset
+    :param ratio_others: ratio of genes to add to HDNs
+    :param output_geneset_file: if no output gmt filename is passed, the data is added to the input file
+    """
+
+    if type(percentage_extended_vips)==str:
+        percentage_extended_vips=percentage_extended_vips.replace('[','').replace(']','').replace(' ','')
+        percentage_extended_vips=[float(i) for i in percentage_extended_vips.split(',')]
+
+    if type(ratio_others)==str:
+        ratio_others=ratio_others.replace('[','').replace(']','').replace(' ','')
+        ratio_others=[float(i) for i in ratio_others.split(',')]
+
+    if output_geneset_file:
+        logging.info('output written to: %s ' %output_geneset_file)
+    else:
+        output_geneset_file=input_geneset_file
+        logging.info('output written on the same file as the input %s' %output_geneset_file)
+
+    geneset = ps.GMTParser().read(input_geneset_file, read_descriptor=True)
+
+    try:
+        vips=set(geneset[hdn_set]['genes'])
+        general=set(geneset[general_set]['genes'])
+    except:
+        sys.exit('The vip setname could not be read')
+
+    # VIPs and other genes
+    for rep in range(reps):
+        for perc_ext in percentage_extended_vips:
+
+            new_vips=np.random.choice(list(vips), int(perc_ext*len(vips)))
+            for add in ratio_others:
+                new_name='Extend_vip_'+str(perc_ext)+'_'+str(add)+'_'+str(rep)
+                # Add a number of genes smaller than the total of generals
+                new_genes_number=min(len(general), int(add*np.ceil(perc_ext*len(vips))) )
+                new_genes=np.random.choice(list(general),new_genes_number )
+                new_set=set(new_vips).union(set(new_genes))
+                geneset[new_name]={}
+                geneset[new_name]['descriptor']='extended vip and other genes list'
+                geneset[new_name]['genes']=list(new_set)
+
+    out.print_GMT(geneset, output_geneset_file)

@@ -56,6 +56,10 @@ def main():
         dm.generate_hdn_network,
         bm.generate_sbm_network,
         bm.generate_sbm2_network,
+
+        dm.hdn_add_partial,
+        dm.hdn_add_extended,
+        dm.hdn_add_branching,
          ])
 
 
