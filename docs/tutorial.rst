@@ -223,7 +223,21 @@ The code below shows how it is possible to implement a function such as the clos
     import numpy as np
 
 
-    def calculate_centrality(graph: nx.Graph, matrix: dict) -> np.ndarray:
+    def calculate_centrality(graph: nx.Graph, geneset: set, matrix: dict, observed_flag: bool = False) -> np.ndarray:
+        """
+        This function calculate the graph closeness centrality.
+        It considers the whole graph and calculate the shortest path, then for each node in the graph calculate the node centrality as follows:
+
+        :math:`node centrality = len(sp) -1 / tot_{sp}`
+
+        where sp is the distance of the node with each other node and tot_sp is the total shortest paths for the whole graph.
+
+        :param graph: The network to analyse
+        :param geneset: the geneset to analyse
+        :param matrix: The dictionary containing nodes and distance matrix
+        """
+
+        graph = nx.subgraph(graph, geneset)
 
         graph_centrality = list()
         for n in graph.nodes:
@@ -231,6 +245,7 @@ The code below shows how it is possible to implement a function such as the clos
             sp = matrix["matrix"][matrix_id]
             tot_sp = sum(sp)
             if tot_sp > 0:
+                # Remove 1 because we are considering one node of the graph
                 graph_centrality[n] = (len(sp) - 1) / tot_sp
 
         return np.asarray(graph_centrality)
@@ -239,6 +254,7 @@ The code below shows how it is possible to implement a function such as the clos
     def test_topology_centrality(
         network_file: "network file",
         geneset_file: "GMT geneset file",
+        matrix: "The matrix with the SP for each node",
         output_table: "output results table, use .csv extension",
         setname: "Geneset to analyse" = None,
         size_cut: "removes all genesets with a mapped length < size_cut" = 20,
@@ -257,7 +273,7 @@ The code below shows how it is possible to implement a function such as the clos
         logging.info("Results file = " + output1.output_table_results)
         # Create table
         output1.create_st_table_empirical()
-        st_test = st.StatisticalTest(calculate_centrality, network)
+        st_test = st.StatisticalTest(calculate_centrality, network, matrix)
         for setname, item in geneset.items():
             # Geneset smaller than size cut are not taken into consideration
             if len(item) > size_cut:

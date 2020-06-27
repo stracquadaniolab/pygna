@@ -57,9 +57,6 @@ class DegreeModel(object):
 
         self.graph = graph
 
-    def plot_graph(self):
-        # Todo
-        pass
 
     def write_network(self, output_file: str) -> None:
         """

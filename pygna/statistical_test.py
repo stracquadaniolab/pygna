@@ -118,7 +118,7 @@ def geneset_localisation_statistic_median(network: nx.Graph, geneset: set, diz: 
     :param network: the network used in the analysis
     :param geneset: the geneset to analyse
     :param diz: the dictionary containing the genes name
-    :param observed_flag: XXXX
+    :param observed_flag: whether the gene has been already observed
     """
     cum_sum = 0.0
     geneset_index = [diz["nodes"].index(i) for i in geneset]
@@ -140,7 +140,7 @@ def geneset_localisation_statistic(network: nx.Graph, geneset: set, diz: dict = 
     :param network: the network used in the analysis
     :param geneset: the geneset to analyse
     :param diz: the dictionary containing the genes name
-    :param observed_flag: XXXX
+    :param observed_flag: whether the gene has been already observed
     """
     n = np.array([diz["nodes"].index(i) for i in geneset])
     diz = diz["matrix"]
@@ -158,7 +158,7 @@ def geneset_module_statistic(network: nx.Graph, geneset: set, diz: dict = {}, ob
     :param network: the network used in the analysis
     :param geneset: the geneset to analyse
     :param diz: the dictionary containing the genes name
-    :param observed_flag: XXXX
+    :param observed_flag: whether the gene has been already observed
     """
     # Largest Connected Component for the subgraph induced by the geneset
     module = nx.subgraph(network, geneset)
@@ -181,7 +181,7 @@ def geneset_total_degree_statistic(network: nx.Graph, geneset: set, diz: dict = 
     :param network: the network used in the analysis
     :param geneset: the geneset to analyse
     :param diz: the dictionary containing the genes name
-    :param observed_flag: XXXX
+    :param observed_flag: whether the gene has been already observed
     """
     degree = nx.degree(network)
     geneset = list(geneset)
@@ -197,7 +197,7 @@ def geneset_internal_degree_statistic(network: nx.Graph, geneset: set, diz: dict
     :param network: the network used in the analysis
     :param geneset: the geneset to analyse
     :param diz: the dictionary containing the genes name
-    :param observed_flag: XXXX
+    :param observed_flag: whether the gene has been already observed
     """
     degree = nx.degree(network)
     total = np.array([degree[g] for g in geneset])
@@ -219,7 +219,7 @@ def geneset_RW_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observ
     :param network: the network used in the analysis
     :param geneset: the geneset to analyse
     :param diz: the dictionary containing the genes name
-    :param observed_flag: XXXX
+    :param observed_flag: whether the gene has been already observed
     """
     try:
         diz["matrix"]
