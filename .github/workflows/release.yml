@@ -53,7 +53,7 @@ jobs:
       - name: "Upload Conda package"
         run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
 
-      - name: "Build the Docker image"
+      - name: "Release Docker image on GitHub Packages"
         uses: docker/build-push-action@v1
         with:
           dockerfile: ./docker/dockerfile
@@ -64,3 +64,14 @@ jobs:
           tag_with_sha: true
           username: ${{ github.ref }}
           password: ${{ secrets.GH_TOKEN }}
+
+      - name: "Release Docker image on DockerHub"
+        uses: docker/build-push-action@v1
+        with:
+          dockerfile: ./docker/dockerfile
+          repository: stracquadaniolab/pygna
+          tags: latest
+          tag_with_ref: true
+          tag_with_sha: true
+          username: ${{ secrets.DOCKERHUB_LOGIN }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}

@@ -1,7 +1,5 @@
 # PyGNA: a Python framework for geneset network analysis
 
-Current version: 3.1.8-dev
-
 ![GitHub tag (latest by date)](https://img.shields.io/github/v/tag/stracquadaniolab/pygna?style=flat-square)
 [![Anaconda-Server Badge](https://anaconda.org/stracquadaniolab/pygna/badges/version.svg)](https://anaconda.org/stracquadaniolab/pygna)
 ![Build](https://github.com/stracquadaniolab/pygna/workflows/Build/badge.svg)
@@ -25,17 +23,17 @@ Alternatively you can install it through `pip`:
 
     $ pip install pygna
 
-We also provide a docker image installation with the latest version of Pygna.
-It can be easily called from a terminal window with:
+We also provide a docker image installation with the latest version of PyGNA.
+It can be easily executed from the command line from DockerHub:
 
-     $ docker run docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
+    $ docker run stracquadaniolab/pygna/pygna:latest
 
-You will be prompted to the help section of Pygna.
-
-
-You can also run pygna using Docker as follows:
+or GitHub Packages:
 
     $ docker run docker.pkg.github.com/stracquadaniolab/pygna/pygna:latest
+
+
+which will show the PyGNA command line help.
 
 ## Getting started
 
