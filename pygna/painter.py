@@ -71,14 +71,14 @@ def paint_datasets_stats(table_filename: 'pygna results table',
         data["ind"] = data.index
 
         g = sns.catplot(
-            y="value",
-            x="setname",
+            y="setname",
+            x="value",
             hue="type",
             data=data,
             height=2.5,
             kind="bar",
             palette=palette_binary,
-            orient="v",
+            orient="h",
             aspect=1.5,
         )
 
@@ -89,15 +89,15 @@ def paint_datasets_stats(table_filename: 'pygna results table',
             pval = stars(r["pvalue"])
             g.facet_axis(0, 0).annotate(
                 pval,
-                xy=(k - 0.25, r["value"] + 0.1 * r["value"]),
+                xy=(r["value"] + 0.1 * r["value"],k + 0.25),
                 color=col[r["pvalue"] < (0.1 * 2 / len(data))],
                 fontsize=12,
             )
             k += 1
 
         g.facet_axis(0, 0).xaxis.grid(color="gray", linestyle="dotted", linewidth=0.5)
-        g.set_ylabels(stat_name)
-        g.set_xticklabels(g.get_xticklabels(), rotation=45, horizontalalignment='right')
+        g.set_xlabels(stat_name)
+        #g.set_xticklabels(g.facet_axis(0, 0).get_xticklabels(), rotation=45, horizontalalignment='right')
         # g.set_ylabels("")
         g.despine(bottom=True, left=True)
 
@@ -490,11 +490,11 @@ def stars(pvalue: float) -> str:
         elif 0.01 < pvalue <= 0.05:
             return "*"
         elif 0.001 < pvalue <= 0.01:
-            return "* *"
+            return "**"
         elif 0.0001 < pvalue <= 0.001:
-            return "* * *"
+            return "***"
         else:
-            return "* * * *"
+            return "****"
 
 
 def paint_summary_gnt(output_figure: 'output figure filename',

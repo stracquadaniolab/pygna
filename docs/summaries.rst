@@ -70,16 +70,32 @@ Please notice that to convert the entrezID into Symbols, a stable internet conne
 
 .. code-block:: text
 
-    usage: pygna get-connected-components [-h] [-c] network-file geneset-file setname o graphml
+        usage: pygna get-connected-components [-h] [--geneset-file GENESET_FILE]
+                                            [-s SETNAME] [--graphml GRAPHML]
+                                            [-t THRESHOLD] [-c]
+                                            network-file output-gmt name
 
-    positional arguments:
-      network-file          network file
-      geneset-file          GMT geneset file
-      setname               The setname to analyse
-      o                     The output file name (should be GMT)
-      graphml               The name of the graphml file
+            This function evaluate all the connected components in the subgraph pf the network with a given setname.
+            Multiple setnames can be passed to this function to analyze all of them in a run.
+            The file produces a GMT output and optionally a plot of the subnetwork with the connected components analysed.
+            Please notice that to convert the entrezID into Symbols, a stable internet connection is required
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -c, --convert-entrez  Convert EntrezID->Symbol (default: True)
+
+        positional arguments:
+        network-file          network tsv file
+        output-gmt            The output file name (should be gmt)
+        name                  pass a name for the putput gmt terms
+
+        optional arguments:
+        -h, --help            show this help message and exit
+        --geneset-file GENESET_FILE
+                                GMT of the geneset file, is a file is passed please
+                                add the setname (default: -)
+        -s SETNAME, --setname SETNAME
+                                The setname to analyse (default: -)
+        --graphml GRAPHML     Pass a graphml filename to show the results on
+                                Cytoscape (default: -)
+        -t THRESHOLD, --threshold THRESHOLD
+                                ignores all CC smaller than this value (default: 1)
+        -c, --convert-entrez  pass flag to convert EntrezID->Symbol (default: False)
 

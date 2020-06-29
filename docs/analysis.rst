@@ -284,10 +284,10 @@ If only A_geneset_file is passed the analysis is run on all the couples of sets 
                             heatmap of results (default: -)
 
 Weights Diffusion Analysis
---------------------------
+-----------------------------
 
 Test diffusion hotnet
-*********************
+++++++++++++++++++++++
 
 Performs the analysis of random walk applying the weights of an upstream analysis.
 Given a csv file the user needs to specify the columns of interest and the threshold of significance.

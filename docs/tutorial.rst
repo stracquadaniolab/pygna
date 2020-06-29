@@ -16,6 +16,8 @@ Networks are read as tab separated text files, where edges are represented by a 
 Genesets use the GMT format, where each geneset is reported as:
 `name \tab descriptor \tab gene1 \tab gene2`
 
+Otherwise, a single geneset could be passed as a TXT file, with a list of genes.
+
 Since GMT file can have multiple genesets, PyGNA can either run the analyses on all
 of them or on a user-specified subset.
 
@@ -208,123 +210,133 @@ PyGNA can be easily extended to run user-defined statistical tests. Check
     vignettes
 
 It is possible to define custom functions outside the pygna package and use them in a stand-alone test.
-The code below shows how it is possible to implement a function such as the closeness centrality of a graph, using Pygna.
+The code below shows how it is possible to implement a function such as the average closeness centrality of a geneset, using Pygna.
 
 .. code-block:: python
 
-    import argh
-    import logging
-    import networkx as nx
-    import pygna.reading_class as rc
-    import pygna.output as out
-    import pygna.statistical_test as st
-    import pygna.painter as paint
-    import pygna.diagnostic as diagnostic
-    import numpy as np
+        import argh
+        import logging
+        import networkx as nx
+        import pygna.reading_class as rc
+        import pygna.output as out
+        import pygna.statistical_test as st
+        import pygna.painter as paint
+        import pygna.diagnostic as diagnostic
+        import pygna.command as cmd
+        import numpy as np
 
 
-    def calculate_centrality(graph: nx.Graph, geneset: set, matrix: dict, observed_flag: bool = False) -> np.ndarray:
-        """
-        This function calculate the graph closeness centrality.
-        It considers the whole graph and calculate the shortest path, then for each node in the graph calculate the node centrality as follows:
+        def average_closeness_centrality(graph: nx.Graph, geneset: set, diz: dict, observed_flag: bool = False) -> float:
+            """
+            This function calculates the average closeness centrality of a geneset.
+            For a single node, the closeness centrality is defined as the inverse
+            of the shortest path distance of the node from all the other nodes.
 
-        :math:`node centrality = len(sp) -1 / tot_{sp}`
+            Given a network with N nodes and a distance shortest path function
+            between two nodes d(u,v)
+            closeness centrality (u)= (N -1) / sum (v != u) d(u,v)
 
-        where sp is the distance of the node with each other node and tot_sp is the total shortest paths for the whole graph.
+            where sp is the distance of the node with each other node and tot_sp is the total shortest paths for the whole graph.
 
-        :param graph: The network to analyse
-        :param geneset: the geneset to analyse
-        :param matrix: The dictionary containing nodes and distance matrix
-        """
+            """
 
-        graph = nx.subgraph(graph, geneset)
+            graph_centrality = []
 
-        graph_centrality = list()
-        for n in graph.nodes:
-            matrix_id = matrix["nodes"].index(n)
-            sp = matrix["matrix"][matrix_id]
-            tot_sp = sum(sp)
-            if tot_sp > 0:
-                # Remove 1 because we are considering one node of the graph
-                graph_centrality[n] = (len(sp) - 1) / tot_sp
+            ids = [diz["nodes"].index(n) for n in geneset]
+            graph_centrality = [(len(matrix["nodes"]) - 1) / matrix['vector'][idx] for idx in ids]
 
-        return np.asarray(graph_centrality)
-
-
-    def test_topology_centrality(
-        network_file: "network file",
-        geneset_file: "GMT geneset file",
-        matrix: "The matrix with the SP for each node",
-        output_table: "output results table, use .csv extension",
-        setname: "Geneset to analyse" = None,
-        size_cut: "removes all genesets with a mapped length < size_cut" = 20,
-        number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
-        cores: "Number of cores for the multiprocessing" = 1,
-        results_figure: "barplot of results, use pdf or png extension" = None,
-        diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
-                                "(one for each dataset)" = None):
-
-        logging.info("Evaluating the test topology total degree, please wait")
-        network = rc.ReadTsv(network_file).get_network()
-        geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
-        setnames = [key for key in geneset.keys()]
-        # Generate output
-        output1 = out.Output(network_file, output_table, "topology_total_degree", geneset_file, setnames)
-        logging.info("Results file = " + output1.output_table_results)
-        # Create table
-        output1.create_st_table_empirical()
-        st_test = st.StatisticalTest(calculate_centrality, network, matrix)
-        for setname, item in geneset.items():
-            # Geneset smaller than size cut are not taken into consideration
-            if len(item) > size_cut:
-                item = set(item)
-                observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
-                                                                                         max_iter=number_of_permutations,
-                                                                                         alternative="greater",
-                                                                                         cores=cores)
-                logging.info("Setname:" + setname)
-                if n_mapped < size_cut:
-                    logging.info("%s removed from results since nodes mapped are < %d" % (setname, size_cut))
-                else:
-                    logging.info("Observed: %g p-value: %g" % (observed, pvalue))
-                    logging.info("Null mean: %g null variance: %g".format(np.mean(null_d), np.var(null_d)))
-                    output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
-                                                      pvalue, np.mean(null_d), np.var(null_d))
-                    if diagnostic_null_folder:
-                        diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
-                                                          '_total_degree_null_distribution.pdf', setname=setname)
-        output1.close_temporary_table()
-        if results_figure:
-            paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
-        logging.info("Test topology CENTRALITY completed")
-
-
-    def main():
-        """
-        argh dispatch
-        """
-        argh.dispatch_commands([test_topology_centrality])
-
-
-    if __name__ == "__main__":
-        """
-        MAIN
-        """
-        main()
+            return np.mean(graph_centrality)
 
 
 
-Centrality calculation
-+++++++++++++++++++++++
+        def test_topology_centrality(
+            network_file: "network file",
+            geneset_file: "GMT geneset file",
+            distance_matrix_filename: "The matrix with the SP for each node",
+            output_table: "output results table, use .csv extension",
+            setname: "Geneset to analyse" = None,
+            size_cut: "removes all genesets with a mapped length < size_cut" = 20,
+            number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
+            cores: "Number of cores for the multiprocessing" = 1,
+            results_figure: "barplot of results, use pdf or png extension" = None,
+            in_memory: 'load hdf5 data onto memory' = False,
+            diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
+                                    "(one for each dataset)" = None):
 
-It is possible to access to the centrality calculation in the example with:
+            """
+            This function calculates the average closeness centrality of a geneset.
+            For a single node, the closeness centrality is defined as the inverse
+            of the shortest path distance of the node from all the other nodes.
+            """
 
-.. autofunction:: pygna.centrality.calculate_centrality
+
+
+            logging.info("Evaluating the test topology total degree, please wait")
+            network = rc.ReadTsv(network_file).get_network()
+            network = nx.Graph(network.subgraph(max(nx.connected_components(network), key=len)))
+            geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
+            setnames = [key for key in geneset.keys()]
+
+
+            diz = {"nodes": cmd.read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
+                "matrix": cmd.read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
+            diz["matrix"] = diz["matrix"] + np.transpose(diz["matrix"])
+
+            np.fill_diagonal(diz["matrix"], float(0))
+
+            diz['vector'] = np.sum(diz["matrix"],axis = 0)
+
+            # Generate output
+            output1 = out.Output(network_file, output_table, "topology_total_degree", geneset_file, setnames)
+            logging.info("Results file = " + output1.output_table_results)
+            # Create table
+            output1.create_st_table_empirical()
+            st_test = st.StatisticalTest(average_closeness_centrality, network, diz)
+            for setname, item in geneset.items():
+                # Geneset smaller than size cut are not taken into consideration
+                if len(item) > size_cut:
+                    item = set(item)
+                    observed, pvalue, null_d, n_mapped, n_geneset = st_test.empirical_pvalue(item,
+                                                                                            max_iter=number_of_permutations,
+                                                                                            alternative="greater",
+                                                                                            cores=cores)
+                    logging.info("Setname:" + setname)
+                    if n_mapped < size_cut:
+                        logging.info("%s removed from results since nodes mapped are < %d" % (setname, size_cut))
+                    else:
+                        logging.info("Observed: %g p-value: %g" % (observed, pvalue))
+                        logging.info("Null mean: %g null variance: %g".format(np.mean(null_d), np.var(null_d)))
+                        output1.update_st_table_empirical(setname, n_mapped, n_geneset, number_of_permutations, observed,
+                                                        pvalue, np.mean(null_d), np.var(null_d))
+                        if diagnostic_null_folder:
+                            diagnostic.plot_null_distribution(null_d, observed, diagnostic_null_folder + setname +
+                                                            '_total_degree_null_distribution.pdf', setname=setname)
+            output1.close_temporary_table()
+            if results_figure:
+                paint.paint_datasets_stats(output1.output_table_results, results_figure, alternative='greater')
+            logging.info("Test topology CENTRALITY completed")
+
+
+        def main():
+            """
+            argh dispatch
+            """
+            argh.dispatch_commands([test_topology_centrality])
+
+
+
 
 
 Diagnostic
-+++++++++++++++++++
+---------------
 
-Diagnostic tools are implemented for GNT tests. **TODO** describe them here (briefly).
+Distribution plot
+++++++++++++++++++++
 
-**#TODO: Add example of distribution plot**
+When running a statistical test, one might want to visually assess the null distribution.
+By passing  `-d <diagnostic_folder/>` through command line, a distribution plot
+of the empirical null is shown for each test.
+
+Here is an example.
+
+.. image:: _static/distribution.png

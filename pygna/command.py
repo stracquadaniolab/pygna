@@ -19,6 +19,7 @@ import tables
 import mygene
 
 
+
 def read_distance_matrix(distance_matrix_filename, in_memory=False):
     """
     Reads the large matrix. Uses a hdf5 file to work with it
@@ -34,21 +35,21 @@ def read_distance_matrix(distance_matrix_filename, in_memory=False):
 ######### SUMMARY ##############################################################
 ################################################################################
 
-
 def network_summary(network_file: "network file",
                     text_output: "output text file for the summary",
                     degree_figure_file: "pdf or png file for the degree distribution",
                     c_components_figure_file: "pdf or png file for the connected components distribution",
                     geneset_input_file: "geneset file" = None,
                     setname: "specify a single geneset" = None):
-    """
-    This function saves the principal info of a graph:
-    - network properties
-    - degree distribution
-    - connected components diagnostic
+    '''This function saves the principal info of a graph.
+    | - network properties \n
+    - degree distribution\n
+    - connected components diagnostic\n
 
     If a geneset/setname is passed to the function, the properties of the subgraph are evaluated
-    """
+
+    '''
+
     logging.info("Evaluating network summary, please wait")
     network = rc.ReadTsv(network_file).get_network()
 
@@ -312,7 +313,8 @@ def test_topology_sp(
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
-):
+                                                                ):
+
     """
     Performs geneset network topology shortest path analysis.
 
@@ -801,17 +803,7 @@ def get_connected_components(network_file: "network tsv file",
     This function evaluate all the connected components in the subgraph pf the network with a given setname.
     Multiple setnames can be passed to this function to analyze all of them in a run.
     The file produces a GMT output and optionally a plot of the subnetwork with the connected components analysed.
-
     Please notice that to convert the entrezID into Symbols, a stable internet connection is required
-
-    :param network_file: tsv network file
-    :param output_gmt: output gmt file that contains all the connected components
-    :param name : 'pass a name for the putput gmt terms',
-    :param geneset_file: GMT of the geneset file, is a file is passed please add the setname
-    :param setname: The setname to analyse from the gmt
-    :param graphml: Pass a graphml filename to show the results on Cytoscape
-    :param threshold: ignores all CC smaller than this value
-    :param convert_entrez: pass flag to convert EntrezID->Symbol
     """
 
     network = rc.ReadTsv(network_file).get_network()
@@ -857,3 +849,4 @@ def get_connected_components(network_file: "network tsv file",
         logging.info('There are more than 100 nodes in the network, the graphml file might be very large.')
 
     nx.write_graphml(network, graphml)
+

@@ -14,4 +14,3 @@ Degree Model
 .. autofunction:: pygna.degree_model.plot_adjacency
 
 
-.. autofunction:: pygna.degree_model.generate_hdn_network

@@ -14,9 +14,6 @@ logging.basicConfig(level=logging.INFO)
 
 
 def main():
-    """
-    argh dispatch
-    """
     argh.dispatch_commands([
         # network summary and graph file
         cmd.network_summary,
@@ -57,8 +54,8 @@ def main():
         dm.hdn_add_partial,
         dm.hdn_add_extended,
         dm.hdn_add_branching,
-         ])
 
+         ], )
 
 if __name__ == "__main__":
     """

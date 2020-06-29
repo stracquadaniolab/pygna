@@ -15,4 +15,3 @@ The following sections describe the different PyGNA classes and functions availa
     statistical_comparison
     statistical_diffusion
     statistical_test
-    utils

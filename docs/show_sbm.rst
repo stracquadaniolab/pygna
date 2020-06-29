@@ -64,7 +64,7 @@ the SBM matrix is parametrised by varying :math:`p_00` and
 :math:`p_{01}=p_{10}=p_{11 = 1-p-{00}}`.
 
 Percentage of nodes
-~~~~~~~~~~~~~~~~~~~
+---------------------
 
 Here is how the adjacency matrix varies with different percentages of
 nodes in the blocks.
@@ -74,7 +74,7 @@ nodes in the blocks.
 
 
 Connection probabilities
-~~~~~~~~~~~~~~~~~~~~~~~~
+---------------------------
 
 Here we show how the adjacency matrix varies for different probabilities
 of connection.

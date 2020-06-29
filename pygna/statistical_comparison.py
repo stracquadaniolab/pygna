@@ -5,7 +5,6 @@ import sys
 import multiprocessing
 import pygna.statistical_test as st
 
-
 class StatisticalComparison:
     """
     This class implements the statistical analysis comparison between two genesets.

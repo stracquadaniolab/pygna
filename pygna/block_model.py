@@ -380,14 +380,14 @@ def get_mix_genesets(gmt_diz,
 #########################################################################
 
 def generate_gna_sbm( output_tsv: 'output_network',
-                        output_gmt: 'output_gmt',
-                        output_gmt2: 'mixed crosstalk'=None,
+                        output_gmt: 'output geneset filename, this contains only the blocks',
+                        output_gmt2: 'mixture output geneset filename, this contains the mixture blocks'=None,
                         N:'number of nodes in the network' = 1000,
-                        block_size = 50,
-                        d = 0.06,
-                        fc_cis = 2.,
-                        fc_trans = .5,
-                        pi : 'percentages for the mixed genesets, use string comma separated' = '4,6,10,12,88,90,94,96',
+                        block_size:'size of the first 8 blocks' = 50,
+                        d:'baseline probability of connection, p0 in the paper' = 0.06,
+                        fc_cis:'positive within-block scaling factor for the probability of connection, Mii = fc_cis * d (alpha parameter in the paper)' = 2.,
+                        fc_trans:'positive between-block scaling factor for the probability of connection, (beta parameter in the paper)' = .5,
+                        pi : 'percentage of block-i nodes for the genesets made of block-i and block-j. Use symmetrical values (5,95),use string comma separated' = '4,6,10,12,88,90,94,96',
                         descriptor='crosstalk_sbm',
                         sbm_matrix_figure: 'shows the blockmodel matrix' = None):
 
@@ -395,23 +395,12 @@ def generate_gna_sbm( output_tsv: 'output_network',
     This function generates benchmark network and geneset to test
     the crosstalk between two blocks.
 
-    This function generates 4 blocks with d*fold_change probability
+    This function generates 4 blocks with d*fold change probability
     and other 4 blocks with d probability.
     The crosstalk is set both between the the first 4 blocks and the others.
 
     Make sure that 8*cluster_size < N
 
-    :param output_tsv: output network filename
-    :param output_gmt: output geneset filename, this contains only the blocks
-    :param output_gmt2: mixture output geneset filename, this contains the mixture blocks
-    :param N: number of nodes in the network
-    :param block_size: size of the first 8 blocks
-    :param d: baseline probability of connection, p0 in the paper
-    :param fc_cis: positive within-block scaling factor for the probability of connection, Mii = fc_cis * d (alpha parameter in the paper),
-    :param fc_trans: positive between-block scaling factor for the probability of connection, (beta parameter in the paper),
-    :param pi: percentage of block-i nodes for the genesets made of block-i and block-j. Use symmetrical values (5,95)
-    :param descriptor: descriptor for the gmt file
-    :param sbm_matrix_figure: default None, pass a figure filename  to show the blockmodel matrix
     """
 
     clusters = 8
@@ -498,26 +487,18 @@ def generate_gna_sbm( output_tsv: 'output_network',
 
 
 
-def generate_gnt_sbm( output_tsv: 'output_network',
-                        output_gmt: 'output_gmt',
+def generate_gnt_sbm( output_tsv: 'output network filename',
+                        output_gmt: 'output geneset filename, this contains only the blocks',
                         N:'number of nodes in the network' = 1000,
-                        block_size = 50,
-                        d = 0.06,
-                        fold_change = 2.,
-                        descriptor='mixed_sbm'):
+                        block_size: 'size of the first 6 blocks'= 50,
+                        d: 'baseline probability of connection, p0 in the paper' = 0.06,
+                        fold_change:'positive within-block scaling factor for the probability of connection, Mii = fold_change * d (alpha parameter in the paper)' = 2.,
+                        descriptor:'descriptor for the gmt file'='mixed_sbm'):
 
     """
     This function generates 3 blocks with d*fold_change probability
     and other 3 blocks with d probability.
     Make sure that 6*cluster_size < N
-
-    :param output_tsv: output network filename
-    :param output_gmt: output geneset filename, this contains only the blocks
-    :param N: number of nodes in the network
-    :param block_size: size of the first 8 blocks
-    :param d: baseline probability of connection, p0 in the paper
-    :param fold_change: positive within-block scaling factor for the probability of connection, Mii = fold_change * d (alpha parameter in the paper)
-    :param descriptor: descriptor for the gmt file
     """
 
 

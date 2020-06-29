@@ -231,18 +231,17 @@ def plot_adjacency(graph: nx.Graph, output_folder: str, prefix: str) -> None:
     plt.savefig(output_folder + prefix + "VIP.png")
 
 
-def generate_hdn_network(output_folder: str, prefix: str, n_nodes: int = 1000, network_prob: float = 0.005,
-                         hdn_probability: float = 0.3, hdn_percentage: float = 0.05, number_of_simulations: int = 5):
+def generate_hdn_network(output_folder: 'the output folder path',
+                        prefix:'the prefix of the file to be saved',
+                        n_nodes: 'the number of nodes in the network' = 1000,
+                        network_prob: 'probability of connection in the network' = 0.005,
+                         hdn_probability: 'probability of connection of the HDNs'= 0.3,
+                         hdn_percentage: 'percentage of HDNs' = 0.05,
+                         number_of_simulations: int = 5):
+
     """
     This function generates a simulated network using the VIP model
 
-    :param output_folder: the output folder path
-    :param prefix: the prefix of the file to be saved
-    :param n_nodes: the number of nodes in the network
-    :param network_prob: probability of connection in the network
-    :param hdn_probability: probability of connection of the VIP
-    :param hdn_percentage: percentage of connection
-    :param number_of_simulations: number of simulation to be performed
     """
 
     dm = DegreeModel(
@@ -263,26 +262,16 @@ def generate_hdn_network(output_folder: str, prefix: str, n_nodes: int = 1000, n
 
 def hdn_add_branching(input_geneset_file:'input geneset containing the sets to be merged',
                     network_file: 'network filename',
-                    hdn_set:'setname of the VIPs'='cluster_1',
-                    general_set:'other geneset'='cluster_0',
-                    number_of_hdns:'number of seed VIPs to start adding nodes'=3,
+                    hdn_set:'setname of the HDNs in the geneset'='cluster_1',
+                    general_set:'other setname in the geneset'='cluster_0',
+                    number_of_hdns:'number of seed HDNs to start adding nodes'=3,
                     number_of_reps: 'number of new genesets created for each condition'=3,
-                    output_geneset_file=None,
-                    output_graph_file = None ):
+                    output_geneset_file:'if no output gmt filename is passed, the data is added to the input file'=None,
+                    output_graph_file:'if graphml file is passed the network with labels is written' = None ):
 
     """
     Creates new genesets from the vip list, new genesets are created adding 1 step
-    nodes to vips. The new genes are created as branches.\n
-
-
-    :param input_geneset_file: input geneset containing the sets to be merged
-    :param network_file: network filename is needed to find the edges
-    :param hdn_set: setname of the HDNs in the geneset
-    :param general_set: other setname in the geneset
-    :param number_of_hdns: number of new genesets made of part of HDNs
-    :param number_of_reps: number of new genesets created for each condition
-    :param output_geneset_file: if no output gmt filename is passed, the data is added to the input file
-    :param output_geneset_file: if graphml file is passed the network with labels is written
+    nodes to vips. The new genes are created as branches.
     """
 
     if output_geneset_file:
@@ -392,23 +381,15 @@ def hdn_add_branching(input_geneset_file:'input geneset containing the sets to b
         nx.write_graphml(MG, output_graph_file+ ".graphml")
 
 def hdn_add_partial(input_geneset_file:'input geneset containing the sets to be merged',
-                    hdn_set:'setname of the VIPs'='cluster_1',
-                    general_set:'other geneset'='cluster_0',
+                    hdn_set:'setname of the HDNs in the geneset'='cluster_1',
+                    general_set:'other setname in the geneset'='cluster_0',
                     reps: 'number of new genesets made of part of vips' = 3,
-                    percentage_partial_vips: 'percentage of vips in the new geneset' = '0.1,0.2,0.5',
-                    output_geneset_file=None):
+                    percentage_partial_vips: 'percentage of HDNs in the new geneset' = '0.1,0.2,0.5',
+                    output_geneset_file:'if no output gmt filename is passed, the data is added to the input file'=None):
 
     """
     Creates new genesets from the vip list, number of genesets and portion of
-    genes can be specified by input.\n
-
-    :param input_geneset_file: input geneset containing the sets to be merged
-    :param hdn_set: setname of the HDNs in the geneset
-    :param general_set: other setname in the geneset
-    :param reps: number of new genesets
-    :param percentage_partial_vips: percentage of HDNs in the new geneset
-    :param output_geneset_file: if no output gmt filename is passed, the data is
-    added to the input file
+    genes can be specified by input.
     """
 
     if type(percentage_partial_vips)==str:
@@ -441,25 +422,18 @@ def hdn_add_partial(input_geneset_file:'input geneset containing the sets to be 
     out.print_GMT(geneset, output_geneset_file)
 
 def hdn_add_extended(input_geneset_file:'input geneset containing the sets to be merged',
-                    hdn_set:'setname of the VIPs'='cluster_1',
-                    general_set:'other geneset'='cluster_0',
-                    reps: 'number of new genesets made of part of vips' = 3,
-                    percentage_extended_vips: 'percentage of vips in the new geneset' = '[0.2]',
-                    ratio_others: 'ratio of genes to add to vips' = '[2,2.5,3,4]',
-                    output_geneset_file=None):
+                    hdn_set:'setname of the HDNs in the geneset'='cluster_1',
+                    general_set:'other setname in the geneset'='cluster_0',
+                    reps: 'number of new genesets made of part of HDNs' = 3,
+                    percentage_extended_vips: 'percentage of HDNs in the new genesett' = '[0.2]',
+                    ratio_others: 'ratio of genes to add to HDNs' = '[2,2.5,3,4]',
+                    output_geneset_file:'if no output gmt filename is passed, the data is added to the input file'=None):
 
     """
     Creates new genesets from the vip list, number of genesets and portion of genes
     can be specified by input. The final new geneset is going to be formed by:
-    percentage_ev*HDN_total + ratio*percentage_ev*vips_total.\n
+    percentage ev*HDN_total + ratio*percentage ev*vips total.
 
-    :param input_geneset_file: input geneset containing the sets to be merged
-    :param hdn_set: setname of the HDNs in the geneset
-    :param general_set: other setname in the geneset
-    :param reps: number of new genesets made of part of HDNs
-    :param percentage_extended_vips: percentage of HDNs in the new geneset
-    :param ratio_others: ratio of genes to add to HDNs
-    :param output_geneset_file: if no output gmt filename is passed, the data is added to the input file
     """
 
     if type(percentage_extended_vips)==str:
