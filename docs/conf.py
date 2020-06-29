@@ -24,8 +24,8 @@ sys.path.insert(0, os.path.abspath("../../pygna/docs/"))
 # -- Project information -----------------------------------------------------
 
 project = 'PyGNA'
-copyright = 'Viola Fanfani & Giovanni Stracquadanio'
-author = 'Viola Fanfani & Giovanni Stracquadanio'
+copyright = 'Viola Fanfani & Fabio Cassano & Giovanni Stracquadanio'
+author = 'Viola Fanfani & Fabio Cassano & Giovanni Stracquadanio'
 
 # The short X.Y version
 version = '3.2.4'
