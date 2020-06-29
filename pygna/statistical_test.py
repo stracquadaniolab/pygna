@@ -44,7 +44,7 @@ class StatisticalTest:
         # mapping geneset
         mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
         if len(mapped_geneset) == 0:
-            return 0, 0, np.array([0]), 0, 0
+            return 0, 1, np.array([0]), 0, 0
         else:
             logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
             observed = self.__test_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)

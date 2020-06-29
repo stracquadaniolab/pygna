@@ -50,20 +50,22 @@ class StatisticalComparison:
         mapped_genesetB = sorted(list(set(genesetB) & self.__universe))
         logging.info("Mapped %d genes out of %d from genesetA" % (len(mapped_genesetA), len(genesetA)))
         logging.info("Mapped %d genes out of %d from genesetB" % (len(mapped_genesetB), len(genesetB)))
-
-        # Observed statistical values
-        observed = self.__comparison_statistic(self.__network, mapped_genesetA, mapped_genesetB, self.__diz)
-
-        # iterations
-        null_distribution = StatisticalComparison.get_comparison_null_distribution_mp(self, mapped_genesetA,
-                                                                                      mapped_genesetB, max_iter, keep)
-        pvalue = 1
-        if alternative == "greater":
-            pvalue = (np.sum(null_distribution >= observed) + 1) / (float(len(null_distribution) + 1))
+        if (len(mapped_genesetA) == 0) or (len(mapped_genesetB) == 0):
+            return 0, 1, np.array([0]), 0, 0
         else:
-            pvalue = (np.sum(null_distribution <= observed) + 1) / (float(len(null_distribution) + 1))
+            # Observed statistical values
+            observed = self.__comparison_statistic(self.__network, mapped_genesetA, mapped_genesetB, self.__diz)
 
-        return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB)
+            # iterations
+            null_distribution = StatisticalComparison.get_comparison_null_distribution_mp(self, mapped_genesetA,
+                                                                                          mapped_genesetB, max_iter, keep)
+            pvalue = 1
+            if alternative == "greater":
+                pvalue = (np.sum(null_distribution >= observed) + 1) / (float(len(null_distribution) + 1))
+            else:
+                pvalue = (np.sum(null_distribution <= observed) + 1) / (float(len(null_distribution) + 1))
+
+            return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB)
 
     def get_comparison_null_distribution_mp(self, genesetA: list, genesetB: list, max_iter: int = 100,
                                             keep: bool = False) -> np.ndarray:
