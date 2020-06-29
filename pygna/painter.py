@@ -291,8 +291,8 @@ def paint_volcano_plot(table_filename: 'pygna comparison output',
                        output_file: 'output figure file, specify png or pdf file',
                        rwr: 'use RWR is the table comes from a RWR analysis' = False,
                        id_col="setname_B",
-                       threshold_x=0,
-                       threshold_y=2,
+                       threshold_x=0.0,
+                       threshold_y=2.0,
                        annotate=False):
     """
     This function plots the results of a GNA test of association of a single geneset against multiple pathways.
