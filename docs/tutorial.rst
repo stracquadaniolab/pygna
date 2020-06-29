@@ -11,12 +11,32 @@ PyGNA relies requires two data sources, a network and a geneset. Regardless of
 the test, the genes in the geneset are mapped to the input network (e.g. BioGrid) and
 then statistical tests are carried out.
 
-Networks are read as tab separated text files, where edges are represented by a node pair.
+Networks are read as tab separated text files (.tsv), where edges are represented by a node pair.
+An example of a .tsv file is the fowllowing:
+
+.. code-block:: text
+
+    node1\tnode2
+    node1\tnode3
+    node1\tnode4
+    node2\tnode5
+
 
 Genesets use the GMT format, where each geneset is reported as:
-`name \tab descriptor \tab gene1 \tab gene2`
 
-Otherwise, a single geneset could be passed as a TXT file, with a list of genes.
+.. code-block:: text
+
+    <name>\t<descriptor>\tgene1\tgene2\tgene3...
+
+
+Otherwise, a single geneset could be passed as a TXT file, with a list of genes, one for each line.
+
+.. code-block:: text
+
+    gene1
+    gene2
+    gene3
+    ...
 
 Since GMT file can have multiple genesets, PyGNA can either run the analyses on all
 of them or on a user-specified subset.

@@ -319,7 +319,9 @@ The **Simulations** parameters are used to specify the number and name of the ou
 + ``suffix`` is the suffix used for the output.
 
 For each simulated datasets there are two output files:
+
 - suffix_network_$simulation.tsv : the network file
+
 - suffix_genes_$simulation.gmt : the gene list grouped by cluster
 
 

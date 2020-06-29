@@ -8,8 +8,11 @@ Network Properties
 ++++++++++++++++++++
 
 `network-summary` saves the principal info of a graph:
+
 - network properties
+
 - degree distribution
+
 - connected components diagnostic
 
 If a geneset/setname is passed to the function, the properties of the subgraph are evaluated

@@ -95,7 +95,7 @@ def test_topology_total_degree(
     """
     logging.info("Evaluating the test topology total degree, please wait")
     network = rc.ReadTsv(network_file).get_network()
-
+    data = rc.ReadTxt(geneset_file).get_data()
     geneset = rc.ReadGmt(geneset_file).get_geneset(setname)
 
     setnames = [key for key in geneset.keys()]

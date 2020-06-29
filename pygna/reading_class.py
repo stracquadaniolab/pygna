@@ -239,6 +239,7 @@ class ReadTxt(ReadingData):
         super().__init__()
         self.filename = filename
         self.data = []
+        self.__readfile()
 
     def __readfile(self) -> None:
         """
