@@ -4,6 +4,39 @@ import numpy as np
 import sys
 import multiprocessing
 
+def get_bin(degree, map_bin, name=None):
+    # For a node degree return the bin_name according to the ranges
+    for r,i in map_bin.items():
+        if (degree>=r[0]) & (degree<r[1]):
+            return(i)
+
+def get_node_bins_map(degree, bin_histogram):
+    # Reshape the dictionary to have range:bin_number
+    map_bin = {val['range']:i for i,val in bin_histogram.items()}
+    # Get a map of the bin of each node node:bin_number
+    node_2_bin = {d[0]:get_bin(d[1], map_bin) for d in degree}
+    return node_2_bin
+
+def get_sampling_p(mapped_geneset, network, bins, node_2_bin_map):
+    # Reshape the dictionary to have range:bin_number
+    map_bin = {val['range']:i for i,val in bins.items()}
+    # Get the degree of the mapped geneset
+    degree = network.degree(nbunch = mapped_geneset)
+    # Get a map of the bin of each node node:bin_number
+    node_2_bin = [get_bin(d[1], map_bin) for d in degree]
+    # Count the mapped node for each bin
+    counts = {k:node_2_bin.count(k) for k in bins.keys()}
+    # Get the probability for each bin bin_number:probability
+    # For each bin we have:
+    #   - c = number of mapped nodes in the bin
+    #   - nk = number of total nodes in the bin
+    #   - m = total number of mapped nodes
+    # p = c/nk/m, indeed c/m would be the probability of choosing the bin, 
+    # c/nk/m becomes the probability of choosing one of the nodes in the bin
+    bin_2_p_map = {(k):(counts[k]/val['nk']/len(mapped_geneset) if (val['nk']>0) else 0) for k,val in bins.items()}
+    # Get the probability of sampling for each node
+    p = [bin_2_p_map[int(k)] for n,k in node_2_bin_map.items()]
+    return(p)
 
 class StatisticalTest:
     """
@@ -11,7 +44,8 @@ class StatisticalTest:
     It performs the statistical tests on the given network, elaborates the number of observed genes, the pvalue etc.
     Please refer to the single method documentation for the returning values
     """
-    def __init__(self, test_statistic, network: nx.Graph, diz: dict = {}):
+
+    def __init__(self, test_statistic, network: nx.Graph, diz: dict = {}, degree_bins = 1):
         """
         :param test_statistic: the statistical function to be used for the calculation of the empirical p-value and the
         null distribution
@@ -21,17 +55,42 @@ class StatisticalTest:
         self.__test_statistic = test_statistic
         self.__network = network
         self.__diz = diz
+        self.degree_bins = degree_bins
+        self.node_2_bin_map = None
+        self.bins = None
 
         if (type(self.__network) is nx.Graph) or (type(self.__network) is nx.DiGraph):
-            self.__universe = set(self.__network.nodes())
+            self.__universe = list(set(self.__network.nodes()))
         elif type(self.__network) is dict:
-            self.__universe = set(self.__network.keys())
+            self.__universe = list(set(self.__network.keys()))
         else:
             logging.error("Unknown network type: %s" % type(self.__network))
             sys.exit(-1)
 
-    def empirical_pvalue(self, geneset: set, alternative: str = "less", max_iter: int = 100, cores: int = 1) -> \
-        [int, float, float, int, int]:
+        # If number of bins is specified, the mapping is generated
+        if (degree_bins>1):
+
+            if type(self.__network) is dict:
+                logging.error('Cannot do degree corrected sampling without the whole network')
+
+            degree= list(self.__network.degree(nbunch = self.__universe))
+            [nn,dd] = list(zip(*degree))
+
+            # We make sure that later the universe corresponds to the mapping
+            self.__universe = list(nn)
+            histogram, bins_edge = np.histogram(list(dd), bins = degree_bins, density = False)
+            self.bins = {int(i):{'nk':histogram[i], 'range':(bins_edge[i],bins_edge[i+1])} for i in range(len(histogram))}
+            self.bins[len(self.bins.keys())-1]['range'] = (self.bins[len(self.bins.keys())-1]['range'][0], self.bins[len(self.bins.keys())-1]['range'][1]+1)
+            self.node_2_bin_map = get_node_bins_map(degree, self.bins)
+
+
+    def empirical_pvalue(
+        self,
+        geneset: set,
+        alternative: str = "less",
+        max_iter: int = 100,
+        cores: int = 1,
+    ) -> [int, float, float, int, int, int]:
         """
         Calculate the empirical pvalue on the genes list
 
@@ -42,18 +101,34 @@ class StatisticalTest:
         :return observed, pvalue, null_distribution, len(mapped_genesetA), len(mapped_genesetB): the list with the data calculated
         """
         # mapping geneset
-        mapped_geneset = sorted(list(set(geneset).intersection(self.__universe)))
+        mapped_geneset = sorted(list(set(geneset).intersection(set(self.__universe))))
         if len(mapped_geneset) == 0:
             return 0, 1, np.array([0]), 0, 0
         else:
-            logging.info("Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset)))
-            observed = self.__test_statistic(self.__network, mapped_geneset, self.__diz, observed_flag=True)
-            null_distribution = StatisticalTest.get_null_distribution_mp(self, mapped_geneset, max_iter, n_proc=cores)
+            logging.info(
+                "Mapped %d genes out of %d." % (len(mapped_geneset), len(geneset))
+            )
+
+            sampling_p = None
+            if self.degree_bins > 1:
+                # if more than one bin is specified, the sampling probability is generated
+                sampling_p = get_sampling_p(mapped_geneset, self.__network, self.bins, self.node_2_bin_map)
+
+            observed = self.__test_statistic(
+                self.__network, mapped_geneset, self.__diz, observed_flag=True
+            )
+            null_distribution = StatisticalTest.get_null_distribution_mp(
+                self, mapped_geneset, max_iter, n_proc=cores, sampling_p = sampling_p
+            )
             # computing empirical pvalue
             if alternative == "greater":
-                pvalue = (np.sum(null_distribution >= observed) + 1) / (float(max_iter) + 1)
+                pvalue = (np.sum(null_distribution >= observed) + 1) / (
+                    float(max_iter) + 1
+                )
             else:
-                pvalue = (np.sum(null_distribution <= observed) + 1) / (float(max_iter) + 1)
+                pvalue = (np.sum(null_distribution <= observed) + 1) / (
+                    float(max_iter) + 1
+                )
 
             return (
                 observed,
@@ -63,7 +138,7 @@ class StatisticalTest:
                 len(geneset),
             )
 
-    def get_null_distribution_mp(self, geneset: list, iter: int = 100, n_proc: int = 1):
+    def get_null_distribution_mp(self, geneset: list, iter: int = 100, n_proc: int = 1, sampling_p = None):
         """
         Calculate the null distribution with multiple cores on the geneset
 
@@ -73,14 +148,20 @@ class StatisticalTest:
         :return: the array with null distribution
         """
         if n_proc == 1:
-            null_distribution = StatisticalTest.get_null_distribution(self, geneset, iter)
+            null_distribution = StatisticalTest.get_null_distribution(
+                self, geneset, iter, sampling_p
+            )
 
         else:
 
             p = multiprocessing.Pool(n_proc)
             n_trial = int(iter / n_proc)
-            results = [p.apply_async(StatisticalTest.get_null_distribution,
-                                     args=(self, geneset, n_trial)) for w in list(range(1, n_proc + 1))]
+            results = [
+                p.apply_async(
+                    StatisticalTest.get_null_distribution, args=(self, geneset, n_trial, sampling_p)
+                )
+                for w in list(range(1, n_proc + 1))
+            ]
             null_distribution = np.array([])
             for r in results:
                 null_distribution = np.hstack((null_distribution, np.array(r.get())))
@@ -88,7 +169,7 @@ class StatisticalTest:
 
         return np.asarray(null_distribution)
 
-    def get_null_distribution(self, geneset: list, n_samples: int):
+    def get_null_distribution(self, geneset: list, n_samples: int, sampling_p = None):
         """
         Calculate the null distribution over the geneset
 
@@ -99,8 +180,12 @@ class StatisticalTest:
         np.random.seed()
         random_dist = []
         for i in range(n_samples):
-            random_sample = np.random.choice(list(self.__universe), len(geneset), replace=False)
-            random_dist.append(self.__test_statistic(self.__network, set(random_sample), self.__diz))
+            random_sample = np.random.choice(
+                self.__universe, len(geneset), replace=False, p = sampling_p
+            )
+            random_dist.append(
+                self.__test_statistic(self.__network, set(random_sample), self.__diz)
+            )
 
         return random_dist
 
@@ -110,8 +195,9 @@ class StatisticalTest:
 ###############################################################################
 
 
-def geneset_localisation_statistic_median(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) \
-    -> float:
+def geneset_localisation_statistic_median(
+    network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False
+) -> float:
     """
     Calculate the median shortest path for each node
 
@@ -132,8 +218,9 @@ def geneset_localisation_statistic_median(network: nx.Graph, geneset: set, diz: 
     return cum_sum / float(len(geneset))
 
 
-def geneset_localisation_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) \
-    -> float:
+def geneset_localisation_statistic(
+    network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False
+) -> float:
     """
     Identify the genes in a geneset
 
@@ -151,7 +238,9 @@ def geneset_localisation_statistic(network: nx.Graph, geneset: set, diz: dict = 
     return sum_columns / len(n)
 
 
-def geneset_module_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) -> float:
+def geneset_module_statistic(
+    network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False
+) -> float:
     """
     Evaluate the length of a observed network
 
@@ -173,8 +262,9 @@ def geneset_module_statistic(network: nx.Graph, geneset: set, diz: dict = {}, ob
         return 0
 
 
-def geneset_total_degree_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) -> \
-    float:
+def geneset_total_degree_statistic(
+    network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False
+) -> float:
     """
     Total degree of the geneset: average total_degree
 
@@ -189,8 +279,9 @@ def geneset_total_degree_statistic(network: nx.Graph, geneset: set, diz: dict = 
     return np.average(total)
 
 
-def geneset_internal_degree_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) \
-    -> float:
+def geneset_internal_degree_statistic(
+    network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False
+) -> float:
     """
     Internal degree ratio: average of the ratio internal_degree/total_degree
 
@@ -212,7 +303,9 @@ def geneset_internal_degree_statistic(network: nx.Graph, geneset: set, diz: dict
     return np.average(ratio)
 
 
-def geneset_RW_statistic(network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False) -> np.ndarray:
+def geneset_RW_statistic(
+    network: nx.Graph, geneset: set, diz: dict = {}, observed_flag: bool = False
+) -> np.ndarray:
     """
     Poisson binomial probability, sum of interaction probabilities for the genes in the geneset
 

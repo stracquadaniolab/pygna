@@ -106,7 +106,7 @@ def test_topology_total_degree(
 
     # Create table
     output1.create_st_table_empirical()
-    st_test = st.StatisticalTest(st.geneset_total_degree_statistic, network)
+    st_test = st.StatisticalTest(st.geneset_total_degree_statistic, network, degree_bins = n_bins)
 
     for setname, item in geneset.items():
         # Geneset smaller than size cut are not taken into consideration
@@ -142,10 +142,11 @@ def test_topology_internal_degree(
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
-):
+    ):
     """
     Performs the analysis of internal degree.
     It computes a p-value for the ratio of internal degree of the geneset being bigger than the one expected by chance
@@ -158,7 +159,7 @@ def test_topology_internal_degree(
     output1 = out.Output(network_file, output_table, "topology_internal_degree", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-    st_test = st.StatisticalTest(st.geneset_internal_degree_statistic, network)
+    st_test = st.StatisticalTest(st.geneset_internal_degree_statistic, network, degree_bins = n_bins)
     for setname, item in geneset.items():
         item = set(item)
         if len(item) > size_cut:
@@ -192,6 +193,7 @@ def test_topology_rwr(
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
@@ -213,7 +215,7 @@ def test_topology_rwr(
 
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-    st_test = st.StatisticalTest(st.geneset_RW_statistic, network, rw_dict)
+    st_test = st.StatisticalTest(st.geneset_RW_statistic, network, rw_dict, degree_bins = n_bins)
 
     for setname, item in geneset.items():
         item = set(item)
@@ -249,6 +251,7 @@ def test_topology_module(
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     output_lcc: "for creating a GMT file with the LCC lists pass a GMT filename" = None,
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
@@ -267,7 +270,7 @@ def test_topology_module(
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
 
-    st_test = st.StatisticalTest(st.geneset_module_statistic, network)
+    st_test = st.StatisticalTest(st.geneset_module_statistic, network, degree_bins = n_bins)
     for setname, item in geneset.items():
         item = set(item)
         if len(item) > size_cut:
@@ -310,6 +313,7 @@ def test_topology_sp(
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
@@ -337,7 +341,7 @@ def test_topology_sp(
     output1 = out.Output(network_file, output_table, "topology_sp", geneset_file, setnames)
     logging.info("Results file = " + output1.output_table_results)
     output1.create_st_table_empirical()
-    st_test = st.StatisticalTest(st.geneset_localisation_statistic, network, diz)
+    st_test = st.StatisticalTest(st.geneset_localisation_statistic, network, diz, degree_bins = n_bins)
 
     for setname, item in geneset.items():
 
