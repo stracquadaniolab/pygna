@@ -3,40 +3,7 @@ import networkx as nx
 import numpy as np
 import sys
 import multiprocessing
-
-def get_bin(degree, map_bin, name=None):
-    # For a node degree return the bin_name according to the ranges
-    for r,i in map_bin.items():
-        if (degree>=r[0]) & (degree<r[1]):
-            return(i)
-
-def get_node_bins_map(degree, bin_histogram):
-    # Reshape the dictionary to have range:bin_number
-    map_bin = {val['range']:i for i,val in bin_histogram.items()}
-    # Get a map of the bin of each node node:bin_number
-    node_2_bin = {d[0]:get_bin(d[1], map_bin) for d in degree}
-    return node_2_bin
-
-def get_sampling_p(mapped_geneset, network, bins, node_2_bin_map):
-    # Reshape the dictionary to have range:bin_number
-    map_bin = {val['range']:i for i,val in bins.items()}
-    # Get the degree of the mapped geneset
-    degree = network.degree(nbunch = mapped_geneset)
-    # Get a map of the bin of each node node:bin_number
-    node_2_bin = [get_bin(d[1], map_bin) for d in degree]
-    # Count the mapped node for each bin
-    counts = {k:node_2_bin.count(k) for k in bins.keys()}
-    # Get the probability for each bin bin_number:probability
-    # For each bin we have:
-    #   - c = number of mapped nodes in the bin
-    #   - nk = number of total nodes in the bin
-    #   - m = total number of mapped nodes
-    # p = c/nk/m, indeed c/m would be the probability of choosing the bin, 
-    # c/nk/m becomes the probability of choosing one of the nodes in the bin
-    bin_2_p_map = {(k):(counts[k]/val['nk']/len(mapped_geneset) if (val['nk']>0) else 0) for k,val in bins.items()}
-    # Get the probability of sampling for each node
-    p = [bin_2_p_map[int(k)] for n,k in node_2_bin_map.items()]
-    return(p)
+from pygna.utils import get_sampling_p, get_node_bins_map
 
 class StatisticalTest:
     """

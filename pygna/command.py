@@ -197,7 +197,7 @@ def test_topology_rwr(
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
-):
+ ):
     """
     Performs the analysis of random walk probabilities.
     Given the RWR matrix, it compares the probability of walking between the genes in the geneset compared to
@@ -256,7 +256,7 @@ def test_topology_module(
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None,
-):
+ ):
     """
     Performs geneset network topology module analysis.
     It computes a p-value for the largest connected component of the geneset being bigger than the one expected by chance
@@ -456,6 +456,7 @@ def test_association_sp(
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
 ):
     """
@@ -480,7 +481,7 @@ def test_association_sp(
     # Read matrix
     sp_diz = {"nodes": read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[0],
               "matrix": read_distance_matrix(distance_matrix_filename, in_memory=in_memory)[1]}
-    # TODO check why "in memory"= True results are different from "in memory"= False
+
     sp_diz["matrix"] = sp_diz["matrix"] + np.transpose(sp_diz["matrix"])
     np.fill_diagonal(sp_diz["matrix"], np.inf)
 
@@ -497,7 +498,7 @@ def test_association_sp(
         else:
             geneset_b = None
 
-    st_comparison = sc.StatisticalComparison(sc.comparison_shortest_path, network, diz=sp_diz, n_proc=cores)
+    st_comparison = sc.StatisticalComparison(sc.comparison_shortest_path, network, diz=sp_diz, n_proc=cores, degree_bins = n_bins)
 
     if not geneset_b:  # Analysis of genesets inside a single file
         logging.info("Analysing all the sets in " + file_geneset_a)
@@ -566,6 +567,7 @@ def test_association_rwr(
     cores: "Number of cores for the multiprocessing" = 1,
     in_memory: "set if you want the large matrix to be read in memory" = False,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     results_figure: "heatmap of results" = None,
 ):
     """
@@ -604,7 +606,7 @@ def test_association_rwr(
         else:
             geneset_b = None
 
-    st_comparison = sc.StatisticalComparison(sc.comparison_random_walk, network, n_proc=cores, diz=rw_dict)
+    st_comparison = sc.StatisticalComparison(sc.comparison_random_walk, network, n_proc=cores, diz=rw_dict, degree_bins = n_bins)
     if not geneset_b:
         logging.info("Analysing all the sets in " + file_geneset_a)
         setnames = [key for key in geneset_a.keys()]
