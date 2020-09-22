@@ -3,6 +3,10 @@ Changelog
 
 Latest Version
 --------------
+v3.3.0
++++++++
+Added node degree corrected sampling
+
 v3.1.2
 +++++++
 Fixing conda CI
@@ -17,12 +21,12 @@ Updated requirements (python >=3.6)
 
 v2.0.5
 +++++++
-Solved problem in function from table to gmt. 
+Solved problem in function from table to gmt.
 
 v2.0.4
 +++++++
 Fully working version with documentation for basic functionalities.
-Complete API docs missing. 
+Complete API docs missing.
 
 
 v2.0.1
@@ -32,7 +36,7 @@ Bear with us!
 
 v2.0.0
 +++++++
-IO conventions changed, introduced temporary files. 
+IO conventions changed, introduced temporary files.
 Now the package should be fully compatible with snakemake
 conventions.
 
