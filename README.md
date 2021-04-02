@@ -103,7 +103,22 @@ The official documentation for `pygna` can be found on [readthedocs](https://pyg
 
 ## Citation
 
-A unified framework for geneset network analysis. Viola Fanfani, Giovanni Stracquadanio. bioRxiv 699926; doi: https://doi.org/10.1101/699926
+V. Fanfani, F. Cassano, and G. Stracquadanio, “PyGNA: a unified framework for geneset network analysis,” BMC Bioinformatics, vol. 21, no. 1, 2020.
+DOI: https://doi.org/10.1186/s12859-020-03801-1
+
+```
+@article{Fanfani2020,
+author = {Fanfani, Viola and Cassano, Fabio and Stracquadanio, Giovanni},
+doi = {10.1186/s12859-020-03801-1},
+issn = {14712105},
+journal = {BMC Bioinformatics},
+number = {1},
+pmid = {33092528},
+title = {{PyGNA: a unified framework for geneset network analysis}},
+volume = {21},
+year = {2020}
+}
+```
 
 ## Issues
 
