@@ -84,6 +84,7 @@ def test_topology_total_degree(
     size_cut: "removes all genesets with a mapped length < size_cut" = 20,
     number_of_permutations: "number of permutations for computing the empirical pvalue" = 500,
     cores: "Number of cores for the multiprocessing" = 1,
+    n_bins: 'if >1 applies degree correction by binning the node degrees and sampling according to geneset distribution' = 1,
     results_figure: "barplot of results, use pdf or png extension" = None,
     diagnostic_null_folder: "plot null distribution, pass the folder where all the figures are going to be saved "
                             "(one for each dataset)" = None):
