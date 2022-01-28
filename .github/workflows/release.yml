@@ -3,75 +3,54 @@ name: "Release"
 on:
     push:
         tags:
-        - '*'
+            - "*"
 
 jobs:
-  release:
-    name: "Build and release"
-    runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: pygna
-    strategy:
-      matrix:
-        python: [3.8]
-        numpy: [1.15]
-    steps:
-      - uses: actions/checkout@v1
+    release:
+        name: "Build and release"
+        runs-on: ubuntu-latest
+        strategy:
+            matrix:
+                python: [3.8]
+                numpy: [1.15]
+        steps:
+            - uses: actions/checkout@v2
 
-      - name: "Setup Python"
-        uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python }}
+            - name: "Setup Python"
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
 
-      - name: "Install PIP required packages"
-        run: pip install wheel twine
+            - name: "Setup Conda"
+              uses: conda-incubator/setup-miniconda@v2
+              with:
+                  auto-update-conda: true
+                  channels: conda-forge,bioconda,defaults
+                  conda-build-version: "3.21.7"
 
-      - name: "Build PIP package"
-        run: python setup.py sdist bdist_wheel
+            - name: "Install Conda client"
+              run: conda install -c anaconda anaconda-client
 
-      - name: "Publish package on PyPi"
-        run: twine upload -u ${{ secrets.PYPI_USERNAME }} -p ${{secrets.PYPI_PASSWORD}} dist/*
+            - name: "Build Conda package"
+              run: |
+                  conda build --no-build-id --numpy ${{ matrix.numpy }} --output-folder . .
+                  conda convert -p osx-64 linux-64/*.tar.bz2
 
-      - name: "Setup Conda"
-        uses: s-weigand/setup-conda@v1
-        with:
-          update-conda: true
-          python-version: ${{ matrix.python }}
-          conda-channels: anaconda, conda-forge, bioconda
+            - name: "Upload Conda package"
+              run: |
+                  $CONDA/bin/anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress linux-64/*.tar.bz2
+                  $CONDA/bin/anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress osx-64/*.tar.bz2
 
-      - name: "Install Conda development packages"
-        run: |
-            conda install conda-build
-            conda install -c anaconda anaconda-client
+            - name: "Login to GitHub Container Registry"
+              uses: docker/login-action@v1
+              with:
+                  registry: ghcr.io
+                  username: ${{ github.repository_owner }}
+                  password: ${{ secrets.GHCR_TOKEN }}
 
-      - name: "Build Conda package"
-        run: |
-            mkdir conda-build
-            conda build . --no-build-id --numpy ${{ matrix.numpy }} --output-folder ./conda-build
-            conda convert -p all ./conda-build/**/pygna*.bz2 --output-dir ./conda-build
-
-      - name: "Upload Conda package"
-        run: anaconda -t ${{ secrets.ANACONDA_API_TOKEN }} upload --force -u stracquadaniolab --no-progress ./conda-build/**/pygna*.bz2
-
-      - name: "Release Docker image on GitHub Packages"
-        uses: docker/build-push-action@v1
-        with:
-          dockerfile: ./docker/dockerfile
-          registry: docker.pkg.github.com
-          repository: ${{ github.repository }}/pygna
-          tags: latest
-          tag_with_ref: true
-          tag_with_sha: true
-          username: ${{ github.ref }}
-          password: ${{ secrets.GH_TOKEN }}
-
-      - name: "Release Docker image on DockerHub"
-        uses: docker/build-push-action@v1
-        with:
-          dockerfile: ./docker/dockerfile
-          repository: stracquadaniolab/pygna
-          tags: latest
-          tag_with_ref: true
-          tag_with_sha: true
-          username: ${{ secrets.DOCKERHUB_LOGIN }}
-          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+            - name: "Push Docker image to GitHub Container Registry"
+              uses: docker/build-push-action@v2
+              with:
+                  file: ./docker/Dockerfile
+                  push: true
+                  tags: ghcr.io/${{ github.repository }}:v3.3.1, ghcr.io/${{ github.repository }}:latest
