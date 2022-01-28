@@ -5,7 +5,7 @@ LABEL org.opencontainers.image.description="PyGNA: a Python framework for Genese
 LABEL org.opencontainers.image.url="https://github.com/stracquadaniolab/pygna"
 LABEL org.opencontainers.image.documentation="https://github.com/stracquadaniolab/pygna"
 LABEL org.opencontainers.image.source="https://github.com/stracquadaniolab/pygna"
-LABEL org.opencontainers.image.revision="3.3.1"
+LABEL org.opencontainers.image.revision="3.4.0"
 LABEL org.opencontainers.image.vendor="stracquadaniolab"
 LABEL org.opencontainers.image.authors="Viola Fanfani, Fabio Cassano, Giovanni Stracquadanio"
 
