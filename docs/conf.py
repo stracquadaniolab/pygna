@@ -28,9 +28,9 @@ copyright = 'Viola Fanfani & Fabio Cassano & Giovanni Stracquadanio'
 author = 'Viola Fanfani & Fabio Cassano & Giovanni Stracquadanio'
 
 # The short X.Y version
-version = '3.4.0'
+version = '3.3.1'
 # The full version, including alpha/beta/rc tags
-release = '3.4.0'
+release = '3.3.1'
 
 
 # -- General configuration ---------------------------------------------------
