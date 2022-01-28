@@ -1,5 +1,5 @@
 pandas
-numpy==1.15
+numpy==1.21.0
 scipy
 matplotlib
 pyyaml
